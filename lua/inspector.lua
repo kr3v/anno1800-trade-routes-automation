@@ -87,9 +87,7 @@ local function _inspect_object_yaml(obj, name, depth, marked)
                     name = tostring(k),
                     type = "function",
                 }
-                -- i.name:match("^__") or                            i.name:match("^Set") or                            i.name:match("^Add") or                            i.name:match("^Cheat") or                            i.name:match("^Toggle") or                            i.name:match("^Debug") or                            i.name:match("^Remove") then
-                --if not i.name:match("^Get") then
-                if true then
+                 if not (i.name:match("^Get") or i.name:match("^get")) then
                     i.callable = false
                     table.insert(functions, i)
                     goto continue
@@ -104,79 +102,24 @@ local function _inspect_object_yaml(obj, name, depth, marked)
                     table.insert(functions, i)
                     goto continue
                 end
-
                 i.error = tostring(err)
-
-                if i.error == "no matching overload found" then
-                    --local ret1, err1 = safe_call(target, k, 1010205)
-                    --if err1 == nil then
-                    --    i = {
-                    --        name = i.name .. "(1010205)",
-                    --        type = "function",
-                    --        returns = ret1
-                    --    }
-                    --end
-                end
 
                 table.insert(functions, i)
                 goto continue
             end
 
-            local actual_value, actual_value_str, metatable_value;
-            if tostring(k) == "GameObjectID" then
-                actual_value = "<omitted>";
-                actual_value_str = "<omitted>";
-                metatable_value = "<omitted>";
-                goto prop;
-            else
-                local successA, errA = pcall(function()
-                    actual_value = _obj[k];
-                end)
-                if not successA then
-                    actual_value = "<error: " .. tostring(errA) .. ">"
-                end
-
-                local successS, errS = pcall(function()
-                    actual_value_str = tostring_quote(actual_value);
-                end)
-                if not successS then
-                    actual_value_str = "<error: " .. tostring(errS) .. ">"
-                end
-
-                local successM, errM = pcall(function()
-                    if is_mt then
-                        metatable_value = tostring(v);
-                    else
-                        metatable_value = tostring(type(v));
-                    end
-                    if type(v) == "string" and v:match("^property<") then
-                        metatable_value = v
-
-                        successA2, errA2 = pcall(function()
-                            actual_value = _obj[v];
-                        end)
-                        if not successA2 then
-                            actual_value = "<error: " .. tostring(errA2) .. ">"
-                        end
-                    end
-                end)
-                if not successM then
-                    metatable_value = "<error: " .. tostring(errM) .. ">"
-                end
-            end
-
-            :: prop ::
+            local metatable_value = tostring(v);
             local prop = {
                 name = tostring(k),
                 metatable_value = metatable_value,
-                actual_value_str = actual_value_str,
+                actual_value_str = tostring_quote(_obj[k]),
                 is_property = metatable_value:match("^property<C") ~= nil
-                        or metatable_value == "table"
-                        or metatable_value:match("^property<rdui::C") ~= nil
+                        or metatable_value:match("^table")
+                        or metatable_value:match("^property<")
+                        or metatable_value:match("^userdata")
+                        or metatable_value:match("^property<rdui::C") ~= nil,
+                object = _obj[k],
             }
-            if prop.is_property then
-                prop.object = actual_value
-            end
             table.insert(properties, prop)
 
             :: continue ::
@@ -204,7 +147,7 @@ local function _inspect_object_yaml(obj, name, depth, marked)
                 else
                     log("    " .. prop.name .. ":")
                     log("      metatable_value: \"" .. _type .. "\"")
-                    log("      actual_value: " .. prop.actual_value_str)
+                    log("      actual_value_str: " .. prop.actual_value_str)
                     if prop.is_property then
                         log("      is_property: true")
                         if depth <= 12 then
@@ -241,16 +184,16 @@ local function _inspect_object_yaml(obj, name, depth, marked)
     end
 
 
-    -- If it's a table, show contents
-    if type(target) == "table" then
-        walk_table(target, target, false)
+    -- Check metatable (for userdata/tables with methods)
+    local mt = getmetatable(target)
+    if mt then
+        if type(mt) == "table" then
+            walk_table(obj, mt, true)
+        end
     else
-        -- Check metatable (for userdata/tables with methods)
-        local mt = getmetatable(target)
-        if mt then
-            if type(mt) == "table" then
-                walk_table(target, mt, true)
-            end
+        -- If it's a table, show contents
+        if type(target) == "table" then
+            walk_table(target, target, false)
         end
     end
 

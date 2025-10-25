@@ -35,4 +35,4 @@ local function executor_manager()
 end
 
 -- Start the executor manager in a separate thread
-system.start(executor_manager, "trade-automation-executor")
+system.start(executor_manager, "trade-automation-executor-2")
