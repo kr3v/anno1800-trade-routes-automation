@@ -1,13 +1,10 @@
-install/executor:
-	rm ./anno-1800/executor.lua
-	ln ./lua/executor.lua ./anno-1800/executor.lua
-
-install/sample:
+install:
 	cp ./sample1.lua ./anno-1800/trade-automation/execute.lua
+	cp -r lua/* ./anno-1800/
 
 clean/logs:
 	@rm ./anno-1800/modlog.txt || true
 
-run-sample: clean/logs install/sample
+run-sample: clean/logs install
 	sleep 1
 	cat ./anno-1800/modlog.txt

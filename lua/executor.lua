@@ -12,6 +12,7 @@ local function file_exists(path)
 end
 
 local function executor_manager()
+    print("executor_manager started")
     while true do
         if file_exists(stopme) then
             os.remove(stopme)
@@ -23,7 +24,7 @@ local function executor_manager()
             if not success then
                 print("success:", tostring(success))
                 if err then
-                    --print("ERROR executing script: " .. tostring(err))
+                    print("ERROR executing script: " .. tostring(err))
                 end
             end
             print("os.remove(execute)")
