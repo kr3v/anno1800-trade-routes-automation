@@ -21,7 +21,10 @@ local function executor_manager()
             print("dofile(execute) " .. execute)
             local success, err = pcall(dofile, execute)
             if not success then
-                print("ERROR executing script: " .. tostring(err))
+                print("success:", tostring(success))
+                if err then
+                    --print("ERROR executing script: " .. tostring(err))
+                end
             end
             print("os.remove(execute)")
             os.remove(execute)
