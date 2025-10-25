@@ -6,6 +6,7 @@ local inspect_object_yaml = require("lua/inspector");
 local logger = require("lua/logger");
 local serpLight = require("lua/serp/lighttools");
 local objectAccessor = require("lua/object_accessor");
+local session = require("lua/session");
 
 local function GetShipCargo_ith()
     return
@@ -53,7 +54,7 @@ print("------------------------------------------------")
 
 local success, err = pcall(function()
     inspect_object_yaml(session);
-    inspect_object_yaml(MoveShipTo(oid, 1000, 1000), "MoveShipTo");
+    inspect_object_yaml(MoveShipTo(oid, 1000, 1200), "MoveShipTo");
 end);
 print("PCALL success: " .. tostring(success));
 print("PCALL error: " .. tostring(err));
