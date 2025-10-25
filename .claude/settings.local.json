@@ -4,7 +4,8 @@
       "Read(//data/workspace/repos/personal/anno/modding-guide/Scripting/**)",
       "Read(//data/workspace/repos/personal/anno/Anno-1800-Mods/WorkInProgress-Mods/shared_LuaMedium/data/scripts_serp/**)",
       "Read(//data/workspace/repos/personal/anno/Anno-1800-Mods/Recommended-Mods/P RewardDestroyPirate (Serp)/shared_LuaLight/data/scripts_serp/**)",
-      "Bash(make run-sample:*)"
+      "Bash(make run-sample:*)",
+      "Read(//data/workspace/repos/personal/anno/modding-guide/**)"
     ],
     "deny": [],
     "ask": []

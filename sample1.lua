@@ -32,6 +32,10 @@ local function GetAllShipsNames()
     return ship_names;
 end
 
+local function MoveShipTo(oid, x, y)
+    return session.getObjectByID(oid):moveTo(x, y);
+end
+
 ------------------------------------------------
 
 
@@ -48,8 +52,8 @@ local oid = tonumber(obj_str:match("oid (%d+)"))
 print("------------------------------------------------")
 
 local success, err = pcall(function()
-    local val = GetAllShipsNames(oid);
-    inspect_object_yaml(val, "GetAllShipsNames");
+    inspect_object_yaml(session);
+    inspect_object_yaml(MoveShipTo(oid, 1000, 1000), "MoveShipTo");
 end);
 print("PCALL success: " .. tostring(success));
 print("PCALL error: " .. tostring(err));
