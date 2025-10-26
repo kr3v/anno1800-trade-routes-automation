@@ -963,7 +963,13 @@ local function t_FnViaTextEmbed(PID)
     end)
 end
 
-
+local function DoForSessionGameObjectRaw (cmd)
+    game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(ts_embed_string) .. " )]")
+    local ret = ts.Participants.GetParticipant(120).Profile.CompanyName
+    local old = ts.GetAssetData(100939).Text
+    ts.Participants.GetParticipant(120).Profile.SetCompanyName(old)
+    return ret
+end
 
 -- text embed helper for using MetaObjects.SessionGameObject, which is otherwise unavailable in lua...
 -- ts_embed_string should be eg: "[MetaObjects SessionGameObject("..tostring(OID)..") Area CityName]"
@@ -1713,6 +1719,7 @@ g_LTL_Serp = {
     -- Trickster Anno Helpers
     t_FnViaTextEmbed = t_FnViaTextEmbed,
     DoForSessionGameObject = DoForSessionGameObject,
+    DoForSessionGameObjectRaw = DoForSessionGameObjectRaw,
     GetFertilitiesOrLodesFromArea_CurrentSession = GetFertilitiesOrLodesFromArea_CurrentSession,
     GetVectorGuidsFromSessionObject = GetVectorGuidsFromSessionObject,
     GetCoopPeersAtMarker = GetCoopPeersAtMarker,

@@ -1,4 +1,4 @@
-local logger = require("lua/logger");
+local _logger = require("lua/logger");
 
 local function safe_call(base, func_key, ...)
     local func = base[func_key]
@@ -24,13 +24,13 @@ end
 
 -- NEVER do `inspect_object(ship.Logistic.__original)`
 -- ALWAYS do `inspect_object(ship.Logistic)`
-local function _inspect_object_yaml(obj, name, depth, marked)
+local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marked)
     if type(obj) == "table" then
         if marked[obj] then
             local indent = string.rep("  ", depth)
-            logger.log(indent .. name .. ":")
-            logger.log(indent .. "  type: " .. type(obj))
-            logger.log(indent .. "  note: <already inspected>")
+            L.log(indent .. name .. ":")
+            L.log(indent .. "  type: " .. type(obj))
+            L.log(indent .. "  note: <already inspected>")
             return
         end
         marked[obj] = true
@@ -38,7 +38,7 @@ local function _inspect_object_yaml(obj, name, depth, marked)
 
     local indent = string.rep("  ", depth)
     local log = function(t)
-        logger.log(indent .. t)
+        L.log(indent .. t)
     end
 
     name = name or "object"
@@ -66,28 +66,35 @@ local function _inspect_object_yaml(obj, name, depth, marked)
     end
     log(name .. ":")
     log("  type: " .. type(target))
-    if is_proxy then
-        log("  is_proxy: true")
-    end
+    --if is_proxy then
+    --    log("  is_proxy: true")
+    --end
 
     local walk_table = function(_obj, _table, is_mt)
-        if is_mt then
-            log("  walk_table_type: metatable")
-        else
-            log("  walk_table_type: table")
-        end
+        --if is_mt then
+        --    log("  walk_table_type: metatable")
+        --else
+        --    log("  walk_table_type: table")
+        --end
 
         -- Separate properties and functions
         local properties = {}
         local functions = {}
 
         for k, v in pairs(_table) do
+            if k == "__index" or k == "__original" or k == "__metatable" or k == "__name" or k == "classtable" then
+                goto continue
+            end
+            if k == "GameObjectID" then
+                goto continue
+            end
+
             if type(v) == "function" then
                 local i = {
                     name = tostring(k),
                     type = "function",
                 }
-                 if not (i.name:match("^Get") or i.name:match("^get")) then
+                if not allowGetFuncCall or not (i.name:match("^Get") or i.name:match("^get")) then
                     i.callable = false
                     table.insert(functions, i)
                     goto continue
@@ -114,6 +121,7 @@ local function _inspect_object_yaml(obj, name, depth, marked)
                 metatable_value = metatable_value,
                 actual_value_str = tostring_quote(_obj[k]),
                 is_property = metatable_value:match("^property<C") ~= nil
+                        or metatable_value:match("^C") ~= nil
                         or metatable_value:match("^table")
                         or metatable_value:match("^property<")
                         or metatable_value:match("^userdata")
@@ -135,7 +143,7 @@ local function _inspect_object_yaml(obj, name, depth, marked)
 
         -- Print properties first
         if #properties > 0 then
-            log("  metatable_properties:")
+            log("  properties:")
             for _, prop in ipairs(properties) do
                 local _type = prop.metatable_value;
                 if _type:match("property<bool") ~= nil then
@@ -144,19 +152,24 @@ local function _inspect_object_yaml(obj, name, depth, marked)
                     log("    " .. prop.name .. ": " .. prop.actual_value_str)
                 elseif _type:match("property<int") ~= nil then
                     log("    " .. prop.name .. ": " .. prop.actual_value_str)
+                elseif _type:match("property<float") ~= nil then
+                    log("    " .. prop.name .. ": " .. prop.actual_value_str)
+                elseif _type:match("property<rdsdk::CRDStringW>") ~= nil then
+                    log("    " .. prop.name .. ": " .. prop.actual_value_str)
                 else
                     log("    " .. prop.name .. ":")
-                    log("      metatable_value: \"" .. _type .. "\"")
-                    log("      actual_value_str: " .. prop.actual_value_str)
+                    log("      type: \"" .. _type .. "\"")
                     if prop.is_property then
-                        log("      is_property: true")
                         if depth <= 12 then
                             local success, err = pcall(function()
-                                _inspect_object_yaml(prop.object, "nested_property", depth + 3, marked)
+                                _inspect_object_yaml(L, prop.object, "fields", allowGetFuncCall, depth + 3, marked)
                             end)
                             if not success then
                                 log("      error_inspecting_property: \"" .. tostring(err) .. "\"")
                             end
+                        else
+                            log("      is_property: true")
+                            log("      actual_value_str: " .. prop.actual_value_str)
                         end
                     end
                 end
@@ -165,7 +178,7 @@ local function _inspect_object_yaml(obj, name, depth, marked)
 
         -- Then print functions
         if #functions > 0 then
-            log("  metatable_functions:")
+            log("  functions:")
             for _, func in ipairs(functions) do
                 if func.returns ~= nil then
                     log("    " .. func.name .. ": " .. tostring_quote(func.returns))
@@ -204,8 +217,15 @@ local function _inspect_object_yaml(obj, name, depth, marked)
     end
 end
 
-local function inspect_object_yaml(obj, name)
-    _inspect_object_yaml(obj, name, 0, {})
+local function inspectL(L, obj, name, allowGetFuncCall)
+    _inspect_object_yaml(L, obj, name, allowGetFuncCall, 0, {})
 end
 
-return inspect_object_yaml
+return {
+    Do = function(L, obj, title)
+        inspectL(L, obj, title or "object", false)
+    end,
+    DoF = function(L, obj, title)
+        inspectL(L, obj, title or "object", true)
+    end,
+}

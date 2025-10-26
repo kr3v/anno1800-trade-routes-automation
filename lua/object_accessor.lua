@@ -1,16 +1,17 @@
-local function GetObjectAccessor(id, path)
+local function getObjectAccessor(_gen, path)
     return setmetatable({}, {
         __index = function(_, key)
             if key == "__original" then
                 -- Return the original object
-                local o = ts.Objects.GetObject(id)
+                local o = _gen();
                 for _, part in ipairs(path) do
                     o = o[part]
                 end
                 return o
             end
 
-            local o = TextSources.TextSourceRoots.Objects.GetObject(id)
+            local o = _gen();
+            --local o = ts.Objects.GetObject(id)
 
             -- Traverse the path
             for _, part in ipairs(path) do
@@ -30,7 +31,7 @@ local function GetObjectAccessor(id, path)
                 end
                 table.insert(newPath, key)
 
-                return GetObjectAccessor(id, newPath)
+                return getObjectAccessor(_gen, newPath)
             end
 
             return ret
@@ -38,4 +39,35 @@ local function GetObjectAccessor(id, path)
     })
 end
 
-return GetObjectAccessor
+return {
+    GameObject = function(oid)
+        return getObjectAccessor(
+                function()
+                    return ts.GetGameObject(oid);
+                end,
+                {}
+        );
+    end,
+    Area = function()
+        return getObjectAccessor(
+                function()
+                    return ts.Area;
+                end,
+                {}
+        );
+    end,
+    AreaByID = function(areaID)
+        return getObjectAccessor(
+                function()
+                    return ts.Area.GetArea(areaID);
+                end,
+                {}
+        );
+    end,
+    Generic = function(getter)
+        return getObjectAccessor(
+                getter,
+                {}
+        );
+    end
+}

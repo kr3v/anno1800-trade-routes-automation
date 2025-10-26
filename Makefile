@@ -6,5 +6,5 @@ clean/logs:
 	@rm ./anno-1800/modlog.txt || true
 
 run-sample: clean/logs install
-	sleep 1
+	sleep 2
 	cat ./anno-1800/modlog.txt
