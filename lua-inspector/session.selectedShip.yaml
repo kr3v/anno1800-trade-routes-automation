@@ -1,0 +1,97 @@
+---
+object:
+  type: userdata
+  properties:
+    __type:
+      type: "table: 000000182C62B0B8"
+      fields:
+        type: table
+        properties:
+          name:
+            type: "rdgs::CScriptGameObject"
+        functions:
+          is:
+            skipped_debug_call: true
+        tostring: "table: 000000182C62B0B8"
+    class_cast:
+      type: "userdata: 0000000141649800"
+      fields:
+        type: userdata
+        tostring: "userdata: 0000000141649800"
+    class_check:
+      type: "userdata: 0000000141649870"
+      fields:
+        type: userdata
+        tostring: "userdata: 0000000141649870"
+  functions:
+    __eq:
+      skipped_debug_call: true
+    __gc:
+      skipped_debug_call: true
+    __newindex:
+      skipped_debug_call: true
+    __pairs:
+      skipped_debug_call: true
+    addDamagePercent:
+      skipped_debug_call: true
+    addHealPercent:
+      skipped_debug_call: true
+    addToSelection:
+      skipped_debug_call: true
+    addUpgrade:
+      skipped_debug_call: true
+    changeGUID:
+      skipped_debug_call: true
+    debugStop:
+      skipped_debug_call: true
+    destruct:
+      skipped_debug_call: true
+    enableAmbientArea:
+      skipped_debug_call: true
+    enterBombardementTargetMode:
+      skipped_debug_call: true
+    getName:
+      error: "caught (...) exception"
+    getOID:
+      error: "caught (...) exception"
+    getProperty:
+      error: "caught (...) exception"
+    getType:
+      error: "caught (...) exception"
+    hideGroundDecal:
+      skipped_debug_call: true
+    hidePropsAtBlocking:
+      skipped_debug_call: true
+    isMoving:
+      skipped_debug_call: true
+    kill:
+      skipped_debug_call: true
+    moveTo:
+      skipped_debug_call: true
+    moveToRadius:
+      skipped_debug_call: true
+    new:
+      skipped_debug_call: true
+    removePropsAtBlocking:
+      skipped_debug_call: true
+    removeUpgrade:
+      skipped_debug_call: true
+    select:
+      skipped_debug_call: true
+    setDebugInvincible:
+      skipped_debug_call: true
+    setDirection:
+      skipped_debug_call: true
+    setPosition:
+      skipped_debug_call: true
+    showGroundDecal:
+      skipped_debug_call: true
+    showPropsAtBlocking:
+      skipped_debug_call: true
+    startSequence:
+      skipped_debug_call: true
+    startTimedEffect:
+      skipped_debug_call: true
+    visible:
+      skipped_debug_call: true
+  tostring: "userdata: 0000001A0BFD8560"

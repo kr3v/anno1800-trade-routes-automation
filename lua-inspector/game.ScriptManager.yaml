@@ -1,0 +1,43 @@
+---
+object:
+  type: userdata
+  properties:
+    __type:
+      type: "table: 000000001A37C5B8"
+      fields:
+        type: table
+        properties:
+          name:
+            type: "rdgs::CScriptManager"
+        functions:
+          is:
+            skipped_debug_call: true
+        tostring: "table: 000000001A37C5B8"
+    class_cast:
+      type: "userdata: 000000014080C6B0"
+      fields:
+        type: userdata
+        tostring: "userdata: 000000014080C6B0"
+    class_check:
+      type: "userdata: 000000014080C720"
+      fields:
+        type: userdata
+        tostring: "userdata: 000000014080C720"
+  functions:
+    __eq:
+      skipped_debug_call: true
+    __newindex:
+      skipped_debug_call: true
+    __pairs:
+      skipped_debug_call: true
+    autoComplete:
+      skipped_debug_call: true
+    cheat:
+      skipped_debug_call: true
+    new:
+      skipped_debug_call: true
+    startScript:
+      skipped_debug_call: true
+    toggleVisibility:
+      skipped_debug_call: true
+  tostring: "sol.rdgs::CScriptManager*: 0000001ACF6FA4B0"

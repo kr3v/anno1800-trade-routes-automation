@@ -10,12 +10,50 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		log.Fatal("Usage: memory-inspector <PID>")
+		log.Fatal("Usage: memory-inspector <PID> [dump <address> <offset_before> <offset_after>]")
 	}
 
 	pid, err := strconv.Atoi(os.Args[1])
 	if err != nil {
 		log.Fatalf("Invalid PID: %v", err)
+	}
+
+	// Check if this is a memory dump command
+	if len(os.Args) >= 3 && os.Args[2] == "dump" {
+		if len(os.Args) != 6 {
+			log.Fatal("Usage: memory-inspector <PID> dump <address> <offset_before> <offset_after>")
+		}
+
+		// Parse address (supports hex with 0x prefix)
+		var address uint64
+		_, err := fmt.Sscanf(os.Args[3], "0x%x", &address)
+		if err != nil {
+			// Try parsing as decimal
+			address, err = strconv.ParseUint(os.Args[3], 10, 64)
+			if err != nil {
+				log.Fatalf("Invalid address: %v", err)
+			}
+		}
+
+		offsetBefore, err := strconv.Atoi(os.Args[4])
+		if err != nil {
+			log.Fatalf("Invalid offset_before: %v", err)
+		}
+
+		offsetAfter, err := strconv.Atoi(os.Args[5])
+		if err != nil {
+			log.Fatalf("Invalid offset_after: %v", err)
+		}
+
+		if offsetBefore < 0 || offsetAfter < 0 {
+			log.Fatal("Offsets must be non-negative")
+		}
+
+		// Call the print function
+		if err := PrintMemoryAtAddress(pid, uintptr(address), offsetBefore, offsetAfter); err != nil {
+			log.Fatalf("Failed to print memory: %v", err)
+		}
+		return
 	}
 
 	fmt.Printf("Parsing memory maps for PID %d...\n", pid)
@@ -36,17 +74,18 @@ func main() {
 	}
 
 	// Hardcoded search term - change this to whatever you're looking for
-	//searchTerm := `VeryFatShip`
-	//
-	//doMatch(pid, regions, searchTerm)
+	searchTerm := `ShowRouteUI`
+	fmt.Printf("\nSearching for pattern '%s' across all readable regions...\n", searchTerm)
+	doMatch(pid, regions, []byte(searchTerm))
 
+	//a := 8589935495
+	//pattern := make([]byte, 8)
+	//binary.LittleEndian.PutUint64(pattern, uint64(a))
+	//fmt.Printf("\nSearching for pattern '%v' across all readable regions...\n", pattern)
+	//doMatch(pid, regions, pattern)
 }
 
-func doMatch(pid int, regions []MemoryRegion, searchTerm string) {
-	pattern := []byte(searchTerm)
-
-	fmt.Printf("\nSearching for pattern '%s' across all readable regions...\n", searchTerm)
-
+func doMatch(pid int, regions []MemoryRegion, pattern []byte) {
 	// Perform parallelized search
 	matches := parallelSearch(pid, regions, pattern)
 

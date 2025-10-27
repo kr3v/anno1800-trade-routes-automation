@@ -21,8 +21,17 @@ local objectAccessor = require("lua/object_accessor");
 -- 4. How to move ship between sessions? How to get ships current session?
 
 -- Alternative approach 1 - how to manage trade routes?
--- Alternative approach 2 - figure out python capabilities.
 
+
+-- Alternative approach 2 - figure out python capabilities.
+--CScriptManagerTextSource*:
+--type: "CScriptManagerTextSource*MT: 0000000018277C08"
+--fields:
+--type: table
+--functions:
+--SetEnablePython:
+--skipped_debug_call: true
+--tostring: "CScriptManagerTextSource*MT: 0000000018277C08"
 
 local function GetAreaName(areaId)
     if areaId.AreaIndex ~= 1 then
@@ -75,64 +84,131 @@ local function MoveShipToV2(oid, x, y)
     objectAccessor.GameObject(oid).Walking.SetDebugGoto(1000, 1000);
 end
 
--- CSessionTransferManager <- figure out what it is
+local function LookAtObject()
+    -- ts.MetaObjects.CheatLookAtObject(35751307771905)
+end
+
+-- github.com/anno-mods/FileDBReader to extract positions for buildings
+-- use ore sources as 'static' points?
+
+local function IsVisible()
+    --session.getObjectByID(35751307771905).visible
+end
+
+local function MoveCameraTo(x, y)
+    ts.SessionCamera.ToWorldPos(x, y);
+end
+
+-- write a routine that would find all islands through camera move and then 'active area' to map coordinates to islands
+-- given: a map roughtly 1800x1800 units
+-- my camera saw about 120x60 at default settings at a time
+
+-- possible optimization: Minimap? pre-parse it or check if anything is extractable there.
+-- IsMinimapRotationEnabled
+
+--rdui::CMinimapFOVMarkerObject*:
+--type: "table: 000000001856E6C8"
+--fields:
+--type: table
+--properties:
+--Position:
+--type: "property<phoenix::Vector3>"
+--fields:
+--type: string
+--tostring: "property<phoenix::Vector3>"
+--RotationAngle:
+--type: "property<phoenix::Float32>"
+--fields:
+--type: string
+--tostring: "property<phoenix::Float32>"
+--Width:
+--type: "property<phoenix::Float32>"
+--fields:
+--type: string
+--tostring: "property<phoenix::Float32>"
+--tostring: "table: 000000001856E6C8"
+
+--
+-- ToggleDebugInfo
+-- GetWorldMap
+-- SessionCamera, SessionTransfer
+-- MetaObjects
 
 ------------------------------------------------
 
---
-local selections = session.selection;
-if #selections == 0 then
-    L.log("No objects selected in the session.")
-    return
+local function sessionProperties()
+    local l = L.logger("lua/property_counts.tsv");
+    for i, v in pairs(serpLight.PropertiesStringToID) do
+        local c = #session.getObjectGroupByProperty(v);
+        if c > 0 then
+            local is = tostring(i);
+            if #is < 25 then
+                is = is .. string.rep(" ", 25 - #is);
+            end
+            l.log(is .. "\t" .. tostring(v) .. "\t" .. tostring(c));
+        end
+    end
 end
-selection = selections[1];
-local obj_str = tostring(selection:getName());
-local oid = tonumber(obj_str:match("oid (%d+)"));
-L.log(oid)
+
+----
+
+--
+--local selections = session.selection;
+--if #selections == 0 then
+--    L.log("No objects selected in the session.")
+--    return
+--end
+--selection = selections[1];
+--local obj_str = tostring(selection:getName());
+--local oid = tonumber(obj_str:match("oid (%d+)"));
+--L.log(oid)
+
+
+local oid = 35751307771905;
 
 print("------------------------------------------------")
 
 local success, err = pcall(function()
-    --inspector.Do(L.logger("lua/G.yaml"), _G)
-    --inspector.Do(L.logger("lua/TradeRoute.yaml"), ts.TradeRoute)
-
-    --local LC = L.logger("lua/TradeRouteRouteCounts.yaml");
-    --local cache = {}
-    --for i=1,1000000 do
-    --    local r = tostring(ts.TradeRoute.GetRoute(i));
-    --    local c = cache[r] or 0;
-    --    cache[r] = c + 1;
-    --end
-    --local cToV =  {};
-    --for k,v in pairs(cache) do
-    --    table.insert(cToV, {v,k});
-    --end
-    --table.sort(cToV, function(a,b) return a[1] > b[1]; end);
-    --inspector.Do(LC, cToV);
-
-    --inspector.DoF(L.logger("lua/TradeRouteRoute.1.yaml"), objectAccessor.Generic(function()
-    --    return ts.TradeRoute;
+    --inspector.DoF(L.logger("lua/game.TextSourceManager.yaml"), objectAccessor.Generic(function()
+    --    return game.TextSourceManager;
     --end));
+    --inspector.Do(L, serpLight.DoForSessionGameObject('[TradeRoute UIEditRoute Station(2) Good(1010205) GoodData Text]', true, true));
 
-    inspector.Do(L.logger("lua/TradeRouteRoute.2.yaml"), objectAccessor.Generic(function()
-        -- this works
-        --return serpLight.DoForSessionGameObject('[TradeRoute UIEditRoute GetStation(1)]', true, true);
-
-        local ret = {};
-        for i = 1, 10000 do
-            local q = serpLight.DoForSessionGameObjectRaw('[TradeRoute Route(' .. tostring(i) .. ') ActiveErrorCount]', true, true);
-            if q ~= nil and q ~= "nil" then
-                table.insert(ret, { i, q });
-            end
-        end
-        return ret;
-    end));
-
+    --local l = L.logger("lua/TradeRouteRoute.2.yaml");
+    --for i = 8589935495-5000, 8589943659+5000 do
+    --    local oa = objectAccessor.Generic(function()
+    --        return ts.TradeRoute.GetRoute(i);
+    --    end)
+    --    local q = oa.NoShipsActive;
+    --    if q or q == "true" then
+    --        l.log("TradeRoute Route " .. tostring(i) .. ": NoShipsActive=" .. tostring(q));
+    --        for j = 8589935495-20000,8589943659 do
+    --            local oa2 = objectAccessor.Generic(function()
+    --                return oa.GetStation(j).GetGood(1010205);
+    --            end);
+    --            local guid = oa2.Guid;
+    --            local amount = oa2.Amount;
+    --            if guid and guid > 0 or amount and amount > 0 then
+    --                l.log("  Station " .. tostring(j) .. ": Good(1010205) Guid=" .. tostring(guid) .. " Amount=" .. tostring(amount));
+    --            end
+    --        end
+    --    end
+    --end
     -- [TradeRoute UIEditRoute TradeRouteID]
 
-    --inspector.Do(L.logger("lua/CTradeRouteManagerTextSource.yaml"), objectAccessor.Generic(function()
-    --    return _G["CTradeRouteManagerTextSource*"];
-    --end))
+    --local l = L.logger("lua/session.selectedLoadingStation.properties.tsv");
+    --for i, v in pairs(serpLight.PropertiesStringToID) do
+    --    pcall(function()
+    --        local t = session.getObjectByID(oid):getProperty(v);
+    --        l.log("Property " .. tostring(i) .. " (" .. tostring(v) .. ")" .. ": " .. t);
+    --    end);
+    --end
+
+    --inspector.DoF(L.logger("lua/ts.GetGameObject(ship-oid).yaml"), ts);
+
+    inspector.Do(L.logger("lua/ts.yaml"), objectAccessor.Generic(function()
+        return ts;
+    end))
 
     --inspector.DoF(L, objectAccessor.Generic(function()
     --    return _G["CTradeRouteManagerTextSource*"].UIEditRoute.GetStation(0).GetGood(0).Amount;
@@ -147,9 +223,6 @@ local success, err = pcall(function()
     --    return _G["CTradeRouteManagerTextSource*"].UIEditRoute.GetStation(1).GetGood(0).Amount;
     --end));
     --inspector.DoF(L, objectAccessor.Generic(function()
-    --    return _G["CTradeRouteManagerTextSource*"].UIEditRoute.GetStation(1).GetGood(1).Amount;
-    --end));
-    --inspector.DoF(L, objectAccessor.Generic(function()
     --    return _G["CTradeRouteManagerTextSource*"].UIEditRoute.GetStation(1).GetGood(1010218).Amount;
     --end));
     --inspector.DoF(L, objectAccessor.Generic(function()
@@ -162,21 +235,11 @@ local success, err = pcall(function()
     --    return _G["CTradeRouteManagerTextSource*"].UIEditRoute.GetStation(2).GetGood(1010218).Amount;
     --end));
 
-    --for i,v in pairs(serpLight.PropertiesStringToID) do
-    --    local c = #session.getObjectGroupByProperty(v);
-    --    if c > 0 then
-    --        local is = tostring(i);
-    --        if #is < 25 then
-    --            is = is .. string.rep(" ", 25 - #is);
-    --        end
-    --        L.log(is .. "\t" .. tostring(v) .. "\t" .. tostring(c));
-    --    end
-    --end
 
     --inspector.Do(L, session.getObjectGroupByProperty(321)[1]:getName());
     --inspector.Do(L, objectAccessor.GameObject(8589937574, {}));
 
-    --inspector.Do(L, session.getObjectByID(35751307771905));
+    --inspector.Do(L, session.getObjectByID(35751307771905).visible);
     --inspector.Do(L, session.getObjectGroupByProperty(289)[1]:getName());
 
     --inspector.Do(L, session.getObjectByID(17179874208));
@@ -184,12 +247,18 @@ local success, err = pcall(function()
     --inspector.Do(L, GetShipTradeRoute(oid));
 
 
-    local o = objectAccessor.GameObject(oid);
-    L.log(tostring(o.__original));
-    L.log(tostring(o.Nameable.__original));
-    L.log(tostring(o.Nameable.__original.GetName));
-    L.log(tostring(o.Nameable.__original.SetName));
-    inspector.Do(L, o.Nameable);
+    --local o = objectAccessor.GameObject(oid);
+    --L.log(tostring(o.__original));
+    --L.log(tostring(o.Nameable.__original));
+    --L.log(tostring(o.Nameable.__original.GetName));
+    --L.log(tostring(o.Nameable.__original.SetName));
+    --inspector.Do(L, o.Nameable);
+    --o = objectAccessor.Objects(oid);
+    --L.log(tostring(o.__original));
+    --L.log(tostring(o.Nameable.__original));
+    --L.log(tostring(o.Nameable.__original.GetName));
+    --L.log(tostring(o.Nameable.__original.SetName));
+    --inspector.Do(L, o.Nameable);
 
     --inspector.Do(L, o);
 

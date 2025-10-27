@@ -25,16 +25,16 @@ end
 -- NEVER do `inspect_object(ship.Logistic.__original)`
 -- ALWAYS do `inspect_object(ship.Logistic)`
 local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marked)
-    if type(obj) == "table" then
-        if marked[obj] then
-            local indent = string.rep("  ", depth)
-            L.log(indent .. name .. ":")
-            L.log(indent .. "  type: " .. type(obj))
-            L.log(indent .. "  note: <already inspected>")
-            return
-        end
-        marked[obj] = true
-    end
+    --if type(obj) == "table" then
+    --    if marked[obj] then
+    --        local indent = string.rep("  ", depth)
+    --        L.log(indent .. name .. ":")
+    --        L.log(indent .. "  type: " .. type(obj))
+    --        L.log(indent .. "  note: <already inspected>")
+    --        return
+    --    end
+    --    marked[obj] = true
+    --end
 
     local indent = string.rep("  ", depth)
     local log = function(t)

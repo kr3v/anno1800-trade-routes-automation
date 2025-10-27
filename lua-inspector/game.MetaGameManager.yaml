@@ -1,0 +1,189 @@
+---
+object:
+  type: userdata
+  properties:
+    __type:
+      type: "table: 0000000024877D08"
+      fields:
+        type: table
+        properties:
+          name:
+            type: "rdgs::CMetaGameManager"
+        functions:
+          is:
+            skipped_debug_call: true
+        tostring: "table: 0000000024877D08"
+    class_cast:
+      type: "userdata: 0000000140497490"
+      fields:
+        type: userdata
+        tostring: "userdata: 0000000140497490"
+    class_check:
+      type: "userdata: 0000000140497500"
+      fields:
+        type: userdata
+        tostring: "userdata: 0000000140497500"
+  functions:
+    __eq:
+      skipped_debug_call: true
+    __newindex:
+      skipped_debug_call: true
+    __pairs:
+      skipped_debug_call: true
+    aiDebugRenderContext:
+      skipped_debug_call: true
+    buildShipInBuilding:
+      skipped_debug_call: true
+    cameraFOV:
+      skipped_debug_call: true
+    cameraFarClip:
+      skipped_debug_call: true
+    createTestStreetGridTiles:
+      skipped_debug_call: true
+    daytime:
+      skipped_debug_call: true
+    destroySelectionNextGametick:
+      skipped_debug_call: true
+    drawDebugLayer:
+      skipped_debug_call: true
+    drawPathplannerLayer:
+      skipped_debug_call: true
+    enableAllConstructionAreas:
+      skipped_debug_call: true
+    executeBuildModeEvent:
+      skipped_debug_call: true
+    executeBuildRailwayEvent:
+      skipped_debug_call: true
+    executeBuildStreetEvent:
+      skipped_debug_call: true
+    executeTargetManagerEvent:
+      skipped_debug_call: true
+    executeTargetManagerEventMouse:
+      skipped_debug_call: true
+    executeTargetManagerGamepadEvent:
+      skipped_debug_call: true
+    executeWorldMapEvent:
+      skipped_debug_call: true
+    feedbackForceFieldRadiusHard:
+      skipped_debug_call: true
+    feedbackForceFieldRadiusSoft:
+      skipped_debug_call: true
+    feedbackForceFieldSpeed:
+      skipped_debug_call: true
+    feedbackSetDebugMode:
+      skipped_debug_call: true
+    feedbackSetDebugRenderMode:
+      skipped_debug_call: true
+    feedbackToggleDebugFlag:
+      skipped_debug_call: true
+    forceSequenceCamera:
+      skipped_debug_call: true
+    forceWeather:
+      skipped_debug_call: true
+    getNearestLabelAtCameraPos:
+      idk: true
+    getObject:
+      idk: true
+    getObjectByID: "userdata: 0000001ADFB14C20"
+    getObjectByLabel: "userdata: 0000001ADFB14C90"
+    getObjectGroupByName: "table: 0000001AE1BF3748"
+    getObjectGroupByObject:
+      error: "caught (...) exception"
+    getObjectGroupByProperty: "table: 0000001AE1BF3BF8"
+    getSelectedFactory: "userdata: 0000001ADFB14B40"
+    getSessionGUID: 180023
+    hasNeverBeenEntered:
+      skipped_debug_call: true
+    hideDebugLayers:
+      skipped_debug_call: true
+    hideStreets:
+      skipped_debug_call: true
+    hideTestRandomArea:
+      skipped_debug_call: true
+    increaseDangerLayer:
+      skipped_debug_call: true
+    isNewSession:
+      skipped_debug_call: true
+    jumpToSelection:
+      skipped_debug_call: true
+    killGameObject:
+      skipped_debug_call: true
+    listenerPositionInterpolationValue:
+      skipped_debug_call: true
+    morale:
+      skipped_debug_call: true
+    new:
+      skipped_debug_call: true
+    openInfoTip:
+      skipped_debug_call: true
+    openSelectedObject:
+      skipped_debug_call: true
+    openSelectedObjectInT9:
+      skipped_debug_call: true
+    openSelectedObjectInToolOne:
+      skipped_debug_call: true
+    preloadObject:
+      skipped_debug_call: true
+    recordCameraSequence:
+      skipped_debug_call: true
+    selectNextObject:
+      skipped_debug_call: true
+    selectNextObjectInWorld:
+      skipped_debug_call: true
+    selection:
+      skipped_debug_call: true
+    setCameraToObjectPosAndRot:
+      skipped_debug_call: true
+    setCameraToPreset:
+      skipped_debug_call: true
+    setDefaultRotation:
+      skipped_debug_call: true
+    setStance:
+      skipped_debug_call: true
+    showAllCollectables:
+      skipped_debug_call: true
+    showStreet:
+      skipped_debug_call: true
+    showStreets:
+      skipped_debug_call: true
+    showTestRandomArea:
+      skipped_debug_call: true
+    spawnDebugGameObject:
+      skipped_debug_call: true
+    spawnDebugGameObjects:
+      skipped_debug_call: true
+    squadAddDestroyTask:
+      skipped_debug_call: true
+    squadAddRouteTask:
+      skipped_debug_call: true
+    startCameraShake:
+      skipped_debug_call: true
+    startFeedbackSequence:
+      skipped_debug_call: true
+    startFleetBombardementTargetMode:
+      skipped_debug_call: true
+    startIslandSequence:
+      skipped_debug_call: true
+    startNegotiationMenu:
+      skipped_debug_call: true
+    startSequence:
+      skipped_debug_call: true
+    startSequenceByAsset:
+      skipped_debug_call: true
+    stopSequence:
+      skipped_debug_call: true
+    switchCameraControl:
+      skipped_debug_call: true
+    toggleAIDebug:
+      skipped_debug_call: true
+    toggleCamSettings:
+      skipped_debug_call: true
+    toggleDrawDistanceToIslandLayer:
+      skipped_debug_call: true
+    togglePostcardView:
+      skipped_debug_call: true
+    toggleResidentView:
+      skipped_debug_call: true
+    unloadSession:
+      skipped_debug_call: true
+  tostring: "userdata: 0000001AE05359E0"

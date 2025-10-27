@@ -1,0 +1,68 @@
+---
+object:
+  type: table
+  properties:
+    UIEditRoute:
+      type: "property<CSessionTradeRoute>"
+      fields:
+        type: table
+        properties:
+          ActiveErrorCount: 0
+          AllShipsPausedActive: false
+          NoGoodsActive: false
+          NoShipsActive: false
+          NotEnoughStationsActive: false
+        functions:
+          GetActiveErrorCount:
+            skipped_debug_call: true
+          GetAllShipsPausedActive:
+            skipped_debug_call: true
+          GetConfiguredGoodNotTradedActive:
+            skipped_debug_call: true
+          GetGoodsDontMatchActive:
+            skipped_debug_call: true
+          GetIsErrorActive:
+            skipped_debug_call: true
+          GetIslandUnderSiegeActive:
+            skipped_debug_call: true
+          GetLoadedGoodNeverUnloadedActive:
+            skipped_debug_call: true
+          GetLongWaitingTimeActive:
+            skipped_debug_call: true
+          GetLostShipName:
+            skipped_debug_call: true
+          GetMismatchingGoodActive:
+            skipped_debug_call: true
+          GetMismatchingGoodActiveForGood:
+            skipped_debug_call: true
+          GetNoGoodsActive:
+            skipped_debug_call: true
+          GetNoShipsActive:
+            skipped_debug_call: true
+          GetNoTradeRightsActive:
+            skipped_debug_call: true
+          GetNoValidPierActive:
+            skipped_debug_call: true
+          GetNotEnoughSlotsErrorActive:
+            skipped_debug_call: true
+          GetNotEnoughSlotsForShipsErrorActive:
+            skipped_debug_call: true
+          GetNotEnoughStationsActive:
+            skipped_debug_call: true
+          GetStation:
+            skipped_debug_call: true
+          GetStorageEmptyActive:
+            skipped_debug_call: true
+          GetStorageFullActive:
+            skipped_debug_call: true
+          GetUnloadedGoodNeverLoadedActive:
+            skipped_debug_call: true
+        tostring: "CSessionTradeRouteTextSource*MT: 000000001827ADB8"
+  functions:
+    GetRoute:
+      skipped_debug_call: true
+    GetUIEditRoute:
+      skipped_debug_call: true
+    SetShowRouteUI:
+      skipped_debug_call: true
+  tostring: "CTradeRouteManagerTextSource*MT: 000000001822D648"

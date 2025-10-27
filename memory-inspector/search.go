@@ -96,7 +96,7 @@ func searchPatternInRegion(
 func searchRegion(pid int, region MemoryRegion, pattern []byte) ([]SearchMatch, error) {
 	var matches []SearchMatch
 
-	err := searchPatternInRegion(pid, region, pattern, 256, 256,
+	err := searchPatternInRegion(pid, region, pattern, 1024, 1024,
 		func(matchAddr uintptr, context []byte, patternOffsetInContext int) {
 			matches = append(matches, SearchMatch{
 				Address:       matchAddr,

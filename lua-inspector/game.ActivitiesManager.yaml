@@ -1,0 +1,37 @@
+---
+object:
+  type: userdata
+  properties:
+    __type:
+      type: "table: 000000001A359078"
+      fields:
+        type: table
+        properties:
+          name:
+            type: "rdgs::CActivitiesManager"
+        functions:
+          is:
+            skipped_debug_call: true
+        tostring: "table: 000000001A359078"
+    class_cast:
+      type: "userdata: 000000014049B660"
+      fields:
+        type: userdata
+        tostring: "userdata: 000000014049B660"
+    class_check:
+      type: "userdata: 000000014049B6D0"
+      fields:
+        type: userdata
+        tostring: "userdata: 000000014049B6D0"
+  functions:
+    __eq:
+      skipped_debug_call: true
+    __newindex:
+      skipped_debug_call: true
+    __pairs:
+      skipped_debug_call: true
+    launchActivity:
+      skipped_debug_call: true
+    new:
+      skipped_debug_call: true
+  tostring: "sol.rdgs::CActivitiesManager*: 0000001AD466BF90"

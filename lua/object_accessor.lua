@@ -11,7 +11,6 @@ local function getObjectAccessor(_gen, path)
             end
 
             local o = _gen();
-            --local o = ts.Objects.GetObject(id)
 
             -- Traverse the path
             for _, part in ipairs(path) do
@@ -44,6 +43,14 @@ return {
         return getObjectAccessor(
                 function()
                     return ts.GetGameObject(oid);
+                end,
+                {}
+        );
+    end,
+    Objects = function(oid)
+        return getObjectAccessor(
+                function()
+                    return ts.Objects.GetObject(oid);
                 end,
                 {}
         );

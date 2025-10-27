@@ -1,0 +1,91 @@
+---
+object:
+  type: userdata
+  properties:
+    __type:
+      type: "table: 00000000F70E7CF8"
+      fields:
+        type: table
+        properties:
+          name:
+            type: "rdgs::CGUIManager"
+        functions:
+          is:
+            skipped_debug_call: true
+        tostring: "table: 00000000F70E7CF8"
+    class_cast:
+      type: "userdata: 0000000140497F80"
+      fields:
+        type: userdata
+        tostring: "userdata: 0000000140497F80"
+    class_check:
+      type: "userdata: 0000000140497FF0"
+      fields:
+        type: userdata
+        tostring: "userdata: 0000000140497FF0"
+  functions:
+    Scenes:
+      skipped_debug_call: true
+    __eq:
+      skipped_debug_call: true
+    __newindex:
+      skipped_debug_call: true
+    __pairs:
+      skipped_debug_call: true
+    animationspeed:
+      skipped_debug_call: true
+    changeDistanceFieldResolution:
+      skipped_debug_call: true
+    copyBuildStringToClipboard:
+      skipped_debug_call: true
+    distancefieldgradient:
+      skipped_debug_call: true
+    distancefieldinnergradient:
+      skipped_debug_call: true
+    distancefieldinnersize:
+      skipped_debug_call: true
+    distancefieldoutergradient:
+      skipped_debug_call: true
+    distancefieldoutersize:
+      skipped_debug_call: true
+    distancefieldthickness:
+      skipped_debug_call: true
+    dumpFontManagerBitmap:
+      skipped_debug_call: true
+    forceLazyLoading:
+      skipped_debug_call: true
+    isUIStartUpPastSceneCreation:
+      skipped_debug_call: true
+    new:
+      skipped_debug_call: true
+    playAudioText:
+      skipped_debug_call: true
+    playCharacterAudioMessage:
+      skipped_debug_call: true
+    setAudioLanguage:
+      skipped_debug_call: true
+    setLanguage:
+      skipped_debug_call: true
+    setTextDisplayMode:
+      skipped_debug_call: true
+    showAnimationsFromActiveScenes:
+      skipped_debug_call: true
+    showCharacterNotification:
+      skipped_debug_call: true
+    showChatWindowScene:
+      skipped_debug_call: true
+    showDebugOnScreenText:
+      skipped_debug_call: true
+    showNotification:
+      skipped_debug_call: true
+    showOnlyRunningAnimations:
+      skipped_debug_call: true
+    showSurvey:
+      skipped_debug_call: true
+    toggleDistanceFieldManager:
+      skipped_debug_call: true
+    toggleFeedback:
+      skipped_debug_call: true
+    toggleMinimap:
+      skipped_debug_call: true
+  tostring: "sol.rdgs::CGUIManager*: 0000001A13D56370"

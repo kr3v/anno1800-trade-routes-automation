@@ -1,0 +1,187 @@
+---
+object:
+  type: userdata
+  properties:
+    __type:
+      type: "table: 0000000018435B58"
+      fields:
+        type: table
+        properties:
+          name:
+            type: "rdgs::CGameManager"
+        functions:
+          is:
+            skipped_debug_call: true
+        tostring: "table: 0000000018435B58"
+    class_cast:
+      type: "userdata: 0000000140499690"
+      fields:
+        type: userdata
+        tostring: "userdata: 0000000140499690"
+    class_check:
+      type: "userdata: 0000000140499700"
+      fields:
+        type: userdata
+        tostring: "userdata: 0000000140499700"
+  functions:
+    ActivitiesManager:
+      skipped_debug_call: true
+    ConditionManager:
+      skipped_debug_call: true
+    DebugRenderManager:
+      skipped_debug_call: true
+    GUIManager:
+      skipped_debug_call: true
+    GameEventManager:
+      skipped_debug_call: true
+    MetaGameManager:
+      skipped_debug_call: true
+    ModManager:
+      skipped_debug_call: true
+    OnlineManager:
+      skipped_debug_call: true
+    ScriptManager:
+      skipped_debug_call: true
+    TextSourceManager:
+      skipped_debug_call: true
+    __eq:
+      skipped_debug_call: true
+    __newindex:
+      skipped_debug_call: true
+    __pairs:
+      skipped_debug_call: true
+    changeRotation:
+      skipped_debug_call: true
+    changeVariation:
+      skipped_debug_call: true
+    crash:
+      skipped_debug_call: true
+    createLerpFX:
+      skipped_debug_call: true
+    debugBreak:
+      skipped_debug_call: true
+    destructObjectGroup:
+      skipped_debug_call: true
+    environmentSetRainDensity:
+      skipped_debug_call: true
+    environmentSetSnowDensity:
+      skipped_debug_call: true
+    environmentSetWindDir:
+      skipped_debug_call: true
+    fastQuit:
+      skipped_debug_call: true
+    finishTransition:
+      skipped_debug_call: true
+    gainAchievement:
+      skipped_debug_call: true
+    gainRandomAchievement:
+      skipped_debug_call: true
+    getCorporationTime: 340866800
+    getSessionTime: 0
+    increaseTimeOfDay:
+      skipped_debug_call: true
+    initCorporationTime:
+      skipped_debug_call: true
+    initRandomSeed:
+      skipped_debug_call: true
+    isSessionLoadingDone:
+      skipped_debug_call: true
+    loadSavegame:
+      skipped_debug_call: true
+    new:
+      skipped_debug_call: true
+    openDebugInfoPage:
+      skipped_debug_call: true
+    playCameraSequenceSound:
+      skipped_debug_call: true
+    playSound:
+      skipped_debug_call: true
+    printCallstack:
+      skipped_debug_call: true
+    publishLoadedSession:
+      skipped_debug_call: true
+    reloadAssetInfos:
+      skipped_debug_call: true
+    reloadData:
+      skipped_debug_call: true
+    restoreCameraView:
+      skipped_debug_call: true
+    rotateCameraAroundLookAt:
+      skipped_debug_call: true
+    rotateCameraAroundLookAtWithDuration:
+      skipped_debug_call: true
+    rotateCameraAroundObject:
+      skipped_debug_call: true
+    rotateCameraAroundObjectGUIDWithDuration:
+      skipped_debug_call: true
+    rotateCameraAroundObjectWithDuration:
+      skipped_debug_call: true
+    setBenchTag:
+      skipped_debug_call: true
+    setCameraPos:
+      skipped_debug_call: true
+    setMasterVolume:
+      skipped_debug_call: true
+    setMusicVolume:
+      skipped_debug_call: true
+    setNewSampling:
+      skipped_debug_call: true
+    setPostEffectEnabled:
+      skipped_debug_call: true
+    setSFXVolume:
+      skipped_debug_call: true
+    simulateWindowClose:
+      skipped_debug_call: true
+    startBuild:
+      skipped_debug_call: true
+    startBuildCheat:
+      skipped_debug_call: true
+    startBuildModule:
+      skipped_debug_call: true
+    startBuildMove:
+      skipped_debug_call: true
+    startLoopSequence:
+      skipped_debug_call: true
+    startMouseMode:
+      skipped_debug_call: true
+    startProfileStream:
+      skipped_debug_call: true
+    startSessionLoadBlocking:
+      skipped_debug_call: true
+    stopAllFx:
+      skipped_debug_call: true
+    stopProfileStream:
+      skipped_debug_call: true
+    stopSound:
+      skipped_debug_call: true
+    storeCameraView:
+      skipped_debug_call: true
+    takeScreenshot:
+      skipped_debug_call: true
+    testTimeQueue:
+      skipped_debug_call: true
+    toggleBlueprintMode:
+      skipped_debug_call: true
+    toggleFrameCaptureMode:
+      skipped_debug_call: true
+    toggleLensFlarePostEffect:
+      skipped_debug_call: true
+    toggleLightBoundToCamera:
+      skipped_debug_call: true
+    togglePortraitEditor:
+      skipped_debug_call: true
+    toggleTelemetry:
+      skipped_debug_call: true
+    toggleTextSourceResolving:
+      skipped_debug_call: true
+    toggleTickDayTime:
+      skipped_debug_call: true
+    toggleVideoPortraitEditor:
+      skipped_debug_call: true
+    unblockGameTiming:
+      skipped_debug_call: true
+    useDebugGameSetup:
+      skipped_debug_call: true
+    writeMemorySnapshot:
+      skipped_debug_call: true
+  tostring: "sol.rdgs::CGameManager*: 0000000018433680"
