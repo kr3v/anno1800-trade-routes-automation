@@ -66,7 +66,7 @@ return {
     AreaByID = function(areaID)
         return getObjectAccessor(
                 function()
-                    return ts.Area.GetArea(areaID);
+                    return ts.Area.GetAreaFromID(areaID);
                 end,
                 {}
         );

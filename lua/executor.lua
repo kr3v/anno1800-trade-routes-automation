@@ -11,25 +11,43 @@ local function file_exists(path)
     return false
 end
 
+local function log(msg)
+    print("[executor] " .. msg)
+end
+
+local function em_do(file)
+    os.rename(file, file .. ".running")
+    file = file .. ".running"
+
+    log("dofile(..) " .. file)
+    local success, err = pcall(dofile, file)
+    if not success then
+        log("success:", tostring(success))
+        if err then
+            log("ERROR executing script: " .. tostring(err))
+        end
+    end
+    log("dofile(..) " .. file .. " complete!")
+
+    log("os.remove(execute)")
+    os.remove(file)
+end
+
 local function executor_manager()
-    print("executor_manager started")
+    log("executor_manager started")
+
     while true do
         if file_exists(stopme) then
             os.remove(stopme)
             return
         end
+
         if file_exists(execute) then
-            print("dofile(execute) " .. execute)
-            local success, err = pcall(dofile, execute)
-            if not success then
-                print("success:", tostring(success))
-                if err then
-                    print("ERROR executing script: " .. tostring(err))
-                end
-            end
-            print("os.remove(execute)")
-            os.remove(execute)
+            system.start(function()
+                em_do(execute)
+            end)
         end
+
         coroutine.yield()
     end
 end

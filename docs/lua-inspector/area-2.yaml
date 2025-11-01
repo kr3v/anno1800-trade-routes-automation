@@ -1,0 +1,1465 @@
+Area:
+  type: "property<CAreaLoader>"
+  fields:
+    type: table
+    properties:
+      AreaFromContext:
+        type: "property<CConstructionArea>"
+        fields:
+          type: table
+          properties:
+            AmountOfShares: 0
+            BuyShareCooldownRemaining: 0
+            BuyShareCooldownTime: 0
+            CityName: ""
+            Economy:
+              type: "property<CAreaEconomy>"
+              fields:
+                type: table
+                properties:
+                  Attractivity: 0
+                  CityStatus: 0
+                  CityStatusMissingAttractivity: 0
+                  CultureStatusFluff: ""
+                  NextCityStatusAttractivity: 0
+                  PopulationCount: 0
+                  Research: 0
+                functions:
+                  AddAmount:
+                    callable: false
+                  ClearIslandStorage:
+                    callable: false
+                  GetAttractivity:
+                    callable: false
+                  GetAttractivityType:
+                    callable: false
+                  GetAvailableAmount:
+                    callable: false
+                  GetAvailableTransporterCount:
+                    callable: false
+                  GetCityStatus:
+                    callable: false
+                  GetCityStatusMissingAttractivity:
+                    callable: false
+                  GetCultureStatusFluff:
+                    callable: false
+                  GetCurrentTransporterCount:
+                    callable: false
+                  GetDelta:
+                    callable: false
+                  GetDeltaSaturation:
+                    callable: false
+                  GetDeltaSaturationUncapped:
+                    callable: false
+                  GetEconomyModifier:
+                    callable: false
+                  GetFreeSpace:
+                    callable: false
+                  GetIsDistributionPaused:
+                    callable: false
+                  GetMaxTransporterCount:
+                    callable: false
+                  GetNeedLocked:
+                    callable: false
+                  GetNeedUnlockPopulation:
+                    callable: false
+                  GetNextCityStatusAttractivity:
+                    callable: false
+                  GetPopulationCount:
+                    callable: false
+                  GetRegisteredDeltaConsumption:
+                    callable: false
+                  GetRegisteredDeltaProduction:
+                    callable: false
+                  GetResearch:
+                    callable: false
+                  GetReservedStorageAmount:
+                    callable: false
+                  GetSatisfaction:
+                    callable: false
+                  GetStorageAmount:
+                    callable: false
+                  GetStorageCapacity:
+                    callable: false
+                  GetStorageTrend:
+                    callable: false
+                  SetCheatAddDelta:
+                    callable: false
+                  SetCheatChangeWorkforceNet:
+                    callable: false
+                  SetCheatItem:
+                    callable: false
+                  SetEconomyModifier:
+                    callable: false
+                  SetSelectStorageGoodDebug:
+                    callable: false
+                tostring: "CAreaEconomyTextSource*MT: 00000000393DA668"
+            Happiness:
+              type: "property<CAreaHappinessManager>"
+              fields:
+                type: table
+                properties:
+                  AttractivenessHappiness: 0.0
+                  AverageHappiness: 0.0
+                  CurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness: 0
+                  GlobalNewspaperHappiness: 0.0
+                  PollutionHappiness: 0.0
+                  WarfareHappiness: 0.0
+                  WarfareHappinessThreshold: 0.0
+                functions:
+                  GetAttractivenessHappiness:
+                    callable: false
+                  GetAverageHappiness:
+                    callable: false
+                  GetAverageHappinessByPopulation:
+                    callable: false
+                  GetCurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness:
+                    callable: false
+                  GetGlobalNewspaperHappiness:
+                    callable: false
+                  GetHappinessImpact:
+                    callable: false
+                  GetPollutionHappiness:
+                    callable: false
+                  GetPopulationNewspaperHappiness:
+                    callable: false
+                  GetStressedWorkforce:
+                    callable: false
+                  GetTotalNewspaperHappiness:
+                    callable: false
+                  GetWarfareHappiness:
+                    callable: false
+                  GetWarfareHappinessThreshold:
+                    callable: false
+                  GetWorkingConditionsHappiness:
+                    callable: false
+                tostring: "CAreaHappinessManagerTextSource*MT: 00000000393DFE68"
+            HasTradeRights: false
+            ID:
+              type: "property<AreaID>"
+              fields:
+                type: table
+                properties:
+                  AreaIndex:
+                    type: "6"
+                  IslandID:
+                    type: "101"
+                  SessionID:
+                    type: "16"
+                tostring: "table: 0000001A1B2E2668"
+            IncomePerShare: 0
+            IsArcticIllnesUnlocked: false
+            IsBuyShareBlocked: false
+            IsExplosionUnlocked: false
+            IsFireUnlocked: false
+            IsIllnessUnlocked: false
+            IsNextWarBlocked:
+              type: "property<rdtime>"
+              fields:
+                type: number
+                tostring: "0"
+            IsOwnedByAnyone: false
+            IsOwnedByCurrentParticipant: false
+            IsRiotUnlocked: false
+            IsTakeoverBlocked: false
+            IslandWarActive: false
+            KontorID:
+              type: "property<GameObjectID>"
+              fields:
+                type: table
+                properties:
+                  AreaID:
+                    type: "table: 0000001A1B2E3FB8"
+                    fields:
+                      type: table
+                      properties:
+                        AreaIndex:
+                          type: "0"
+                        IslandID:
+                          type: "0"
+                        SessionID:
+                          type: "0"
+                      tostring: "table: 0000001A1B2E3FB8"
+                  AsyncObjectFlag:
+                    type: "0"
+                  EditorChunkID:
+                    type: "0"
+                  EditorFlag:
+                    type: "0"
+                  ObjectID:
+                    type: "32889168"
+                tostring: "table: 0000001A1B2E3F68"
+            MilitaryTakeoverChanceStart: 0
+            MilitaryTakeoverCurrentMorale: 0
+            MilitaryTakeoverCurrentSurrenderChance: 0
+            MilitaryTakeoverSpareInfluenceCost: 0
+            Owner: 0
+            OwnerName: ""
+            PassiveTrade:
+              type: "property<CPassiveTradeController>"
+              fields:
+                type: table
+                functions:
+                  GetBuyPrice:
+                    callable: false
+                  GetDetailBuyPrice:
+                    callable: false
+                  GetDetailSellPrice:
+                    callable: false
+                  GetHasOffer:
+                    callable: false
+                  GetMinimumStock:
+                    callable: false
+                  GetOffer:
+                    callable: false
+                  GetSellPrice:
+                    callable: false
+                tostring: "CPassiveTradeControllerTextSource*MT: 0000000039427518"
+            PercentOwnedShares: 0
+            ReservationCost: 0
+            ReservationOwnerName: ""
+            TakeoverChance: 0
+            TakeoverMinimum: 0
+            TotalDebt: 0
+            TotalIncome: 0
+            TotalShareIncome: 0.0
+            Visitors:
+              type: "property<CAreaVisitors>"
+              fields:
+                type: table
+                properties:
+                  CurrentVisitors: 0.0
+                  HasSpecialist: false
+                  HasVisitorPier: false
+                  MaxVisitors: 0.0
+                  NextIntervalVisitorDelta: 0
+                  RemainingIntervalTime:
+                    type: "property<rdtime>"
+                    fields:
+                      type: number
+                      tostring: "0"
+                  SpecialistSpawnProbability: 0.0
+                  VisitorIncome: 0.0
+                  VisitorPierUnlocked: false
+                functions:
+                  AcceptSpecialistNet:
+                    callable: false
+                  DenySpecialistNet:
+                    callable: false
+                  EndInterval:
+                    callable: false
+                  GetCurrentVisitors:
+                    callable: false
+                  GetHasSpecialist:
+                    callable: false
+                  GetHasVisitorPier:
+                    callable: false
+                  GetMaxVisitors:
+                    callable: false
+                  GetNextIntervalVisitorDelta:
+                    callable: false
+                  GetRemainingIntervalTime:
+                    callable: false
+                  GetSpecialistSpawnProbability:
+                    callable: false
+                  GetVisitorIncome:
+                    callable: false
+                  GetVisitorPierUnlocked:
+                    callable: false
+                  SpawnSpecialist:
+                    callable: false
+                tostring: "CAreaVisitorsTextSource*MT: 00000000393E1C18"
+            WarTimer:
+              type: "property<rdtime>"
+              fields:
+                type: number
+                tostring: "0"
+          functions:
+            ClearReservation:
+              callable: false
+            GetAmountOfShares:
+              callable: false
+            GetBuyShareCooldownRemaining:
+              callable: false
+            GetBuyShareCooldownTime:
+              callable: false
+            GetCityName:
+              callable: false
+            GetEconomy:
+              callable: false
+            GetHappiness:
+              callable: false
+            GetHasTradeRights:
+              callable: false
+            GetID:
+              callable: false
+            GetIncomePerShare:
+              callable: false
+            GetIsArcticIllnesUnlocked:
+              callable: false
+            GetIsBuyShareBlocked:
+              callable: false
+            GetIsDuplicate:
+              callable: false
+            GetIsExplosionUnlocked:
+              callable: false
+            GetIsFireUnlocked:
+              callable: false
+            GetIsIllnessUnlocked:
+              callable: false
+            GetIsNextWarBlocked:
+              callable: false
+            GetIsOwnedByAnyone:
+              callable: false
+            GetIsOwnedByCurrentParticipant:
+              callable: false
+            GetIsRiotUnlocked:
+              callable: false
+            GetIsTakeoverBlocked:
+              callable: false
+            GetIslandWarActive:
+              callable: false
+            GetKontorID:
+              callable: false
+            GetMilitaryTakeoverChanceStart:
+              callable: false
+            GetMilitaryTakeoverCurrentMorale:
+              callable: false
+            GetMilitaryTakeoverCurrentSurrenderChance:
+              callable: false
+            GetMilitaryTakeoverInfluenceCost:
+              callable: false
+            GetMilitaryTakeoverSpareInfluenceCost:
+              callable: false
+            GetOwner:
+              callable: false
+            GetOwnerName:
+              callable: false
+            GetOwnerProfile:
+              callable: false
+            GetPassiveTrade:
+              callable: false
+            GetPercentOwnedShares:
+              callable: false
+            GetReservationCost:
+              callable: false
+            GetReservationOwnerName:
+              callable: false
+            GetTakeoverChance:
+              callable: false
+            GetTakeoverMinimum:
+              callable: false
+            GetTotalDebt:
+              callable: false
+            GetTotalIncome:
+              callable: false
+            GetTotalShareIncome:
+              callable: false
+            GetVisitors:
+              callable: false
+            GetWarTimer:
+              callable: false
+            ReserveIslandInt:
+              callable: false
+            SetBuyShare:
+              callable: false
+            SetHostileTakeover:
+              callable: false
+            SetOpenMilitaryResultScreen:
+              callable: false
+            SetResetCooldown:
+              callable: false
+            SetSellShare:
+              callable: false
+          tostring: "CConstructionAreaTextSource*MT: 00000000393F1778"
+      Current:
+        type: "property<CConstructionArea>"
+        fields:
+          type: table
+          properties:
+            AmountOfShares: 5
+            BuyShareCooldownRemaining: 0
+            BuyShareCooldownTime: 600000000
+            CityName: "n1"
+            Economy:
+              type: "property<CAreaEconomy>"
+              fields:
+                type: table
+                properties:
+                  Attractivity: -40
+                  CityStatus: 19319
+                  CityStatusMissingAttractivity: 40
+                  CultureStatusFluff: "If only anyone with any damned taste worked for the local council..."
+                  NextCityStatusAttractivity: 0
+                  PopulationCount: 16704
+                  Research: 0
+                functions:
+                  AddAmount:
+                    callable: false
+                  ClearIslandStorage:
+                    callable: false
+                  GetAttractivity:
+                    callable: false
+                  GetAttractivityType:
+                    callable: false
+                  GetAvailableAmount:
+                    callable: false
+                  GetAvailableTransporterCount:
+                    callable: false
+                  GetCityStatus:
+                    callable: false
+                  GetCityStatusMissingAttractivity:
+                    callable: false
+                  GetCultureStatusFluff:
+                    callable: false
+                  GetCurrentTransporterCount:
+                    callable: false
+                  GetDelta:
+                    callable: false
+                  GetDeltaSaturation:
+                    callable: false
+                  GetDeltaSaturationUncapped:
+                    callable: false
+                  GetEconomyModifier:
+                    callable: false
+                  GetFreeSpace:
+                    callable: false
+                  GetIsDistributionPaused:
+                    callable: false
+                  GetMaxTransporterCount:
+                    callable: false
+                  GetNeedLocked:
+                    callable: false
+                  GetNeedUnlockPopulation:
+                    callable: false
+                  GetNextCityStatusAttractivity:
+                    callable: false
+                  GetPopulationCount:
+                    callable: false
+                  GetRegisteredDeltaConsumption:
+                    callable: false
+                  GetRegisteredDeltaProduction:
+                    callable: false
+                  GetResearch:
+                    callable: false
+                  GetReservedStorageAmount:
+                    callable: false
+                  GetSatisfaction:
+                    callable: false
+                  GetStorageAmount:
+                    callable: false
+                  GetStorageCapacity:
+                    callable: false
+                  GetStorageTrend:
+                    callable: false
+                  SetCheatAddDelta:
+                    callable: false
+                  SetCheatChangeWorkforceNet:
+                    callable: false
+                  SetCheatItem:
+                    callable: false
+                  SetEconomyModifier:
+                    callable: false
+                  SetSelectStorageGoodDebug:
+                    callable: false
+                tostring: "CAreaEconomyTextSource*MT: 00000000393DA668"
+            Happiness:
+              type: "property<CAreaHappinessManager>"
+              fields:
+                type: table
+                properties:
+                  AttractivenessHappiness: 0.0
+                  AverageHappiness: 16.772829055786
+                  CurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness: 0
+                  GlobalNewspaperHappiness: 0.0
+                  PollutionHappiness: -9.5833339691162
+                  WarfareHappiness: 5.0
+                  WarfareHappinessThreshold: 80.0
+                functions:
+                  GetAttractivenessHappiness:
+                    callable: false
+                  GetAverageHappiness:
+                    callable: false
+                  GetAverageHappinessByPopulation:
+                    callable: false
+                  GetCurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness:
+                    callable: false
+                  GetGlobalNewspaperHappiness:
+                    callable: false
+                  GetHappinessImpact:
+                    callable: false
+                  GetPollutionHappiness:
+                    callable: false
+                  GetPopulationNewspaperHappiness:
+                    callable: false
+                  GetStressedWorkforce:
+                    callable: false
+                  GetTotalNewspaperHappiness:
+                    callable: false
+                  GetWarfareHappiness:
+                    callable: false
+                  GetWarfareHappinessThreshold:
+                    callable: false
+                  GetWorkingConditionsHappiness:
+                    callable: false
+                tostring: "CAreaHappinessManagerTextSource*MT: 00000000393DFE68"
+            HasTradeRights: true
+            ID:
+              type: "property<AreaID>"
+              fields:
+                type: table
+                properties:
+                  AreaIndex:
+                    type: "1"
+                  IslandID:
+                    type: "2"
+                  SessionID:
+                    type: "4"
+                tostring: "table: 0000001A1B3065C8"
+            IncomePerShare: 3549
+            IsArcticIllnesUnlocked: false
+            IsBuyShareBlocked: false
+            IsExplosionUnlocked: true
+            IsFireUnlocked: true
+            IsIllnessUnlocked: true
+            IsNextWarBlocked:
+              type: "property<rdtime>"
+              fields:
+                type: number
+                tostring: "0"
+            IsOwnedByAnyone: true
+            IsOwnedByCurrentParticipant: true
+            IsRiotUnlocked: true
+            IsTakeoverBlocked: false
+            IslandWarActive: false
+            KontorID:
+              type: "property<GameObjectID>"
+              fields:
+                type: table
+                properties:
+                  AreaID:
+                    type: "table: 0000001A1B3096A8"
+                    fields:
+                      type: table
+                      properties:
+                        AreaIndex:
+                          type: "1"
+                        IslandID:
+                          type: "2"
+                        SessionID:
+                          type: "4"
+                      tostring: "table: 0000001A1B3096A8"
+                  AsyncObjectFlag:
+                    type: "0"
+                  EditorChunkID:
+                    type: "0"
+                  EditorFlag:
+                    type: "0"
+                  ObjectID:
+                    type: "1"
+                tostring: "table: 0000001A1B309658"
+            MilitaryTakeoverChanceStart: 40
+            MilitaryTakeoverCurrentMorale: 100
+            MilitaryTakeoverCurrentSurrenderChance: 0
+            MilitaryTakeoverSpareInfluenceCost: 50
+            Owner: 0
+            OwnerName: "Olive Humffray"
+            PassiveTrade:
+              type: "property<CPassiveTradeController>"
+              fields:
+                type: table
+                functions:
+                  GetBuyPrice:
+                    callable: false
+                  GetDetailBuyPrice:
+                    callable: false
+                  GetDetailSellPrice:
+                    callable: false
+                  GetHasOffer:
+                    callable: false
+                  GetMinimumStock:
+                    callable: false
+                  GetOffer:
+                    callable: false
+                  GetSellPrice:
+                    callable: false
+                tostring: "CPassiveTradeControllerTextSource*MT: 0000000039427518"
+            PercentOwnedShares: 100
+            ReservationCost: 250
+            ReservationOwnerName: "not reserverd."
+            TakeoverChance: 0
+            TakeoverMinimum: 100
+            TotalDebt: 0
+            TotalIncome: 17745
+            TotalShareIncome: 17746.80078125
+            Visitors:
+              type: "property<CAreaVisitors>"
+              fields:
+                type: table
+                properties:
+                  CurrentVisitors: 0.0
+                  HasSpecialist: false
+                  HasVisitorPier: true
+                  MaxVisitors: 0.0
+                  NextIntervalVisitorDelta: 0
+                  RemainingIntervalTime:
+                    type: "property<rdtime>"
+                    fields:
+                      type: number
+                      tostring: "1112400"
+                  SpecialistSpawnProbability: 0.0
+                  VisitorIncome: 0.0
+                  VisitorPierUnlocked: true
+                functions:
+                  AcceptSpecialistNet:
+                    callable: false
+                  DenySpecialistNet:
+                    callable: false
+                  EndInterval:
+                    callable: false
+                  GetCurrentVisitors:
+                    callable: false
+                  GetHasSpecialist:
+                    callable: false
+                  GetHasVisitorPier:
+                    callable: false
+                  GetMaxVisitors:
+                    callable: false
+                  GetNextIntervalVisitorDelta:
+                    callable: false
+                  GetRemainingIntervalTime:
+                    callable: false
+                  GetSpecialistSpawnProbability:
+                    callable: false
+                  GetVisitorIncome:
+                    callable: false
+                  GetVisitorPierUnlocked:
+                    callable: false
+                  SpawnSpecialist:
+                    callable: false
+                tostring: "CAreaVisitorsTextSource*MT: 00000000393E1C18"
+            WarTimer:
+              type: "property<rdtime>"
+              fields:
+                type: number
+                tostring: "0"
+          functions:
+            ClearReservation:
+              callable: false
+            GetAmountOfShares:
+              callable: false
+            GetBuyShareCooldownRemaining:
+              callable: false
+            GetBuyShareCooldownTime:
+              callable: false
+            GetCityName:
+              callable: false
+            GetEconomy:
+              callable: false
+            GetHappiness:
+              callable: false
+            GetHasTradeRights:
+              callable: false
+            GetID:
+              callable: false
+            GetIncomePerShare:
+              callable: false
+            GetIsArcticIllnesUnlocked:
+              callable: false
+            GetIsBuyShareBlocked:
+              callable: false
+            GetIsDuplicate:
+              callable: false
+            GetIsExplosionUnlocked:
+              callable: false
+            GetIsFireUnlocked:
+              callable: false
+            GetIsIllnessUnlocked:
+              callable: false
+            GetIsNextWarBlocked:
+              callable: false
+            GetIsOwnedByAnyone:
+              callable: false
+            GetIsOwnedByCurrentParticipant:
+              callable: false
+            GetIsRiotUnlocked:
+              callable: false
+            GetIsTakeoverBlocked:
+              callable: false
+            GetIslandWarActive:
+              callable: false
+            GetKontorID:
+              callable: false
+            GetMilitaryTakeoverChanceStart:
+              callable: false
+            GetMilitaryTakeoverCurrentMorale:
+              callable: false
+            GetMilitaryTakeoverCurrentSurrenderChance:
+              callable: false
+            GetMilitaryTakeoverInfluenceCost:
+              callable: false
+            GetMilitaryTakeoverSpareInfluenceCost:
+              callable: false
+            GetOwner:
+              callable: false
+            GetOwnerName:
+              callable: false
+            GetOwnerProfile:
+              callable: false
+            GetPassiveTrade:
+              callable: false
+            GetPercentOwnedShares:
+              callable: false
+            GetReservationCost:
+              callable: false
+            GetReservationOwnerName:
+              callable: false
+            GetTakeoverChance:
+              callable: false
+            GetTakeoverMinimum:
+              callable: false
+            GetTotalDebt:
+              callable: false
+            GetTotalIncome:
+              callable: false
+            GetTotalShareIncome:
+              callable: false
+            GetVisitors:
+              callable: false
+            GetWarTimer:
+              callable: false
+            ReserveIslandInt:
+              callable: false
+            SetBuyShare:
+              callable: false
+            SetHostileTakeover:
+              callable: false
+            SetOpenMilitaryResultScreen:
+              callable: false
+            SetResetCooldown:
+              callable: false
+            SetSellShare:
+              callable: false
+          tostring: "CConstructionAreaTextSource*MT: 00000000393F1778"
+      CurrentSelectedArea:
+        type: "property<CConstructionArea>"
+        fields:
+          type: table
+          properties:
+            AmountOfShares: 0
+            BuyShareCooldownRemaining: 0
+            BuyShareCooldownTime: 0
+            CityName: ""
+            Economy:
+              type: "property<CAreaEconomy>"
+              fields:
+                type: table
+                properties:
+                  Attractivity: 0
+                  CityStatus: 0
+                  CityStatusMissingAttractivity: 0
+                  CultureStatusFluff: ""
+                  NextCityStatusAttractivity: 0
+                  PopulationCount: 0
+                  Research: 0
+                functions:
+                  AddAmount:
+                    callable: false
+                  ClearIslandStorage:
+                    callable: false
+                  GetAttractivity:
+                    callable: false
+                  GetAttractivityType:
+                    callable: false
+                  GetAvailableAmount:
+                    callable: false
+                  GetAvailableTransporterCount:
+                    callable: false
+                  GetCityStatus:
+                    callable: false
+                  GetCityStatusMissingAttractivity:
+                    callable: false
+                  GetCultureStatusFluff:
+                    callable: false
+                  GetCurrentTransporterCount:
+                    callable: false
+                  GetDelta:
+                    callable: false
+                  GetDeltaSaturation:
+                    callable: false
+                  GetDeltaSaturationUncapped:
+                    callable: false
+                  GetEconomyModifier:
+                    callable: false
+                  GetFreeSpace:
+                    callable: false
+                  GetIsDistributionPaused:
+                    callable: false
+                  GetMaxTransporterCount:
+                    callable: false
+                  GetNeedLocked:
+                    callable: false
+                  GetNeedUnlockPopulation:
+                    callable: false
+                  GetNextCityStatusAttractivity:
+                    callable: false
+                  GetPopulationCount:
+                    callable: false
+                  GetRegisteredDeltaConsumption:
+                    callable: false
+                  GetRegisteredDeltaProduction:
+                    callable: false
+                  GetResearch:
+                    callable: false
+                  GetReservedStorageAmount:
+                    callable: false
+                  GetSatisfaction:
+                    callable: false
+                  GetStorageAmount:
+                    callable: false
+                  GetStorageCapacity:
+                    callable: false
+                  GetStorageTrend:
+                    callable: false
+                  SetCheatAddDelta:
+                    callable: false
+                  SetCheatChangeWorkforceNet:
+                    callable: false
+                  SetCheatItem:
+                    callable: false
+                  SetEconomyModifier:
+                    callable: false
+                  SetSelectStorageGoodDebug:
+                    callable: false
+                tostring: "CAreaEconomyTextSource*MT: 00000000393DA668"
+            Happiness:
+              type: "property<CAreaHappinessManager>"
+              fields:
+                type: table
+                properties:
+                  AttractivenessHappiness: 0.0
+                  AverageHappiness: 0.0
+                  CurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness: 0
+                  GlobalNewspaperHappiness: 0.0
+                  PollutionHappiness: 0.0
+                  WarfareHappiness: 0.0
+                  WarfareHappinessThreshold: 0.0
+                functions:
+                  GetAttractivenessHappiness:
+                    callable: false
+                  GetAverageHappiness:
+                    callable: false
+                  GetAverageHappinessByPopulation:
+                    callable: false
+                  GetCurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness:
+                    callable: false
+                  GetGlobalNewspaperHappiness:
+                    callable: false
+                  GetHappinessImpact:
+                    callable: false
+                  GetPollutionHappiness:
+                    callable: false
+                  GetPopulationNewspaperHappiness:
+                    callable: false
+                  GetStressedWorkforce:
+                    callable: false
+                  GetTotalNewspaperHappiness:
+                    callable: false
+                  GetWarfareHappiness:
+                    callable: false
+                  GetWarfareHappinessThreshold:
+                    callable: false
+                  GetWorkingConditionsHappiness:
+                    callable: false
+                tostring: "CAreaHappinessManagerTextSource*MT: 00000000393DFE68"
+            HasTradeRights: false
+            ID:
+              type: "property<AreaID>"
+              fields:
+                type: table
+                properties:
+                  AreaIndex:
+                    type: "6"
+                  IslandID:
+                    type: "101"
+                  SessionID:
+                    type: "16"
+                tostring: "table: 0000001A1B3253F8"
+            IncomePerShare: 0
+            IsArcticIllnesUnlocked: false
+            IsBuyShareBlocked: false
+            IsExplosionUnlocked: false
+            IsFireUnlocked: false
+            IsIllnessUnlocked: false
+            IsNextWarBlocked:
+              type: "property<rdtime>"
+              fields:
+                type: number
+                tostring: "0"
+            IsOwnedByAnyone: false
+            IsOwnedByCurrentParticipant: false
+            IsRiotUnlocked: false
+            IsTakeoverBlocked: false
+            IslandWarActive: false
+            KontorID:
+              type: "property<GameObjectID>"
+              fields:
+                type: table
+                properties:
+                  AreaID:
+                    type: "table: 0000001A1B325FF8"
+                    fields:
+                      type: table
+                      properties:
+                        AreaIndex:
+                          type: "0"
+                        IslandID:
+                          type: "0"
+                        SessionID:
+                          type: "0"
+                      tostring: "table: 0000001A1B325FF8"
+                  AsyncObjectFlag:
+                    type: "0"
+                  EditorChunkID:
+                    type: "0"
+                  EditorFlag:
+                    type: "0"
+                  ObjectID:
+                    type: "32889168"
+                tostring: "table: 0000001A1B325FA8"
+            MilitaryTakeoverChanceStart: 0
+            MilitaryTakeoverCurrentMorale: 0
+            MilitaryTakeoverCurrentSurrenderChance: 0
+            MilitaryTakeoverSpareInfluenceCost: 0
+            Owner: 0
+            OwnerName: ""
+            PassiveTrade:
+              type: "property<CPassiveTradeController>"
+              fields:
+                type: table
+                functions:
+                  GetBuyPrice:
+                    callable: false
+                  GetDetailBuyPrice:
+                    callable: false
+                  GetDetailSellPrice:
+                    callable: false
+                  GetHasOffer:
+                    callable: false
+                  GetMinimumStock:
+                    callable: false
+                  GetOffer:
+                    callable: false
+                  GetSellPrice:
+                    callable: false
+                tostring: "CPassiveTradeControllerTextSource*MT: 0000000039427518"
+            PercentOwnedShares: 0
+            ReservationCost: 0
+            ReservationOwnerName: ""
+            TakeoverChance: 0
+            TakeoverMinimum: 0
+            TotalDebt: 0
+            TotalIncome: 0
+            TotalShareIncome: 0.0
+            Visitors:
+              type: "property<CAreaVisitors>"
+              fields:
+                type: table
+                properties:
+                  CurrentVisitors: 0.0
+                  HasSpecialist: false
+                  HasVisitorPier: false
+                  MaxVisitors: 0.0
+                  NextIntervalVisitorDelta: 0
+                  RemainingIntervalTime:
+                    type: "property<rdtime>"
+                    fields:
+                      type: number
+                      tostring: "0"
+                  SpecialistSpawnProbability: 0.0
+                  VisitorIncome: 0.0
+                  VisitorPierUnlocked: false
+                functions:
+                  AcceptSpecialistNet:
+                    callable: false
+                  DenySpecialistNet:
+                    callable: false
+                  EndInterval:
+                    callable: false
+                  GetCurrentVisitors:
+                    callable: false
+                  GetHasSpecialist:
+                    callable: false
+                  GetHasVisitorPier:
+                    callable: false
+                  GetMaxVisitors:
+                    callable: false
+                  GetNextIntervalVisitorDelta:
+                    callable: false
+                  GetRemainingIntervalTime:
+                    callable: false
+                  GetSpecialistSpawnProbability:
+                    callable: false
+                  GetVisitorIncome:
+                    callable: false
+                  GetVisitorPierUnlocked:
+                    callable: false
+                  SpawnSpecialist:
+                    callable: false
+                tostring: "CAreaVisitorsTextSource*MT: 00000000393E1C18"
+            WarTimer:
+              type: "property<rdtime>"
+              fields:
+                type: number
+                tostring: "0"
+          functions:
+            ClearReservation:
+              callable: false
+            GetAmountOfShares:
+              callable: false
+            GetBuyShareCooldownRemaining:
+              callable: false
+            GetBuyShareCooldownTime:
+              callable: false
+            GetCityName:
+              callable: false
+            GetEconomy:
+              callable: false
+            GetHappiness:
+              callable: false
+            GetHasTradeRights:
+              callable: false
+            GetID:
+              callable: false
+            GetIncomePerShare:
+              callable: false
+            GetIsArcticIllnesUnlocked:
+              callable: false
+            GetIsBuyShareBlocked:
+              callable: false
+            GetIsDuplicate:
+              callable: false
+            GetIsExplosionUnlocked:
+              callable: false
+            GetIsFireUnlocked:
+              callable: false
+            GetIsIllnessUnlocked:
+              callable: false
+            GetIsNextWarBlocked:
+              callable: false
+            GetIsOwnedByAnyone:
+              callable: false
+            GetIsOwnedByCurrentParticipant:
+              callable: false
+            GetIsRiotUnlocked:
+              callable: false
+            GetIsTakeoverBlocked:
+              callable: false
+            GetIslandWarActive:
+              callable: false
+            GetKontorID:
+              callable: false
+            GetMilitaryTakeoverChanceStart:
+              callable: false
+            GetMilitaryTakeoverCurrentMorale:
+              callable: false
+            GetMilitaryTakeoverCurrentSurrenderChance:
+              callable: false
+            GetMilitaryTakeoverInfluenceCost:
+              callable: false
+            GetMilitaryTakeoverSpareInfluenceCost:
+              callable: false
+            GetOwner:
+              callable: false
+            GetOwnerName:
+              callable: false
+            GetOwnerProfile:
+              callable: false
+            GetPassiveTrade:
+              callable: false
+            GetPercentOwnedShares:
+              callable: false
+            GetReservationCost:
+              callable: false
+            GetReservationOwnerName:
+              callable: false
+            GetTakeoverChance:
+              callable: false
+            GetTakeoverMinimum:
+              callable: false
+            GetTotalDebt:
+              callable: false
+            GetTotalIncome:
+              callable: false
+            GetTotalShareIncome:
+              callable: false
+            GetVisitors:
+              callable: false
+            GetWarTimer:
+              callable: false
+            ReserveIslandInt:
+              callable: false
+            SetBuyShare:
+              callable: false
+            SetHostileTakeover:
+              callable: false
+            SetOpenMilitaryResultScreen:
+              callable: false
+            SetResetCooldown:
+              callable: false
+            SetSellShare:
+              callable: false
+          tostring: "CConstructionAreaTextSource*MT: 00000000393F1778"
+      IsCurrentAreaValidIsland: true
+    functions:
+      GetArea:
+        callable: false
+      GetAreaFromContext:
+        callable: false
+      GetAreaFromID:
+        callable: false
+      GetCurrent:
+        callable: false
+      GetCurrentSelectedArea:
+        callable: false
+      GetIsCurrentAreaValidIsland:
+        callable: false
+    tostring: "CAreaLoaderTextSource*MT: 00000000393E0478"
+AreaCoast:
+  type: "property<CSessionCoastManager>"
+  fields:
+    type: table
+    tostring: "CSessionCoastManagerTextSource*MT: 0000000039450C38"
+AreaFetch:
+  type: "property<CAreaFetchManager>"
+  fields:
+    type: table
+    tostring: "CAreaFetchManagerTextSource*MT: 00000000393DFD28"
+AreaManager:
+  type: "property<CAreaManager>"
+  fields:
+    type: table
+    properties:
+      AreaFestival:
+        type: "property<CAreaFestivalManager>"
+        fields:
+          type: table
+          properties:
+            BonusAttractiveness: 0
+            IsActive: false
+            ProtectsFromIncidents: false
+            RemainingDurationEstimation:
+              type: "property<rdtime>"
+              fields:
+                type: number
+                tostring: "0"
+          functions:
+            GetBonusAttractiveness:
+              callable: false
+            GetIsActive:
+              callable: false
+            GetProtectsFromIncidents:
+              callable: false
+            GetRemainingDurationEstimation:
+              callable: false
+            SetIncreasePool:
+              callable: false
+            SetStopFestival:
+              callable: false
+            SetTriggerFestival:
+              callable: false
+          tostring: "CAreaFestivalManagerTextSource*MT: 00000000393DFA08"
+      AreaMoney:
+        type: "property<CAreaMoneyManager>"
+        fields:
+          type: table
+          properties:
+            TotalMoneyIncome: -25116
+            VisitorIncome: 0
+          functions:
+            GetTotalMoneyIncome:
+              callable: false
+            GetVisitorIncome:
+              callable: false
+          tostring: "CAreaMoneyManagerTextSource*MT: 00000000393E0A68"
+      AreaObjects:
+        type: "property<CAreaObjectManager>"
+        fields:
+          type: table
+          properties:
+            ObjectLists:
+              type: "property<CFilteredObjectLists>"
+              fields:
+                type: table
+                functions:
+                  GetBuildingsWithGameLogicCount:
+                    callable: false
+                tostring: "CFilteredObjectListsTextSource*MT: 00000000393F7C18"
+          functions:
+            GetObjectLists:
+              callable: false
+            SaveBuildingCountSnapshot:
+              callable: false
+          tostring: "CAreaObjectManagerTextSource*MT: 00000000393E1538"
+      AreaPopulation:
+        type: "property<CAreaPopulationManager>"
+        fields:
+          type: table
+          properties:
+            HighestPopulationLevel:
+              type: "property<CPopulationAsset>"
+              fields:
+                type: table
+                properties:
+                  Guid: 5403
+                  Icon: "data/ui/2kimages/main/3dicons/resident/icon_resident_artista.png"
+                  Text: "Artista"
+                  Workforce:
+                    type: "property<CAsset>"
+                    fields:
+                      type: table
+                      properties:
+                        Guid: 5406
+                        Icon: "data/ui/2kimages/main/icons/workforce/icon_workforce_2.5d_artista.png"
+                        Text: "Artista Workforce"
+                      functions:
+                        GetGuid:
+                          callable: false
+                        GetIcon:
+                          callable: false
+                        GetText:
+                          callable: false
+                      tostring: "CAssetTextSource*MT: 00000000393E3158"
+                functions:
+                  GetGuid:
+                    callable: false
+                  GetIcon:
+                    callable: false
+                  GetText:
+                    callable: false
+                  GetWorkforce:
+                    callable: false
+                tostring: "CPopulationAssetTextSource*MT: 0000000039428B48"
+            PopulationCount: 16704
+          functions:
+            GetHighestPopulationLevel:
+              callable: false
+            GetNeedAreaPopulationFulfilled:
+              callable: false
+            GetPopulationCount:
+              callable: false
+            GetSatisfaction:
+              callable: false
+            GetSatisfaction_ExcludeBonusNeeds:
+              callable: false
+            GetSatisfaction_IncludeBonusNeeds:
+              callable: false
+            SetFillAllResidencesOnIsland:
+              callable: false
+          tostring: "CAreaPopulationManagerTextSource*MT: 00000000393E1718"
+      AreaVisitors:
+        type: "property<CAreaVisitors>"
+        fields:
+          type: table
+          properties:
+            CurrentVisitors: 0.0
+            HasSpecialist: false
+            HasVisitorPier: true
+            MaxVisitors: 0.0
+            NextIntervalVisitorDelta: 0
+            RemainingIntervalTime:
+              type: "property<rdtime>"
+              fields:
+                type: number
+                tostring: "1112400"
+            SpecialistSpawnProbability: 0.0
+            VisitorIncome: 0.0
+            VisitorPierUnlocked: true
+          functions:
+            AcceptSpecialistNet:
+              callable: false
+            DenySpecialistNet:
+              callable: false
+            EndInterval:
+              callable: false
+            GetCurrentVisitors:
+              callable: false
+            GetHasSpecialist:
+              callable: false
+            GetHasVisitorPier:
+              callable: false
+            GetMaxVisitors:
+              callable: false
+            GetNextIntervalVisitorDelta:
+              callable: false
+            GetRemainingIntervalTime:
+              callable: false
+            GetSpecialistSpawnProbability:
+              callable: false
+            GetVisitorIncome:
+              callable: false
+            GetVisitorPierUnlocked:
+              callable: false
+            SpawnSpecialist:
+              callable: false
+          tostring: "CAreaVisitorsTextSource*MT: 00000000393E1C18"
+      Attractivity:
+        type: "property<CAreaAttractivityManager>"
+        fields:
+          type: table
+          properties:
+            Attractivity: -40
+            CityStatus: 19319
+            CityStatusMissingAttractivity: 40
+            CultureStatusFluff: "If only anyone with any damned taste worked for the local council..."
+            NextCityStatusAttractivity: 0
+          functions:
+            GetAttractivenessForCityLevel:
+              callable: false
+            GetAttractivity:
+              callable: false
+            GetAttractivityType:
+              callable: false
+            GetCityStatus:
+              callable: false
+            GetCityStatusMissingAttractivity:
+              callable: false
+            GetCultureStatusFluff:
+              callable: false
+            GetNextCityStatusAttractivity:
+              callable: false
+            SetCheatChangeAttractivityNet:
+              callable: false
+          tostring: "CAreaAttractivityManagerTextSource*MT: 00000000393D92B8"
+      EcoSystem:
+        type: "property<CAreaEcoSystemManager>"
+        fields:
+          type: table
+          properties:
+            AirQuality: 0.0
+            AirQualityDelta: 0.0
+            IllnessChance: 1.0
+            IslandHealth: 0.0
+            QualityMaximum: 1000.0
+            SoilQuality: 0.0
+            SoilQualityDelta: 0.0
+            WaterQuality: 0.0
+            WaterQualityDelta: 0.0
+          functions:
+            GetAirQuality:
+              callable: false
+            GetAirQualityDelta:
+              callable: false
+            GetIllnessChance:
+              callable: false
+            GetIslandHealth:
+              callable: false
+            GetQuality:
+              callable: false
+            GetQualityDelta:
+              callable: false
+            GetQualityMaximum:
+              callable: false
+            GetSoilQuality:
+              callable: false
+            GetSoilQualityDelta:
+              callable: false
+            GetWaterQuality:
+              callable: false
+            GetWaterQualityDelta:
+              callable: false
+            SetFeaturePaused:
+              callable: false
+            SetQuality:
+              callable: false
+            SetQualityPaused:
+              callable: false
+          tostring: "CAreaEcoSystemManagerTextSource*MT: 00000000393DAD48"
+      Happiness:
+        type: "property<CAreaHappinessManager>"
+        fields:
+          type: table
+          properties:
+            AttractivenessHappiness: 0.0
+            AverageHappiness: 16.772829055786
+            CurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness: 0
+            GlobalNewspaperHappiness: 0.0
+            PollutionHappiness: -9.5833339691162
+            WarfareHappiness: 5.0
+            WarfareHappinessThreshold: 80.0
+          functions:
+            GetAttractivenessHappiness:
+              callable: false
+            GetAverageHappiness:
+              callable: false
+            GetAverageHappinessByPopulation:
+              callable: false
+            GetCurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness:
+              callable: false
+            GetGlobalNewspaperHappiness:
+              callable: false
+            GetHappinessImpact:
+              callable: false
+            GetPollutionHappiness:
+              callable: false
+            GetPopulationNewspaperHappiness:
+              callable: false
+            GetStressedWorkforce:
+              callable: false
+            GetTotalNewspaperHappiness:
+              callable: false
+            GetWarfareHappiness:
+              callable: false
+            GetWarfareHappinessThreshold:
+              callable: false
+            GetWorkingConditionsHappiness:
+              callable: false
+          tostring: "CAreaHappinessManagerTextSource*MT: 00000000393DFE68"
+      NeedUnlock:
+        type: "property<CAreaNeedUnlockManager>"
+        fields:
+          type: table
+          functions:
+            GetAdditionalNeedUnlockAmount:
+              callable: false
+            GetAdditionalNeedUnlockPopulation:
+              callable: false
+            GetHasAdditionalNeedUnlock:
+              callable: false
+            GetNeedLocked:
+              callable: false
+            GetNeedUnlockPopulation:
+              callable: false
+          tostring: "CAreaNeedUnlockManagerTextSource*MT: 00000000393E13F8"
+      Railway:
+        type: "property<CAreaRailwayManager>"
+        fields:
+          type: table
+          functions:
+            SetRandomSkin:
+              callable: false
+            SetToggleDebugVisualization:
+              callable: false
+          tostring: "CAreaRailwayManagerTextSource*MT: 00000000393E19E8"
+    functions:
+      GetAreaFestival:
+        callable: false
+      GetAreaMoney:
+        callable: false
+      GetAreaObjects:
+        callable: false
+      GetAreaPopulation:
+        callable: false
+      GetAreaVisitors:
+        callable: false
+      GetAttractivity:
+        callable: false
+      GetEcoSystem:
+        callable: false
+      GetHappiness:
+        callable: false
+      GetNeedUnlock:
+        callable: false
+      GetRailway:
+        callable: false
+    tostring: "CAreaManagerTextSource*MT: 00000000393E0798"

@@ -94,13 +94,13 @@ local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marke
                     name = tostring(k),
                     type = "function",
                 }
-                if not allowGetFuncCall or not (i.name:match("^Get") or i.name:match("^get")) then
+                if not allowGetFuncCall or not (i.name:match("^Get") or i.name:match("^get")) or i.name:match("Online") then
                     i.callable = false
                     table.insert(functions, i)
                     goto continue
                 end
 
-                local ret, err = safe_call(_table, k)
+                local ret, err = safe_call(_obj, i.name)
                 if err == nil then
                     i.returns = ret
                     if ret == "" then
@@ -159,7 +159,7 @@ local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marke
                 else
                     log("    " .. prop.name .. ":")
                     log("      type: \"" .. _type .. "\"")
-                    if prop.is_property then
+                    if prop.is_property and prop.name ~= "Online" then
                         if depth <= 12 then
                             local success, err = pcall(function()
                                 _inspect_object_yaml(L, prop.object, "fields", allowGetFuncCall, depth + 3, marked)

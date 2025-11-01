@@ -1,0 +1,307 @@
+---
+object:
+  type: table
+  properties:
+    AmountOfShares: 5
+    BuyShareCooldownRemaining: 0
+    BuyShareCooldownTime: 600000000
+    CityName: "n1"
+    Economy:
+      type: "property<CAreaEconomy>"
+      fields:
+        type: table
+        properties:
+          Attractivity: -40
+          CityStatus: 19319
+          CityStatusMissingAttractivity: 40
+          CultureStatusFluff: "If only anyone with any damned taste worked for the local council..."
+          NextCityStatusAttractivity: 0
+          PopulationCount: 16618
+          Research: 0
+        functions:
+          AddAmount:
+            callable: false
+          ClearIslandStorage:
+            callable: false
+          GetAttractivity: -40
+          GetAttractivityType:
+            error: "no matching overload found"
+          GetAvailableAmount:
+            error: "no matching overload found"
+          GetAvailableTransporterCount:
+            error: "no matching overload found"
+          GetCityStatus: 19319
+          GetCityStatusMissingAttractivity: 40
+          GetCultureStatusFluff: "If only anyone with any damned taste worked for the local council..."
+          GetCurrentTransporterCount:
+            error: "no matching overload found"
+          GetDelta:
+            error: "no matching overload found"
+          GetDeltaSaturation:
+            error: "no matching overload found"
+          GetDeltaSaturationUncapped:
+            error: "no matching overload found"
+          GetEconomyModifier:
+            error: "no matching overload found"
+          GetFreeSpace:
+            error: "no matching overload found"
+          GetIsDistributionPaused:
+            error: "no matching overload found"
+          GetMaxTransporterCount:
+            error: "no matching overload found"
+          GetNeedLocked:
+            error: "no matching overload found"
+          GetNeedUnlockPopulation:
+            error: "no matching overload found"
+          GetNextCityStatusAttractivity: 0
+          GetPopulationCount: 16618
+          GetRegisteredDeltaConsumption:
+            error: "no matching overload found"
+          GetRegisteredDeltaProduction:
+            error: "no matching overload found"
+          GetResearch: 0
+          GetReservedStorageAmount:
+            error: "no matching overload found"
+          GetSatisfaction:
+            error: "no matching overload found"
+          GetStorageAmount:
+            error: "no matching overload found"
+          GetStorageCapacity:
+            error: "no matching overload found"
+          GetStorageTrend:
+            error: "no matching overload found"
+          SetCheatAddDelta:
+            callable: false
+          SetCheatChangeWorkforceNet:
+            callable: false
+          SetCheatItem:
+            callable: false
+          SetEconomyModifier:
+            callable: false
+          SetSelectStorageGoodDebug:
+            callable: false
+        tostring: "CAreaEconomyTextSource*MT: 00000000392DD568"
+    Happiness:
+      type: "property<CAreaHappinessManager>"
+      fields:
+        type: table
+        properties:
+          AttractivenessHappiness: 0.0
+          AverageHappiness: 16.775032043457
+          CurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness: 0
+          GlobalNewspaperHappiness: 0.0
+          PollutionHappiness: -9.5833339691162
+          WarfareHappiness: 5.0
+          WarfareHappinessThreshold: 80.0
+        functions:
+          GetAttractivenessHappiness: 0.0
+          GetAverageHappiness: 16.775032043457
+          GetAverageHappinessByPopulation:
+            error: "no matching overload found"
+          GetCurrentlyRequiredAttractivenessForNeutralAttractivenessHappiness: 0
+          GetGlobalNewspaperHappiness: 0.0
+          GetHappinessImpact:
+            error: "no matching overload found"
+          GetPollutionHappiness: -9.5833339691162
+          GetPopulationNewspaperHappiness:
+            error: "no matching overload found"
+          GetStressedWorkforce:
+            error: "no matching overload found"
+          GetTotalNewspaperHappiness:
+            error: "no matching overload found"
+          GetWarfareHappiness: 5.0
+          GetWarfareHappinessThreshold: 80.0
+          GetWorkingConditionsHappiness:
+            error: "no matching overload found"
+        tostring: "CAreaHappinessManagerTextSource*MT: 00000000392E2D68"
+    HasTradeRights: true
+    ID:
+      type: "property<AreaID>"
+      fields:
+        type: table
+        properties:
+          AreaIndex:
+            type: "1"
+          IslandID:
+            type: "2"
+          SessionID:
+            type: "4"
+        tostring: "table: 0000001A0AEC7D38"
+    IncomePerShare: 3468
+    IsArcticIllnesUnlocked: false
+    IsBuyShareBlocked: false
+    IsExplosionUnlocked: true
+    IsFireUnlocked: true
+    IsIllnessUnlocked: true
+    IsNextWarBlocked:
+      type: "property<rdtime>"
+      fields:
+        type: number
+        tostring: "0"
+    IsOwnedByAnyone: true
+    IsOwnedByCurrentParticipant: true
+    IsRiotUnlocked: true
+    IsTakeoverBlocked: false
+    IslandWarActive: false
+    KontorID:
+      type: "property<GameObjectID>"
+      fields:
+        type: table
+        properties:
+          AreaID:
+            type: "table: 0000001A0AEC97C8"
+            fields:
+              type: table
+              properties:
+                AreaIndex:
+                  type: "1"
+                IslandID:
+                  type: "2"
+                SessionID:
+                  type: "4"
+              tostring: "table: 0000001A0AEC97C8"
+          AsyncObjectFlag:
+            type: "0"
+          EditorChunkID:
+            type: "0"
+          EditorFlag:
+            type: "0"
+          ObjectID:
+            type: "1"
+        tostring: "table: 0000001A0AEC9778"
+    MilitaryTakeoverChanceStart: 40
+    MilitaryTakeoverCurrentMorale: 100
+    MilitaryTakeoverCurrentSurrenderChance: 0
+    MilitaryTakeoverSpareInfluenceCost: 50
+    Owner: 0
+    OwnerName: "Olive Humffray"
+    PassiveTrade:
+      type: "property<CPassiveTradeController>"
+      fields:
+        type: table
+        functions:
+          GetBuyPrice:
+            error: "no matching overload found"
+          GetDetailBuyPrice:
+            error: "no matching overload found"
+          GetDetailSellPrice:
+            error: "no matching overload found"
+          GetHasOffer:
+            error: "no matching overload found"
+          GetMinimumStock:
+            error: "no matching overload found"
+          GetOffer:
+            error: "no matching overload found"
+          GetSellPrice:
+            error: "no matching overload found"
+        tostring: "CPassiveTradeControllerTextSource*MT: 000000003932AC58"
+    PercentOwnedShares: 100
+    ReservationCost: 250
+    ReservationOwnerName: "not reserverd."
+    TakeoverChance: 0
+    TakeoverMinimum: 100
+    TotalDebt: 0
+    TotalIncome: 17340
+    TotalShareIncome: 17342.400390625
+    Visitors:
+      type: "property<CAreaVisitors>"
+      fields:
+        type: table
+        properties:
+          CurrentVisitors: 0.0
+          HasSpecialist: false
+          HasVisitorPier: true
+          MaxVisitors: 0.0
+          NextIntervalVisitorDelta: 0
+          RemainingIntervalTime:
+            type: "property<rdtime>"
+            fields:
+              type: number
+              tostring: "1134100"
+          SpecialistSpawnProbability: 0.0
+          VisitorIncome: 0.0
+          VisitorPierUnlocked: true
+        functions:
+          AcceptSpecialistNet:
+            callable: false
+          DenySpecialistNet:
+            callable: false
+          EndInterval:
+            callable: false
+          GetCurrentVisitors: 0.0
+          GetHasSpecialist: false
+          GetHasVisitorPier: true
+          GetMaxVisitors: 0.0
+          GetNextIntervalVisitorDelta: 0
+          GetRemainingIntervalTime: 1134100
+          GetSpecialistSpawnProbability: 0.0
+          GetVisitorIncome: 0.0
+          GetVisitorPierUnlocked: true
+          SpawnSpecialist:
+            callable: false
+        tostring: "CAreaVisitorsTextSource*MT: 00000000392E4B18"
+    WarTimer:
+      type: "property<rdtime>"
+      fields:
+        type: number
+        tostring: "0"
+  functions:
+    ClearReservation:
+      callable: false
+    GetAmountOfShares: 5
+    GetBuyShareCooldownRemaining: 0
+    GetBuyShareCooldownTime: 600000000
+    GetCityName: "n1"
+    GetEconomy: "CAreaEconomyTextSource*MT: 00000000392DD568"
+    GetHappiness: "CAreaHappinessManagerTextSource*MT: 00000000392E2D68"
+    GetHasTradeRights: true
+    GetID: "table: 0000001A0AE635C8"
+    GetIncomePerShare: 3468
+    GetIsArcticIllnesUnlocked: false
+    GetIsBuyShareBlocked: false
+    GetIsDuplicate:
+      error: "no matching overload found"
+    GetIsExplosionUnlocked: true
+    GetIsFireUnlocked: true
+    GetIsIllnessUnlocked: true
+    GetIsNextWarBlocked: 0
+    GetIsOwnedByAnyone: true
+    GetIsOwnedByCurrentParticipant: true
+    GetIsRiotUnlocked: true
+    GetIsTakeoverBlocked: false
+    GetIslandWarActive: false
+    GetKontorID: "table: 0000001A0AEB8168"
+    GetMilitaryTakeoverChanceStart: 40
+    GetMilitaryTakeoverCurrentMorale: 100
+    GetMilitaryTakeoverCurrentSurrenderChance: 0
+    GetMilitaryTakeoverInfluenceCost:
+      error: "no matching overload found"
+    GetMilitaryTakeoverSpareInfluenceCost: 50
+    GetOwner: 0
+    GetOwnerName: "Olive Humffray"
+    GetOwnerProfile:
+      error: "no matching overload found"
+    GetPassiveTrade: "CPassiveTradeControllerTextSource*MT: 000000003932AC58"
+    GetPercentOwnedShares: 100
+    GetReservationCost: 250
+    GetReservationOwnerName: "not reserverd."
+    GetTakeoverChance: 0
+    GetTakeoverMinimum: 100
+    GetTotalDebt: 0
+    GetTotalIncome: 17340
+    GetTotalShareIncome: 17342.400390625
+    GetVisitors: "CAreaVisitorsTextSource*MT: 00000000392E4B18"
+    GetWarTimer: 0
+    ReserveIslandInt:
+      callable: false
+    SetBuyShare:
+      callable: false
+    SetHostileTakeover:
+      callable: false
+    SetOpenMilitaryResultScreen:
+      callable: false
+    SetResetCooldown:
+      callable: false
+    SetSellShare:
+      callable: false
+  tostring: "CConstructionAreaTextSource*MT: 00000000392F4678"

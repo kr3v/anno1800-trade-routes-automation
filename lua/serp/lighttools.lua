@@ -964,7 +964,7 @@ local function t_FnViaTextEmbed(PID)
 end
 
 local function DoForSessionGameObjectRaw (cmd)
-    game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(ts_embed_string) .. " )]")
+    game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(cmd) .. " )]")
     local ret = ts.Participants.GetParticipant(120).Profile.CompanyName
     local old = ts.GetAssetData(100939).Text
     ts.Participants.GetParticipant(120).Profile.SetCompanyName(old)

@@ -3,7 +3,7 @@ local default_dst = "lua/modlog.txt";
 local function modlog(t, dst)
     file = io.open(dst, "a")
     io.output(file)
-    io.write(t, "\n")
+    io.write(tostring(t), "\n")
     io.close(file)
 end
 
