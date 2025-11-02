@@ -8,7 +8,8 @@ local function modlogn(t, dst)
 end
 
 local function modlog(t, dst)
-    modlogn(t .. "\n", dst)
+    local nowISO = os.date("%Y-%m-%dT%H:%M:%SZ")
+    modlogn(nowISO .. "\t" .. t .. "\n", dst)
 end
 
 local function modlogf(dst, fmt, ...)

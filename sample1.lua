@@ -7,6 +7,10 @@ package.loaded["lua/map_scanner"] = nil;
 package.loaded["lua/rxi/json"] = nil;
 package.loaded["lua/cache"] = nil;
 package.loaded["lua/iskolbin/base64"] = nil;
+-- Add async modules
+package.loaded["lua/async"] = nil;
+package.loaded["lua/ship-cmd"] = nil;
+package.loaded["lua/trade-executor"] = nil;
 
 local inspector = require("lua/inspector");
 local L = require("lua/logger");
@@ -18,87 +22,94 @@ local json = require("lua/rxi/json");
 local cache = require("lua/cache");
 local base64 = require("lua/iskolbin/base64");
 
-local function Area_AddGood(area, guid, amount)
-    area.Economy.AddAmount(guid, amount);
+-- Load async modules
+local async = require("lua/async");
+local shipCmd = require("lua/ship-cmd");
+local tradeExecutor = require("lua/trade-executor");
+
+--local function Area_AddGood(area, guid, amount)
+--    area.Economy.AddAmount(guid, amount);
+--end
+--local function Area_GetStock(area, guid)
+--    return area.Economy.GetStorageAmount(guid);
+--end
+
+local function AreaID_AddGood(areaID, guid, amount)
+    local cmd = '[MetaObjects SessionGameObject(' .. tostring(areaID) .. ') Area Economy AddAmount(' .. tostring(guid) .. ',' .. tostring(amount / 2) .. ')]';
+    --L.logf("cmd=%s", cmd);
+    return serpLight.DoForSessionGameObjectRaw(cmd);
 end
 
-local function Area_GetStock(area, guid)
-    return area.Economy.GetStorageAmount(guid);
+local function AreaID_GetStock(areaID, guid)
+    local cmd = '[MetaObjects SessionGameObject(' .. tostring(areaID) .. ') Area Economy AvailableAmount(' .. tostring(guid) .. ')]';
+    --L.logf("cmd=%s", cmd);
+    return tonumber(serpLight.DoForSessionGameObjectRaw(cmd));
 end
+
 
 local function Area_GetRequest(area, guid)
-    -- TODO: switch to static configuration instead, no way to update MinimumStock
-    --return area.PassiveTrade.GetMinimumStock(guid);
     return 200;
 end
 
 local type_Cargo = {
-    Guid = "string",
-    Value = "string"
-}
-
-local type_CommandKey = {
-    ShipID,
-    type_OrderKey,
-}
-
-local type_CommandValue = {
-    orderKeyValue,
-    ShipDistance,
-}
-
-local type_OrderKey = {
-    AreaID_from,
-    AreaID_to,
-    GoodID,
-    Amount,
-}
-
-local type_OrderValue = {
-    FullSlotsNeeded,
-    OrderDistance,
+    Guid = "number",
+    Value = "number"
 }
 
 local function GetShipCargo(oid)
-    -- List[type_Cargo]
     return serpLight.GetVectorGuidsFromSessionObject(
             '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer Cargo Count]',
             type_Cargo
     );
 end
 
-local function SetShipCargo(oid, cargo)
-    -- void
-    -- TODO: check if the slot EXISTS and empty
+local function SetShipCargo(oid, slot, cargo)
     local o = objectAccessor.GameObject(oid);
     o.ItemContainer.SetCheatItemInSlot(cargo.Guid, cargo.Value);
 end
 
+local function ClearShipCargo(oid, slot)
+    objectAccessor.GameObject(oid).ItemContainer.SetClearSlot(slot);
+end
+
+local function GetShipCargoCapacity(oid)
+    -- TODO: Implement
+    return 4; -- Default to 4 slots
+end
+
 local function GetAllShips()
-    -- Map[oid] -> GameObject; don't use values though
     return serpLight.GetCurrentSessionObjectsFromLocaleByProperty("Walking");
 end
 
-local function IsShipMoving(oid)
-    return serpLight.GetGameObjectPath(oid, "CommandQueue.UI_IsMoving")
-end
-
-local function MoveShipTo(oid, x, y)
-    objectAccessor.GameObject(oid).Walking.SetDebugGoto(x, y);
-end
-
----
-
--- works cross-region
 local function GetShipTradeRoute(oid)
     return serpLight.GetGameObjectPath(oid, "TradeRouteVehicle.RouteName");
 end
 
-----
+-- Initialize async modules
+shipCmd.init({
+    serpLight = serpLight,
+    objectAccessor = objectAccessor,
+    async = async
+})
+
+tradeExecutor.init({
+    async = async,
+    shipCmd = shipCmd,
+    objectAccessor = objectAccessor,
+    logger = L,
+    Area_GetGood = AreaID_GetStock,
+    Area_AddGood = AreaID_AddGood,
+    SetShipCargo = SetShipCargo,
+    ClearShipCargo = ClearShipCargo,
+    GetShipCargo = GetShipCargo,
+    GetShipCargoCapacity = GetShipCargoCapacity
+})
+
+---
 
 print("------------------------------------------------")
 
-local success, err = pcall(function()
+local function trade_execute()
     --local emptyShoreResolution = 20;
     --local mixedShoreResolution = 15;
     --local busyShoreResolution = 10;
@@ -118,7 +129,9 @@ local success, err = pcall(function()
     -- 2.1. For each area, scan it in detail if owned by the player.
     for areaID, grid in pairs(areas) do
         local area = objectAccessor.AreaFromID(areaID);
-        L.logf("%s / %d (owner=%d %s) grid{ minX=%d minY=%d maxX=%d maxY=%d }", area.CityName, areaID, area.Owner, area.OwnerName, tostring(grid.min_x), tostring(grid.min_y), tostring(grid.max_x), tostring(grid.max_y));
+        L.logf("%s / %d (owner=%d %s) grid{ minX=%d minY=%d maxX=%d maxY=%d }",
+                area.CityName, areaID, area.Owner, area.OwnerName,
+                tostring(grid.min_x), tostring(grid.min_y), tostring(grid.max_x), tostring(grid.max_y));
 
         -- owner = 0 => player-owned area
         if area.Owner ~= 0 then
@@ -140,7 +153,6 @@ local success, err = pcall(function()
             local x, y = map_scanner.UnpackCoordinates(k);
             lq.logf("%d,%d,%s", x, y, map_scanner.Coordinate_ToLetter(v));
         end
-
 
         -- 2.2. Determine water access points for the area.
         local water_points = {};
@@ -170,12 +182,12 @@ local success, err = pcall(function()
         for _, point in ipairs(water_points) do
             local dirX = point.x - avgX;
             local dirY = point.y - avgY;
+            point.x = math.floor(point.x + dirX * 30);
             local len = math.sqrt(dirX * dirX + dirY * dirY);
             if len > 0 then
                 dirX = dirX / len;
                 dirY = dirY / len;
             end
-            point.x = math.floor(point.x + dirX * 30);
             point.y = math.floor(point.y + dirY * 30);
 
             -- 2.2.1.debug. Log water access points.
@@ -191,13 +203,18 @@ local success, err = pcall(function()
     -- 3.1. Find all ships allocated to trade routes automation.
     local ships = GetAllShips();
     local available_ships = {};
+    local available_ship_count = 0;
     for oid, _ in pairs(ships) do
         local route_name = GetShipTradeRoute(oid);
         if route_name and route_name:match("^TRADE_ROUTE_AUTOMATION") then
-            L.logf("Found trade route automation ship: oid=%d name=%s route=%s", oid, tostring(objectAccessor.GameObject(oid).Nameable.Name), tostring(route_name));
+            L.logf("Found trade route automation ship: oid=%d name=%s route=%s",
+                    oid, tostring(objectAccessor.GameObject(oid).Nameable.Name), tostring(route_name));
             available_ships[oid] = { route_name = route_name };
+            available_ship_count = available_ship_count + 1;
         end
     end
+
+    L.logf("Total available trade route automation ships: %d", available_ship_count);
 
     -- 4. (work in progress) Determine product disbalances in the areas. Assign ship to balance the good.
     local RumProductGuid = 1010257; -- Rum
@@ -215,7 +232,7 @@ local success, err = pcall(function()
             goto continue;
         end
 
-        local _stock = Area_GetStock(area, RumProductGuid);
+        local _stock = AreaID_GetStock(areaID, RumProductGuid);
         local _request = Area_GetRequest(area, RumProductGuid);
         L.logf("Area %s (id=%d) Rum stock=%d request=%d", area.CityName, areaID, _stock, _request);
 
@@ -235,7 +252,7 @@ local success, err = pcall(function()
     end
 
     local function supplyToGoodToAreaID(supply)
-        local ret = {} -- table<GoodID, table<AreaID, Amount>>
+        local ret = {}
         for areaID, goods in pairs(supply) do
             for goodID, amount in pairs(goods) do
                 if ret[goodID] == nil then
@@ -247,12 +264,9 @@ local success, err = pcall(function()
         return ret;
     end
 
-    local supply_goodToAreaID = supplyToGoodToAreaID(supply); -- table<GoodID, table<AreaID, Amount>>
+    local supply_goodToAreaID = supplyToGoodToAreaID(supply);
 
     L.log("supplyToGoodToAreaID - done");
-
-    ---
-
 
     local function CalculateDistanceBetweenCoordinates(coord1, coord2)
         local dx = coord1.x - coord2.x;
@@ -297,12 +311,14 @@ local success, err = pcall(function()
             if supply_areas ~= nil then
                 L.logf("found supply areas for goodID=%d %s", goodID, tostring(supply_areas));
                 for supply_areaID, supply_amount in pairs(supply_areas) do
-                    local transfer_amount = math.min(amount, supply_amount)
+                    local transfer_amount = 200 -- TODO: let ships capacity determine this
+                    --local transfer_amount = math.min(amount, supply_amount)
                     local full_slots_needed = math.ceil(transfer_amount / 50)
-                    local distance = CalculateDistanceBetweenAreas(areaID, supply_areaID)
+                    local distance = CalculateDistanceBetweenAreas(supply_areaID, areaID)
 
                     if distance.dist == math.huge then
-                        L.logf("Skipping order from area %d to area %d for good %d due to no water route", supply_areaID, areaID, goodID);
+                        L.logf("Skipping order from area %d to area %d for good %d due to no water route",
+                                supply_areaID, areaID, goodID);
                         goto continue;
                     end
 
@@ -327,15 +343,10 @@ local success, err = pcall(function()
 
     L.log("request_orders - done");
 
-    ---
-
-
-    local available_commands = {} -- table<commandKeyType, commandValueType>
+    local available_commands = {}
 
     for ship, _ in pairs(available_ships) do
         for order_key, order_value in pairs(request_orders) do
-            -- TODO: implement
-            --local ship_position = GetShipPosition(ship)
             local ship_position = order_value.OrderDistance.src
 
             local distance_to_pickup = CalculateDistanceBetweenCoordinates(
@@ -363,12 +374,17 @@ local success, err = pcall(function()
         table.insert(available_commands_kv, { Key = k, Value = v });
     end
 
-    -- Sort available_commands by ShipDistance ascending
     table.sort(available_commands_kv, function(a, b)
         return a.Value.ShipDistance < b.Value.ShipDistance
     end);
 
     L.log("available_commands - done");
+
+    -- ========================================================================
+    -- NEW: Spawn async tasks for trade orders
+    -- ========================================================================
+
+    local spawned_tasks = {}
 
     for _, kv in ipairs(available_commands_kv) do
         local command_key = kv.Key
@@ -378,21 +394,89 @@ local success, err = pcall(function()
         local order = command_key.Order
         local order_value = command_value.Order
 
-        inspector.Do(L, {
-            Ship = ship,
+        L.logf("Spawning trade order: Ship=%d, From=%s, To=%s, Distance=%.1f",
+                ship,
+                areas[order.AreaID_from].city_name,
+                areas[order.AreaID_to].city_name,
+                command_value.ShipDistance
+        )
 
-            src = areas[order.AreaID_from].city_name,
-            dst = areas[order.AreaID_to].city_name,
+        -- Spawn async task
+        local task_id = tradeExecutor.SpawnTradeOrder(ship, kv)
+        table.insert(spawned_tasks, task_id)
 
-            src_stock = Area_GetStock(objectAccessor.AreaFromID(order.AreaID_from), order.GoodID),
-            dst_stock = Area_GetStock(objectAccessor.AreaFromID(order.AreaID_to), order.GoodID),
-
-            distance = command_value.ShipDistance,
-        })
-
-        return
+        break ;
     end
-end);
+
+    L.logf("Spawned %d trade order tasks", #spawned_tasks)
+
+    -- ========================================================================
+    -- NEW: Main async loop - run for a limited time or until all tasks complete
+    -- ========================================================================
+
+    local max_ticks = 10000 -- Safety limit
+    local tick_count = 0
+
+    while tick_count < max_ticks do
+        tick_count = tick_count + 1
+
+        -- Run async scheduler
+        local stats = async.tick()
+
+        -- Log progress every 100 ticks
+        if tick_count % 100 == 0 then
+            L.logf("[Tick %d] Async stats: running=%d, waiting=%d, completed=%d, errors=%d",
+                    tick_count, stats.running, stats.waiting, stats.completed, stats.errors)
+        end
+
+        -- Check if all tasks are done
+        local active = async.get_active_tasks()
+        if #active == 0 then
+            L.logf("All tasks completed after %d ticks", tick_count)
+            break
+        end
+
+        -- Cleanup every 1000 ticks
+        if tick_count % 1000 == 0 then
+            async.cleanup(true) -- Keep errors for debugging
+        end
+
+        -- Small delay to avoid tight loop (if needed in your environment)
+        -- os.execute("sleep 0.01") -- Uncomment if running in a tight loop
+        coroutine:yield();
+    end
+
+    -- Final cleanup
+    async.cleanup(true)
+
+    -- Report final stats
+    local final_stats = async.tick()
+    L.logf("Final stats after %d ticks: completed=%d, errors=%d",
+            tick_count, final_stats.completed, final_stats.errors)
+
+    -- Report any errors
+    local errored = async.get_tasks_by_state("error")
+    if #errored > 0 then
+        L.logf("Tasks with errors: %d", #errored)
+        for _, task in ipairs(errored) do
+            L.logf("  Task %d error: %s", task.id, task.error)
+        end
+    end
+end
+
+--local success, err = pcall(function()
+--    local areaID = 38766374813697;
+--    L.logf("%s", tostring(AreaID_GetStock(areaID, 1010257)));
+--    L.logf(AreaID_AddGood(areaID, 1010257, 50));
+--    coroutine.yield();
+--    coroutine.yield();
+--    L.logf("%s", tostring(AreaID_GetStock(areaID, 1010257)));
+--    coroutine.yield();
+--    coroutine.yield();
+--    L.logf("%s", tostring(AreaID_GetStock(areaID, 1010257)));
+--end);
+
+local success, err = pcall(trade_execute);
 
 L.logf("PCALL success: %s", tostring(success));
 L.logf("PCALL error: %s", tostring(err));

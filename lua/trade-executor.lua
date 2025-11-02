@@ -14,6 +14,7 @@ local objectAccessor = nil
 local logger = nil
 
 -- Cargo operations
+local Area_GetGood = nil
 local Area_AddGood = nil
 local SetShipCargo = nil
 local ClearShipCargo = nil
@@ -28,6 +29,7 @@ function TradeExecutor.init(deps)
     objectAccessor = deps.objectAccessor
     logger = deps.logger
 
+    Area_GetGood = deps.Area_GetGood
     Area_AddGood = deps.Area_AddGood
     SetShipCargo = deps.SetShipCargo
     ClearShipCargo = deps.ClearShipCargo
@@ -74,14 +76,32 @@ function TradeExecutor.ExecuteTradeOrderWithShip(ship_oid, cmd)
     local order_key = cmd.Key.Order
     local order_value = cmd.Value.Order
 
+    local sourceArea = order_key.AreaID_from;
+    local destArea = order_key.AreaID_to;
+    local areaSrcBefore = Area_GetGood(sourceArea, order_key.GoodID)
+    local areaDstBefore = Area_GetGood(destArea, order_key.GoodID)
+
     if logger then
         logger.logf(
-            "Starting trade order: Ship=%d, Good=%d, Amount=%d, From=%d, To=%d",
-            ship_oid,
-            order_key.GoodID,
-            order_key.Amount,
-            order_key.AreaID_from,
-            order_key.AreaID_to
+                "Starting trade order: Ship=%d (%s), Good=%d, Amount=%d, From=%d, To=%d",
+                ship_oid,
+                objectAccessor.GameObject(ship_oid).Nameable.Name,
+                order_key.GoodID,
+                order_key.Amount,
+                order_key.AreaID_from,
+                order_key.AreaID_to
+        )
+        logger.logf(
+                "Source area %d good %d before: %d",
+                order_key.AreaID_from,
+                order_key.GoodID,
+                areaSrcBefore
+        )
+        logger.logf(
+                "Destination area %d good %d before: %d",
+                order_key.AreaID_to,
+                order_key.GoodID,
+                areaDstBefore
         )
     end
 
@@ -94,9 +114,9 @@ function TradeExecutor.ExecuteTradeOrderWithShip(ship_oid, cmd)
     end
 
     shipCmd.MoveShipToAsync(
-        ship_oid,
-        order_value.OrderDistance.src.x,
-        order_value.OrderDistance.src.y
+            ship_oid,
+            order_value.OrderDistance.src.x,
+            order_value.OrderDistance.src.y
     )
 
     if logger then
@@ -122,14 +142,25 @@ function TradeExecutor.ExecuteTradeOrderWithShip(ship_oid, cmd)
         })
 
         -- Deduct from source area
-        local source_area = objectAccessor.AreaFromID(order_key.AreaID_from)
-        Area_AddGood(source_area, order_key.GoodID, -amount_to_load)
+        Area_AddGood(sourceArea, order_key.GoodID, -amount_to_load)
 
         total_loaded = total_loaded + amount_to_load
     end
 
+    coroutine.yield();
+    coroutine.yield();
+
+    local area_src_after = Area_GetGood(sourceArea, order_key.GoodID)
+
     if logger then
         logger.logf("Loaded %d total units onto ship %d", total_loaded, ship_oid)
+        logger.logf(
+                "Source area %d good %d before: %d, after: %d",
+                order_key.AreaID_from,
+                order_key.GoodID,
+                areaSrcBefore,
+                area_src_after
+        )
     end
 
     -- Step 4: Move ship to destination area
@@ -138,9 +169,9 @@ function TradeExecutor.ExecuteTradeOrderWithShip(ship_oid, cmd)
     end
 
     shipCmd.MoveShipToAsync(
-        ship_oid,
-        order_value.OrderDistance.dst.x,
-        order_value.OrderDistance.dst.y
+            ship_oid,
+            order_value.OrderDistance.dst.x,
+            order_value.OrderDistance.dst.y
     )
 
     if logger then
@@ -151,15 +182,14 @@ function TradeExecutor.ExecuteTradeOrderWithShip(ship_oid, cmd)
     local cargo = GetShipCargo(ship_oid)
     local total_unloaded = 0
 
-    for i, cargo_item in ipairs(cargo) do
+    for i, cargo_item in pairs(cargo) do
         if cargo_item.Guid == order_key.GoodID then
             if logger then
                 logger.logf("Unloading slot %d with %d units of good %d", i, cargo_item.Value, cargo_item.Guid)
             end
 
             -- Add to destination area
-            local dest_area = objectAccessor.AreaFromID(order_key.AreaID_to)
-            Area_AddGood(dest_area, cargo_item.Guid, cargo_item.Value)
+            Area_AddGood(destArea, cargo_item.Guid, cargo_item.Value)
 
             -- Remove from ship
             ClearShipCargo(ship_oid, i)
@@ -168,12 +198,25 @@ function TradeExecutor.ExecuteTradeOrderWithShip(ship_oid, cmd)
         end
     end
 
+    coroutine.yield();
+    coroutine.yield();
+
+    local area_dst_after = Area_GetGood(destArea, order_key.GoodID)
+
     if logger then
         logger.logf(
-            "Trade order completed: Ship=%d, Unloaded=%d units of good %d",
-            ship_oid,
-            total_unloaded,
-            order_key.GoodID
+                "Trade order completed: Ship=%d, Unloaded=%d units of good %d",
+                ship_oid,
+                total_unloaded,
+                order_key.GoodID
+        )
+
+        logger.logf(
+                "Destination area %d good %d before: %d, after: %d",
+                order_key.AreaID_to,
+                order_key.GoodID,
+                areaDstBefore,
+                area_dst_after
         )
     end
 
