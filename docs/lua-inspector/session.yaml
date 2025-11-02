@@ -34,9 +34,9 @@ object:
       skipped_debug_call: true
     buildShipInBuilding:
       skipped_debug_call: true
-    cameraFOV:
+    cameraFOV: # value  0.46
       skipped_debug_call: true
-    cameraFarClip:
+    cameraFarClip: # value  550
       skipped_debug_call: true
     createTestStreetGridTiles:
       skipped_debug_call: true

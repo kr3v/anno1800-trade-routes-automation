@@ -22,6 +22,10 @@ function tostring_quote(val)
     end
 end
 
+local type_InspectArgs = {
+    allowGetFuncCall = false,
+}
+
 -- NEVER do `inspect_object(ship.Logistic.__original)`
 -- ALWAYS do `inspect_object(ship.Logistic)`
 local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marked)
@@ -89,7 +93,13 @@ local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marke
                 goto continue
             end
 
+            if k == "Object" or k == "GetObject" then
+                goto continue
+            end
+
             if type(v) == "function" then
+                goto continue;
+
                 local i = {
                     name = tostring(k),
                     type = "function",
@@ -208,6 +218,9 @@ local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marke
         if type(target) == "table" then
             walk_table(target, target, false)
         end
+        if type(target) == "userdata" then
+            walk_table(target, target, false)
+        end
     end
 
     -- Try tostring
@@ -226,6 +239,9 @@ return {
         inspectL(L, obj, title or "object", false)
     end,
     DoF = function(L, obj, title)
+        inspectL(L, obj, title or "object", true)
+    end,
+    DoFL = function(L, obj, title)
         inspectL(L, obj, title or "object", true)
     end,
 }

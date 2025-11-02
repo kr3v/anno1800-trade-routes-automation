@@ -1,3 +1,24 @@
+local serpLight = require("lua/serp/lighttools");
+
+-- This module allows reusing Anno objects without fetching them multiple times to tackle the issue of field caching.
+-- E.g.
+-- local obj = ts.GetGameObject(oid)
+-- local name = obj.Nameable.Name
+-- local guid = obj.Static.Guid
+-- The above code would only return a valid value for `Name`, but `Guid` would be same as `Name` due to caching.
+-- Using this module:
+-- local obj = objectAccessor.GameObject(oid)
+-- local name = obj.Nameable.Name
+-- local guid = obj.Static.Guid
+-- both `Name` and `Guid` return correct values.
+
+-- Note:
+-- 1. I think the above `ts` rule applies to objects returned by functions, but not to objects returned by fields.
+--    e.g. `ts.Area.Current.ID` has 3 fields and all are accessible.
+--    but  `ts.Area.GetAreaFromID(areaID)` is NOT reusable,
+--    so you want `objectAccessor.AreaFromID(areaID)`, which IS reusable because it always retrieves a fresh object.
+--    where `areaID = serpLight.AreatableToAreaID(ts.Area.Current.ID)`
+
 local function getObjectAccessor(_gen, path)
     return setmetatable({}, {
         __index = function(_, key)
@@ -55,15 +76,16 @@ return {
                 {}
         );
     end,
-    Area = function()
+    AreaFromID = function(areaID)
         return getObjectAccessor(
                 function()
-                    return ts.Area;
+                    return ts.Area.GetAreaFromID(areaID);
                 end,
                 {}
         );
     end,
-    AreaByID = function(areaID)
+    AreaFromAreatable = function(areatable)
+        local areaID = serpLight.AreatableToAreaID(areatable);
         return getObjectAccessor(
                 function()
                     return ts.Area.GetAreaFromID(areaID);

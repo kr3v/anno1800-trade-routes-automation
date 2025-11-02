@@ -79,7 +79,6 @@ Proposal 1 (extended):
 ```lua
 --local request: table<AreaID, table<GoodID, Amount>> = {}
 --local supply: table<AreaID, table<GoodID, Amount>> = {}
---local overstock: table<AreaID, table<GoodID, Amount>> = {}
 
 ---
 local supply_goodToAreaID = {} -- table<GoodID, table<AreaID, Amount>>
