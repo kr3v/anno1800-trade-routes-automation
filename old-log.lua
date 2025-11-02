@@ -172,3 +172,146 @@
 --    print(inspector.Do(L, IsShipMoving(oid), "IsShipMoving"));
 --    coroutine.yield();
 --end
+
+---
+
+--local function LookAtObject(oid)
+--    ts.MetaObjects.CheatLookAtObject(oid)
+--end
+--
+---- IsVisible == is object within current session and not hidden, not visible through camera
+--local function IsVisible(oid)
+--    return session.getObjectByID(oid).visible;
+--end
+--
+--local function MoveCameraTo(x, y)
+--    ts.SessionCamera.ToWorldPos(x, y);
+--end
+--
+--local function TradeRouteStuff()
+--    local val = serpLight.DoForSessionGameObjectRaw('[TradeRoute Route(11) Station(2) HasGood(2)]');
+--    L.logf("route=%d station=%d has_good(%d)=%s", 11, 2, 2, tostring(val));
+--    L.logf("route=%d station=%d good(%d) guid=%s amount=%s",
+--            11, 2, 2,
+--            tostring(serpLight.DoForSessionGameObjectRaw('[TradeRoute Route(11) Station(2) Good(2) Guid]')),
+--            tostring(serpLight.DoForSessionGameObjectRaw('[TradeRoute Route(11) Station(2) Good(2) Amount]'))
+--    );
+--    L.logf("%s", tostring(ts.TradeRoute.GetRoute(11).GetStation(2).GetGood(2)));
+--
+--    inspector.DoF(L, objectAccessor.Generic(function()
+--        return ts.TradeRoute.GetRoute(11).GetStation(2).GetGood(2);
+--    end));
+--
+--    --ts.TradeRoute.GetRoute(11).GetStation(2).GetGood(2).Amount = 33;
+--
+--    inspector.DoF(L, objectAccessor.Generic(function()
+--        return ts.TradeRoute.GetRoute(11).GetStation(2).GetGood(2);
+--    end));
+--end
+--
+---- github.com/anno-mods/FileDBReader to extract positions for buildings
+---- use ore sources as 'static' points?
+---- write a routine that would find all islands through camera move and then 'active area' to map coordinates to islands
+---- given: a map roughtly 1800x1800 units
+---- my camera saw about 120x60 at default settings at a time
+--
+---- possible optimization: Minimap? pre-parse it or check if anything is extractable there.
+---- IsMinimapRotationEnabled
+--
+----rdui::CMinimapFOVMarkerObject*:
+----type: "table: 000000001856E6C8"
+----fields:
+----type: table
+----properties:
+----Position:
+----type: "property<phoenix::Vector3>"
+----fields:
+----type: string
+----tostring: "property<phoenix::Vector3>"
+----RotationAngle:
+----type: "property<phoenix::Float32>"
+----fields:
+----type: string
+----tostring: "property<phoenix::Float32>"
+----Width:
+----type: "property<phoenix::Float32>"
+----fields:
+----type: string
+----tostring: "property<phoenix::Float32>"
+----tostring: "table: 000000001856E6C8"
+--
+----
+---- ToggleDebugInfo
+---- GetWorldMap
+---- SessionCamera, SessionTransfer
+---- MetaObjects
+--
+--------------------------------------------------
+--
+--local function sessionProperties()
+--    local l = L.logger("lua/property_counts.tsv");
+--    for i, v in pairs(serpLight.PropertiesStringToID) do
+--        local os = session.getObjectGroupByProperty(v);
+--        local c = #os;
+--        if c > 0 then
+--            local is = tostring(i);
+--            if #is < 25 then
+--                is = is .. string.rep(" ", 25 - #is);
+--            end
+--            l.log(is .. "\t" .. tostring(v) .. "\t" .. tostring(c) .. "\t" .. os[1]:getName());
+--        end
+--    end
+--end
+--
+--local function sessionPropertiesOids()
+--    local l = L.logger("lua/oids-with-properties.tsv");
+--    local oids = {};
+--    for i, v in pairs(serpLight.PropertiesStringToID) do
+--        local os = session.getObjectGroupByProperty(v);
+--        for _, obj in pairs(os) do
+--            local obj_str = tostring(obj:getName());
+--            local oid = tonumber(obj_str:match("oid (%d+)"));
+--            if oid then
+--                local oa = objectAccessor.GameObject(oid);
+--                oids[oid] = { Name = oa.Nameable.Name, Guid = oa.Static.Guid, Text = oa.Static.Text };
+--            end
+--        end
+--    end
+--    for oid, name in pairs(oids) do
+--        --l.logf("%s\t%s\t%s\t%s", tostring(oid), tostring(name.Name), tostring(name.Guid), tostring(name.Text));
+--
+--        -- json lines
+--        l.logf('{"oid": %s, "name": "%s", "guid": "%s", "text": "%s"}',
+--                tostring(oid),
+--                tostring(name.Name):gsub('"', '\\"'),
+--                tostring(name.Guid):gsub('"', '\\"'),
+--                tostring(name.Text):gsub('"', '\\"')
+--        );
+--    end
+--end
+
+
+---
+
+-- TODO:
+-- 1. check if ALL commands work when ship is in a different session
+--   a. IsShipMoving - works
+--   b. GetShipCargo and others - TODO
+-- 2. add island economy access functions
+--   a. formalize API access to economy (provides Set +/- functions)
+--   b. figure out Get access
+-- 3. try implementing basic automation for a specific good
+-- 4. How to move ship between sessions? How to get ships current session?
+
+-- Alternative approach 1 - how to manage trade routes?
+
+
+-- Alternative approach 2 - figure out python capabilities.
+--CScriptManagerTextSource*:
+--type: "CScriptManagerTextSource*MT: 0000000018277C08"
+--fields:
+--type: table
+--functions:
+--SetEnablePython:
+--skipped_debug_call: true
+--tostring: "CScriptManagerTextSource*MT: 0000000018277C08"

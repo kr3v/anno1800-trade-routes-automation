@@ -18,29 +18,6 @@ local json = require("lua/rxi/json");
 local cache = require("lua/cache");
 local base64 = require("lua/iskolbin/base64");
 
--- TODO:
--- 1. check if ALL commands work when ship is in a different session
---   a. IsShipMoving - works
---   b. GetShipCargo and others - TODO
--- 2. add island economy access functions
---   a. formalize API access to economy (provides Set +/- functions)
---   b. figure out Get access
--- 3. try implementing basic automation for a specific good
--- 4. How to move ship between sessions? How to get ships current session?
-
--- Alternative approach 1 - how to manage trade routes?
-
-
--- Alternative approach 2 - figure out python capabilities.
---CScriptManagerTextSource*:
---type: "CScriptManagerTextSource*MT: 0000000018277C08"
---fields:
---type: table
---functions:
---SetEnablePython:
---skipped_debug_call: true
---tostring: "CScriptManagerTextSource*MT: 0000000018277C08"
-
 local function Area_AddGood(area, guid, amount)
     area.Economy.AddAmount(guid, amount);
 end
@@ -58,6 +35,28 @@ end
 local type_Cargo = {
     Guid = "string",
     Value = "string"
+}
+
+local type_CommandKey = {
+    ShipID,
+    type_OrderKey,
+}
+
+local type_CommandValue = {
+    orderKeyValue,
+    ShipDistance,
+}
+
+local type_OrderKey = {
+    AreaID_from,
+    AreaID_to,
+    GoodID,
+    Amount,
+}
+
+local type_OrderValue = {
+    FullSlotsNeeded,
+    OrderDistance,
 }
 
 local function GetShipCargo(oid)
@@ -80,17 +79,6 @@ local function GetAllShips()
     return serpLight.GetCurrentSessionObjectsFromLocaleByProperty("Walking");
 end
 
-local function GetAllShipsNames()
-    -- Map[oid] -> Name
-    local ships = GetAllShips();
-    local ship_names = {};
-    for oid, ship in pairs(ships) do
-        local name = objectAccessor.GameObject(oid).Nameable.Name;
-        ship_names[oid] = name;
-    end
-    return ship_names;
-end
-
 local function IsShipMoving(oid)
     return serpLight.GetGameObjectPath(oid, "CommandQueue.UI_IsMoving")
 end
@@ -104,121 +92,6 @@ end
 -- works cross-region
 local function GetShipTradeRoute(oid)
     return serpLight.GetGameObjectPath(oid, "TradeRouteVehicle.RouteName");
-end
-
-local function LookAtObject(oid)
-    ts.MetaObjects.CheatLookAtObject(oid)
-end
-
--- IsVisible == is object within current session and not hidden, not visible through camera
-local function IsVisible(oid)
-    return session.getObjectByID(oid).visible;
-end
-
-local function MoveCameraTo(x, y)
-    ts.SessionCamera.ToWorldPos(x, y);
-end
-
-local function TradeRouteStuff()
-    local val = serpLight.DoForSessionGameObjectRaw('[TradeRoute Route(11) Station(2) HasGood(2)]');
-    L.logf("route=%d station=%d has_good(%d)=%s", 11, 2, 2, tostring(val));
-    L.logf("route=%d station=%d good(%d) guid=%s amount=%s",
-            11, 2, 2,
-            tostring(serpLight.DoForSessionGameObjectRaw('[TradeRoute Route(11) Station(2) Good(2) Guid]')),
-            tostring(serpLight.DoForSessionGameObjectRaw('[TradeRoute Route(11) Station(2) Good(2) Amount]'))
-    );
-    L.logf("%s", tostring(ts.TradeRoute.GetRoute(11).GetStation(2).GetGood(2)));
-
-    inspector.DoF(L, objectAccessor.Generic(function()
-        return ts.TradeRoute.GetRoute(11).GetStation(2).GetGood(2);
-    end));
-
-    --ts.TradeRoute.GetRoute(11).GetStation(2).GetGood(2).Amount = 33;
-
-    inspector.DoF(L, objectAccessor.Generic(function()
-        return ts.TradeRoute.GetRoute(11).GetStation(2).GetGood(2);
-    end));
-end
-
--- github.com/anno-mods/FileDBReader to extract positions for buildings
--- use ore sources as 'static' points?
--- write a routine that would find all islands through camera move and then 'active area' to map coordinates to islands
--- given: a map roughtly 1800x1800 units
--- my camera saw about 120x60 at default settings at a time
-
--- possible optimization: Minimap? pre-parse it or check if anything is extractable there.
--- IsMinimapRotationEnabled
-
---rdui::CMinimapFOVMarkerObject*:
---type: "table: 000000001856E6C8"
---fields:
---type: table
---properties:
---Position:
---type: "property<phoenix::Vector3>"
---fields:
---type: string
---tostring: "property<phoenix::Vector3>"
---RotationAngle:
---type: "property<phoenix::Float32>"
---fields:
---type: string
---tostring: "property<phoenix::Float32>"
---Width:
---type: "property<phoenix::Float32>"
---fields:
---type: string
---tostring: "property<phoenix::Float32>"
---tostring: "table: 000000001856E6C8"
-
---
--- ToggleDebugInfo
--- GetWorldMap
--- SessionCamera, SessionTransfer
--- MetaObjects
-
-------------------------------------------------
-
-local function sessionProperties()
-    local l = L.logger("lua/property_counts.tsv");
-    for i, v in pairs(serpLight.PropertiesStringToID) do
-        local os = session.getObjectGroupByProperty(v);
-        local c = #os;
-        if c > 0 then
-            local is = tostring(i);
-            if #is < 25 then
-                is = is .. string.rep(" ", 25 - #is);
-            end
-            l.log(is .. "\t" .. tostring(v) .. "\t" .. tostring(c) .. "\t" .. os[1]:getName());
-        end
-    end
-end
-
-local function sessionPropertiesOids()
-    local l = L.logger("lua/oids-with-properties.tsv");
-    local oids = {};
-    for i, v in pairs(serpLight.PropertiesStringToID) do
-        local os = session.getObjectGroupByProperty(v);
-        for _, obj in pairs(os) do
-            local obj_str = tostring(obj:getName());
-            local oid = tonumber(obj_str:match("oid (%d+)"));
-            if oid then
-                local oa = objectAccessor.GameObject(oid);
-                oids[oid] = { Name = oa.Nameable.Name, Guid = oa.Static.Guid, Text = oa.Static.Text };
-            end
-        end
-    end
-    for oid, name in pairs(oids) do
-        --l.logf("%s\t%s\t%s\t%s", tostring(oid), tostring(name.Name), tostring(name.Guid), tostring(name.Text));
-
-        -- json lines
-        l.logf('{"oid": %s, "name": "%s", "guid": "%s", "text": "%s"}',
-                tostring(oid),
-                tostring(name.Name):gsub('"', '\\"'),
-                tostring(name.Guid):gsub('"', '\\"'),
-                tostring(name.Text):gsub('"', '\\"')
-        );
-    end
 end
 
 ----
@@ -258,8 +131,11 @@ local success, err = pcall(function()
 
         areas[areaID].scan = scan;
 
+        local cityName = area.CityName:gsub("%s+", "_");
+        areas[areaID].city_name = cityName;
+
         -- 2.1.debug. Save scan results in tsv, use `make area-visualizations` and `utils/area-visualizer.py` to visualize.
-        local lq = L.logger("lua/area_scan_" .. area.CityName:gsub("%s+", "_") .. ".tsv");
+        local lq = L.logger("lua/area_scan_" .. cityName .. ".tsv");
         for k, v in pairs(scan) do
             local x, y = map_scanner.UnpackCoordinates(k);
             lq.logf("%d,%d,%s", x, y, map_scanner.Coordinate_ToLetter(v));
@@ -314,12 +190,12 @@ local success, err = pcall(function()
 
     -- 3.1. Find all ships allocated to trade routes automation.
     local ships = GetAllShips();
-    local trade_route_automation_ships = {};
+    local available_ships = {};
     for oid, _ in pairs(ships) do
         local route_name = GetShipTradeRoute(oid);
         if route_name and route_name:match("^TRADE_ROUTE_AUTOMATION") then
             L.logf("Found trade route automation ship: oid=%d name=%s route=%s", oid, tostring(objectAccessor.GameObject(oid).Nameable.Name), tostring(route_name));
-            trade_route_automation_ships[oid] = { route_name = route_name };
+            available_ships[oid] = { route_name = route_name };
         end
     end
 
@@ -327,88 +203,196 @@ local success, err = pcall(function()
     local RumProductGuid = 1010257; -- Rum
 
     -- 4.1. Find areas that can provide or consume the product.
-    local canProvide = {};
-    local canConsume = {};
+
+    --- request: AreaID -> [(GoodID, Amount)]
+    --- supply:  AreaID -> [(GoodID, Amount)]
+
+    local supply = {};
+    local request = {};
     for areaID, areaData in pairs(areas) do
         local area = objectAccessor.AreaFromID(areaID);
         if area.Owner ~= 0 then
             goto continue;
         end
 
-        local stock = Area_GetStock(area, RumProductGuid);
-        local request = Area_GetRequest(area, RumProductGuid);
-        L.logf("Area %s (id=%d) Rum stock=%d request=%d", area.CityName, areaID, stock, request);
+        local _stock = Area_GetStock(area, RumProductGuid);
+        local _request = Area_GetRequest(area, RumProductGuid);
+        L.logf("Area %s (id=%d) Rum stock=%d request=%d", area.CityName, areaID, _stock, _request);
 
-        if stock >= request * 2 then
-            table.insert(canProvide, { areaID = areaID, excess = stock - request * 2 });
-        elseif stock <= request and request - stock >= 50 then
-            table.insert(canConsume, { areaID = areaID, deficit = request - stock });
+        if _stock >= _request * 2 then
+            if supply[areaID] == nil then
+                supply[areaID] = {};
+            end
+            supply[areaID][RumProductGuid] = _stock - _request;
+        elseif _request - _stock >= 50 then
+            if request[areaID] == nil then
+                request[areaID] = {};
+            end
+            request[areaID][RumProductGuid] = _request - _stock;
         end
 
-        ::continue::
+        :: continue ::
     end
 
-    -- 4.2. Generate a 'trades' table with src-dst and min distance between areas.
-    local trades = {};
-    for _, provider in ipairs(canProvide) do
-        for _, consumer in ipairs(canConsume) do
-            local providerArea = objectAccessor.AreaFromID(provider.areaID);
-            local consumerArea = objectAccessor.AreaFromID(consumer.areaID);
+    local function supplyToGoodToAreaID(supply)
+        local ret = {} -- table<GoodID, table<AreaID, Amount>>
+        for areaID, goods in pairs(supply) do
+            for goodID, amount in pairs(goods) do
+                if ret[goodID] == nil then
+                    ret[goodID] = {}
+                end
+                ret[goodID][areaID] = amount
+            end
+        end
+        return ret;
+    end
 
-            local minDistance = math.huge;
-            for _, pPoint in ipairs(areas[provider.areaID].water_points) do
-                for _, cPoint in ipairs(areas[consumer.areaID].water_points) do
-                    local dx = pPoint.x - cPoint.x;
-                    local dy = pPoint.y - cPoint.y;
-                    local dist = math.sqrt(dx * dx + dy * dy);
-                    if dist < minDistance then
-                        minDistance = dist;
+    local supply_goodToAreaID = supplyToGoodToAreaID(supply); -- table<GoodID, table<AreaID, Amount>>
+
+    L.log("supplyToGoodToAreaID - done");
+
+    ---
+
+
+    local function CalculateDistanceBetweenCoordinates(coord1, coord2)
+        local dx = coord1.x - coord2.x;
+        local dy = coord1.y - coord2.y;
+        return math.sqrt(dx * dx + dy * dy);
+    end
+
+    local function CalculateDistanceBetweenAreas(areaID1, areaID2)
+        local area1 = areas[areaID1];
+        local area2 = areas[areaID2];
+
+        if area1 == nil or area1.water_points == nil then
+            L.logf("Area %d has no water points", areaID1);
+            return { dist = math.huge };
+        end
+        if area2 == nil or area2.water_points == nil then
+            L.logf("Area %d has no water points", areaID2);
+            return { dist = math.huge };
+        end
+
+        local options = {};
+        for _, point1 in ipairs(areas[areaID1].water_points) do
+            for _, point2 in ipairs(areas[areaID2].water_points) do
+                local dist = CalculateDistanceBetweenCoordinates(point1, point2);
+                table.insert(options, { src = point1, dst = point2, dist = dist });
+            end
+        end
+        table.sort(options, function(a, b)
+            return a.dist < b.dist
+        end);
+
+        return options[1];
+    end
+
+    local request_orders = {} -- table<orderKeyType, orderValueType>
+
+    for areaID, area_requests in pairs(request) do
+        L.logf("areaID=%d rq=%s", areaID, tostring(area_requests));
+        for goodID, amount in pairs(area_requests) do
+            L.logf("goodID=%d amount=%d", goodID, amount);
+            local supply_areas = supply_goodToAreaID[goodID]
+            if supply_areas ~= nil then
+                L.logf("found supply areas for goodID=%d %s", goodID, tostring(supply_areas));
+                for supply_areaID, supply_amount in pairs(supply_areas) do
+                    local transfer_amount = math.min(amount, supply_amount)
+                    local full_slots_needed = math.ceil(transfer_amount / 50)
+                    local distance = CalculateDistanceBetweenAreas(areaID, supply_areaID)
+
+                    if distance.dist == math.huge then
+                        L.logf("Skipping order from area %d to area %d for good %d due to no water route", supply_areaID, areaID, goodID);
+                        goto continue;
                     end
+
+                    local key = {
+                        AreaID_from = supply_areaID,
+                        AreaID_to = areaID,
+                        GoodID = goodID,
+                        Amount = transfer_amount,
+                    }
+                    local value = {
+                        FullSlotsNeeded = full_slots_needed,
+                        OrderDistance = distance,
+                    }
+
+                    request_orders[key] = value
+
+                    :: continue ::
                 end
             end
-
-            table.insert(trades, {
-                srcAreaID = provider.areaID,
-                dstAreaID = consumer.areaID,
-                distance = minDistance,
-                srcCityName = providerArea.CityName,
-                dstCityName = consumerArea.CityName,
-                amount = math.min(provider.excess, consumer.deficit)
-            });
-        end
-end);
-
-local function f()
-    local f = io.open("lua/old.jsonl");
-    local j = f:read("a");
-    f:close();
-
-    local data = json.decode(j);
-
-    local minX = math.huge;
-    local minY = math.huge;
-    local maxX = 0;
-    local maxY = 0;
-
-    local coords = {};
-    for _, entry in ipairs(data) do
-        if entry.city_index == '1' then
-            coords[{ x = x, y = y }] = true;
-            if entry.x > maxX then
-                maxX = entry.x;
-            end
-            if entry.x < minX then
-                minX = entry.x;
-            end
-            if entry.y > maxY then
-                maxY = entry.y;
-            end
-            if entry.y < minY then
-                minY = entry.y;
-            end
         end
     end
-end
+
+    L.log("request_orders - done");
+
+    ---
+
+
+    local available_commands = {} -- table<commandKeyType, commandValueType>
+
+    for ship, _ in pairs(available_ships) do
+        for order_key, order_value in pairs(request_orders) do
+            -- TODO: implement
+            --local ship_position = GetShipPosition(ship)
+            local ship_position = order_value.OrderDistance.src
+
+            local distance_to_pickup = CalculateDistanceBetweenCoordinates(
+                    ship_position,
+                    order_value.OrderDistance.src
+            )
+
+            local total_distance = distance_to_pickup + order_value.OrderDistance.dist
+
+            local command_key = {
+                ShipID = ship,
+                Order = order_key,
+            }
+            local command_value = {
+                Order = order_value,
+                ShipDistance = total_distance,
+            }
+
+            available_commands[command_key] = command_value
+        end
+    end
+
+    local available_commands_kv = {};
+    for k, v in pairs(available_commands) do
+        table.insert(available_commands_kv, { Key = k, Value = v });
+    end
+
+    -- Sort available_commands by ShipDistance ascending
+    table.sort(available_commands_kv, function(a, b)
+        return a.Value.ShipDistance < b.Value.ShipDistance
+    end);
+
+    L.log("available_commands - done");
+
+    for _, kv in ipairs(available_commands_kv) do
+        local command_key = kv.Key
+        local command_value = kv.Value
+
+        local ship = command_key.ShipID
+        local order = command_key.Order
+        local order_value = command_value.Order
+
+        inspector.Do(L, {
+            Ship = ship,
+
+            src = areas[order.AreaID_from].city_name,
+            dst = areas[order.AreaID_to].city_name,
+
+            src_stock = Area_GetStock(objectAccessor.AreaFromID(order.AreaID_from), order.GoodID),
+            dst_stock = Area_GetStock(objectAccessor.AreaFromID(order.AreaID_to), order.GoodID),
+
+            distance = command_value.ShipDistance,
+        })
+
+        return
+    end
+end);
 
 L.logf("PCALL success: %s", tostring(success));
 L.logf("PCALL error: %s", tostring(err));
