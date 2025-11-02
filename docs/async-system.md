@@ -44,9 +44,9 @@ High-level trade order execution:
 
 ```lua
 -- Load modules
-local async = require("lua/async")
-local shipCmd = require("lua/ship-cmd")
-local tradeExecutor = require("lua/trade-executor")
+local async = require("utils_async")
+local shipCmd = require("mod_ship_cmd")
+local tradeExecutor = require("mod_trade_executor")
 
 -- Initialize with dependencies
 shipCmd.init({
@@ -82,8 +82,8 @@ local cmd = {
         Order = {
             FullSlotsNeeded = 2,
             OrderDistance = {
-                src = {x = 1000, y = 2000},
-                dst = {x = 3000, y = 4000},
+                src = { x = 1000, y = 2000 },
+                dst = { x = 3000, y = 4000 },
                 dist = 2236
             }
         },

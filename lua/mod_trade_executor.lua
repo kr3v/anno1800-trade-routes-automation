@@ -2,7 +2,7 @@
     Trade Executor Module
 
     Handles asynchronous execution of trade orders using ships.
-    Requires: lua/async.lua, lua/ship-cmd.lua
+    Requires: lua/utils_async.lua, lua/mod_ship_cmd.lua
 ]]
 
 local TradeExecutor = {}

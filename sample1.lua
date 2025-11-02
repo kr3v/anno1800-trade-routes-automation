@@ -1,51 +1,40 @@
-package.loaded["lua/inspector"] = nil;
-package.loaded["lua/logger"] = nil;
+package.loaded["lua/anno_object_inspector"] = nil;
+package.loaded["lua/anno_object_accessor"] = nil;
+package.loaded["lua/anno_session"] = nil;
 package.loaded["lua/serp/lighttools"] = nil;
-package.loaded["lua/session"] = nil;
-package.loaded["lua/object_accessor"] = nil;
-package.loaded["lua/map_scanner"] = nil;
+package.loaded["lua/utils_logger"] = nil;
 package.loaded["lua/rxi/json"] = nil;
-package.loaded["lua/cache"] = nil;
+package.loaded["lua/utils_cache"] = nil;
 package.loaded["lua/iskolbin/base64"] = nil;
--- Add async modules
-package.loaded["lua/async"] = nil;
-package.loaded["lua/ship-cmd"] = nil;
-package.loaded["lua/trade-executor"] = nil;
+package.loaded["lua/utils_async"] = nil;
+package.loaded["lua/mod_map_scanner"] = nil;
+package.loaded["lua/mod_ship_cmd"] = nil;
+package.loaded["lua/mod_trade_executor"] = nil;
 
-local inspector = require("lua/inspector");
-local L = require("lua/logger");
+local inspector = require("lua/anno_object_inspector");
+local objectAccessor = require("lua/anno_object_accessor");
+local session = require("lua/anno_session");
 local serpLight = require("lua/serp/lighttools");
-local objectAccessor = require("lua/object_accessor");
-local session = require("lua/session");
-local map_scanner = require("lua/map_scanner");
+
+local L = require("lua/utils_logger");
 local json = require("lua/rxi/json");
-local cache = require("lua/cache");
+local cache = require("lua/utils_cache");
 local base64 = require("lua/iskolbin/base64");
+local async = require("lua/utils_async");
 
--- Load async modules
-local async = require("lua/async");
-local shipCmd = require("lua/ship-cmd");
-local tradeExecutor = require("lua/trade-executor");
-
---local function Area_AddGood(area, guid, amount)
---    area.Economy.AddAmount(guid, amount);
---end
---local function Area_GetStock(area, guid)
---    return area.Economy.GetStorageAmount(guid);
---end
+local map_scanner = require("lua/mod_map_scanner");
+local shipCmd = require("lua/mod_ship_cmd");
+local tradeExecutor = require("lua/mod_trade_executor");
 
 local function AreaID_AddGood(areaID, guid, amount)
     local cmd = '[MetaObjects SessionGameObject(' .. tostring(areaID) .. ') Area Economy AddAmount(' .. tostring(guid) .. ',' .. tostring(amount / 2) .. ')]';
-    --L.logf("cmd=%s", cmd);
     return serpLight.DoForSessionGameObjectRaw(cmd);
 end
 
 local function AreaID_GetStock(areaID, guid)
     local cmd = '[MetaObjects SessionGameObject(' .. tostring(areaID) .. ') Area Economy AvailableAmount(' .. tostring(guid) .. ')]';
-    --L.logf("cmd=%s", cmd);
     return tonumber(serpLight.DoForSessionGameObjectRaw(cmd));
 end
-
 
 local function Area_GetRequest(area, guid)
     return 200;
@@ -74,7 +63,7 @@ end
 
 local function GetShipCargoCapacity(oid)
     -- TODO: Implement
-    return 4; -- Default to 4 slots
+    return 4;
 end
 
 local function GetAllShips()

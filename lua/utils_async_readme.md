@@ -55,9 +55,9 @@ tradeExecutor.init({
 ## Quick Start
 
 ```lua
-local async = require("lua/async")
-local shipCmd = require("lua/ship-cmd")
-local tradeExecutor = require("lua/trade-executor")
+local async = require("utils_async")
+local shipCmd = require("mod_ship_cmd")
+local tradeExecutor = require("mod_trade_executor")
 
 -- 1. Initialize modules
 shipCmd.init({ serpLight = serpLight, objectAccessor = objectAccessor, async = async })

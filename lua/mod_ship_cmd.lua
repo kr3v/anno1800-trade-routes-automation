@@ -2,7 +2,7 @@
     Ship Commands Module
 
     Provides both synchronous and asynchronous ship command operations.
-    Requires: lua/async.lua for async operations
+    Requires: lua/utils_async.lua for async operations
 ]]
 
 local ShipCmd = {}

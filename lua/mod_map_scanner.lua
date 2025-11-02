@@ -1,5 +1,5 @@
 local serpLight = require("lua/serp/lighttools");
-local objectAccessor = require("lua/object_accessor");
+local objectAccessor = require("anno_object_accessor");
 
 local function MoveCameraTo(x, y)
     ts.SessionCamera.ToWorldPos(x, y);

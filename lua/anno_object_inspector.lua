@@ -1,4 +1,4 @@
-local _logger = require("lua/logger");
+local _logger = require("utils_logger");
 
 local function safe_call(base, func_key, ...)
     local func = base[func_key]
