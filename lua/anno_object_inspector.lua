@@ -1,5 +1,3 @@
-local _logger = require("utils_logger");
-
 local function safe_call(base, func_key, ...)
     local func = base[func_key]
     local success, result = pcall(func, ...)
@@ -98,7 +96,7 @@ local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marke
             end
 
             if type(v) == "function" then
-                goto continue;
+                --goto continue;
 
                 local i = {
                     name = tostring(k),
@@ -206,7 +204,6 @@ local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marke
         end
     end
 
-
     -- Check metatable (for userdata/tables with methods)
     local mt = getmetatable(target)
     if mt then
@@ -214,13 +211,13 @@ local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marke
             walk_table(obj, mt, true)
         end
     else
-        -- If it's a table, show contents
-        if type(target) == "table" then
-            walk_table(target, target, false)
-        end
         if type(target) == "userdata" then
             walk_table(target, target, false)
         end
+    end
+    -- If it's a table, show contents
+    if type(target) == "table" then
+        walk_table(target, target, false)
     end
 
     -- Try tostring

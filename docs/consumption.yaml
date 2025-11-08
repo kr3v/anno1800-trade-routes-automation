@@ -1,0 +1,69 @@
+OW:
+  Population:
+    T1:
+      Needs:
+        - "Fish"
+        - "Work Clothes"
+      Happiness:
+        - "Schnapps"
+      Lifestyle:
+        - "Flour"
+        - "Sugar"
+        - "Jam"
+        - "Soap"
+        - "Herbs"
+        - "Hibiscus Petals"
+    T2:
+      Needs:
+        - "Fish"
+        - "Work Clothes"
+        - "Sausages"
+        - "Bread"
+        - "Soap"
+      Happiness:
+        - "Schnapps"
+        - "Beer"
+      Lifestyle:
+        - "Rum"
+        - "Hot Sauce"
+        - "Beef"
+        - "Penny Farthings"
+        - "Soccer Balls"
+        - "Clay Pipes"
+    T3:
+      Needs:
+        - "Sausages"
+        - "Bread"
+        - "Soap"
+        - "Canned Food"
+        - "Sewing Machines"
+        - "Fur Coats"
+      Happiness:
+        - "Beer"
+        - "Rum"
+      Lifestyle:
+        - "Wool"
+        - "Clay"
+        - "Paper"
+        - "Soccer Balls"
+        - "Perfumes"
+        - "Scooter"
+    T4:
+      Needs:
+        - "Canned Food"
+        - "Sewing Machines"
+        - "Fur Coats"
+        - "Spectacles"
+        - "Coffee"
+        - "Light Bulbs"
+      Happiness:
+        - "Rum"
+        - "Penny Farthings"
+        - "Pocket Watches"
+      Lifestyle:
+        - "Chocolate"
+        - "Mezcal"
+        - "Ice Cream"
+        - "Soap"
+        - "Shampoo"
+        - "Medicine"

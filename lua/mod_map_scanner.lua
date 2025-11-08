@@ -1,5 +1,5 @@
 local serpLight = require("lua/serp/lighttools");
-local objectAccessor = require("anno_object_accessor");
+local objectAccessor = require("lua/anno_object_accessor");
 
 local function MoveCameraTo(x, y)
     ts.SessionCamera.ToWorldPos(x, y);
@@ -166,8 +166,10 @@ local function sessionScanner()
             MoveCameraTo(x, y);
             sleep(1);
 
+            local areaID = serpLight.AreatableToAreaID(ts.Area.Current.ID);
+
             local cityIndexStr = "";
-            local q = objectAccessor.AreaFromAreatable(ts.Area.Current.ID).CityName;
+            local q = objectAccessor.AreaFromID(areaID).CityName;
             if q == nil or q == "" then
                 cityIndexStr = ".";
             else
@@ -175,7 +177,7 @@ local function sessionScanner()
                 cityIndexStr = sn;
             end
 
-            results[PackCoordinates(x, y)] = { city_index = cityIndexStr, area_id = serpLight.AreatableToAreaID(ts.Area.Current.ID) };
+            results[PackCoordinates(x, y)] = { city_index = cityIndexStr, area_id = areaID };
         end
     end
 

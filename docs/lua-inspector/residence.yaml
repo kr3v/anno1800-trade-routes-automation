@@ -1,0 +1,123 @@
+object:
+  type: table
+  properties:
+    CurrentBaseHeat: 0.0
+    CurrentHeatSatisfaction: 0.0
+    CurrentMallNeedsSupply: 0
+    GoodViewStartValue: 0
+    GoodViewValue: 0
+    Happiness: 13.710802078247
+    HappinessByAttractivity: 0.0
+    HappinessByBuffs: 0.0
+    HappinessByHotspots: 0.0
+    HappinessByNeeds: 20.0
+    HappinessWorkingCondition: 0.0
+    HeatByUpgrades: 0.0
+    Influence: 0
+    MallNeedsCategoryCount: 3
+    MaxInfluence: 0
+    MaxMallNeedsSupply: 0
+    MoneyOutput: 34
+    NegativeGoodViewInfluence: 0
+    Occupancy: 0.23999999463558
+    PopulationLevel:
+      type: "property<CAsset>"
+      fields:
+        type: table
+        properties:
+          Guid: 15000000
+          Icon: "data/ui/2kimages/main/3dicons/resident/icon_resident_farmer.png"
+          Text: "Farmers"
+        functions:
+          GetGuid: 15000000
+          GetIcon: "data/ui/2kimages/main/3dicons/resident/icon_resident_farmer.png"
+          GetText: "Farmers"
+        tostring: "CAssetTextSource*MT: 00000000393253F8"
+    PopulationMovesIn: true
+    PopulationMovesOut: false
+    PositiveGoodViewInfluence: 0
+    ResearchOutput: 0
+    ResidentCount: 6
+    ResidentLimitBySupply: 22
+    ResidentMax: 25
+    ResidentMaxFromBonusNeeds: 15
+    SameHeightGoodViewInfluence: 0
+    TargetResidentsFromBaseNeeds: 10
+    WorkforceOutput: 6.0
+  functions:
+    GetBusNeedDistanceSatisfaction:
+      error: "no matching overload found"
+    GetCurrentBaseHeat: 0.0
+    GetCurrentHappinessForGood:
+      error: "no matching overload found"
+    GetCurrentHeatForGood:
+      error: "no matching overload found"
+    GetCurrentHeatSatisfaction: 0.0
+    GetCurrentMallNeedsSupply: 0
+    GetCurrentMoneyForGood:
+      error: "no matching overload found"
+    GetCurrentResearchForGood:
+      error: "no matching overload found"
+    GetCurrentSupplyForGood:
+      error: "no matching overload found"
+    GetDebuffAmountForCategory:
+      error: "no matching overload found"
+    GetEconomyModifier:
+      error: "no matching overload found"
+    GetGoodViewStartValue: 0
+    GetGoodViewValue: 0
+    GetHappiness: 13.710802078247
+    GetHappinessByAttractivity: 0.0
+    GetHappinessByBuffs: 0.0
+    GetHappinessByHotspots: 0.0
+    GetHappinessByNeeds: 20.0
+    GetHappinessDebuffForNeedByCategory:
+      error: "no matching overload found"
+    GetHappinessWorkingCondition: 0.0
+    GetHeatByUpgrades: 0.0
+    GetInfluence: 0
+    GetIsBusNeedSatisfactionReduced:
+      error: "no matching overload found"
+    GetMallNeedsCategory:
+      error: "no matching overload found"
+    GetMallNeedsCategoryCount: 3
+    GetMallNeedsSatisfaction:
+      error: "no matching overload found"
+    GetMaxHappinessForGood:
+      error: "no matching overload found"
+    GetMaxHeatForGood:
+      error: "no matching overload found"
+    GetMaxInfluence: 0
+    GetMaxMallNeedsSupply: 0
+    GetMaxMoneyForGood:
+      error: "no matching overload found"
+    GetMaxResearchForGood:
+      error: "no matching overload found"
+    GetMaxSupplyForGood:
+      error: "no matching overload found"
+    GetMoneyOutput: 34
+    GetNegativeGoodViewInfluence: 0
+    GetOccupancy: 0.23999999463558
+    GetPopulationLevel: "CAssetTextSource*MT: 00000000393253F8"
+    GetPopulationMovesIn: true
+    GetPopulationMovesOut: false
+    GetPositiveGoodViewInfluence: 0
+    GetResearchOutput: 0
+    GetResidentCount: 6
+    GetResidentLimitBySupply: 22
+    GetResidentMax: 25
+    GetResidentMaxFromBonusNeeds: 15
+    GetSameHeightGoodViewInfluence: 0
+    GetSatisfaction:
+      error: "no matching overload found"
+    GetSatisfactionTrend:
+      error: "no matching overload found"
+    GetTargetResidentsFromBaseNeeds: 10
+    GetTotalHappinessDebuffForNeed:
+      error: "no matching overload found"
+    GetWorkforceOutput: 6.0
+    SetCheatFill:
+      callable: false
+    SetEconomyModifier:
+      callable: false
+  tostring: "CPropertyResidence7TextSource*MT: 000000003937DF58"

@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import MultipleLocator, AutoLocator
 import sys
 
 f = sys.argv[1] if len(sys.argv) > 1 else None
@@ -13,6 +13,7 @@ coords = []
 point_types = []
 arrow_dirs = []
 for line in points.strip().split('\n'):
+    line = line.split('\t')[1]
     parts = line.split(',')
     if len(parts) < 3:
         continue
@@ -89,9 +90,23 @@ if legend_elements:
 ax.set_xlim(min_x - 50, max_x + 50)
 ax.set_ylim(min_y - 50, max_y + 50)
 ax.set_aspect('equal')
-ax.xaxis.set_major_locator(MultipleLocator(10))
-ax.yaxis.set_major_locator(MultipleLocator(10))
-ax.grid(True, alpha=0.3)
+
+# Set minor ticks every 10 units for the grid
+ax.xaxis.set_minor_locator(MultipleLocator(10))
+ax.yaxis.set_minor_locator(MultipleLocator(10))
+
+# Set major ticks at larger intervals for readable labels
+# Use 50 for ranges < 500, otherwise 100
+x_range = max_x - min_x + 100  # +100 for the padding
+y_range = max_y - min_y + 100
+major_interval = 100 if max(x_range, y_range) > 500 else 50
+
+ax.xaxis.set_major_locator(MultipleLocator(major_interval))
+ax.yaxis.set_major_locator(MultipleLocator(major_interval))
+
+# Enable grid on minor ticks (10px intervals)
+ax.grid(True, which='minor', alpha=0.3)
+ax.grid(True, which='major', alpha=0.5, linewidth=0.8)
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_title('Bounding Rectangle with Arrows')

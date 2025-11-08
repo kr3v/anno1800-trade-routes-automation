@@ -247,22 +247,22 @@
 ---- MetaObjects
 --
 --------------------------------------------------
---
---local function sessionProperties()
---    local l = L.logger("lua/property_counts.tsv");
---    for i, v in pairs(serpLight.PropertiesStringToID) do
---        local os = session.getObjectGroupByProperty(v);
---        local c = #os;
---        if c > 0 then
---            local is = tostring(i);
---            if #is < 25 then
---                is = is .. string.rep(" ", 25 - #is);
---            end
---            l.log(is .. "\t" .. tostring(v) .. "\t" .. tostring(c) .. "\t" .. os[1]:getName());
---        end
---    end
---end
---
+
+local function sessionProperties()
+    local l = L.logger("lua/property_counts.tsv");
+    for i, v in pairs(serpLight.PropertiesStringToID) do
+        local os = session.getObjectGroupByProperty(v);
+        local c = #os;
+        if c > 0 then
+            local is = tostring(i);
+            if #is < 25 then
+                is = is .. string.rep(" ", 25 - #is);
+            end
+            l.log(is .. "\t" .. tostring(v) .. "\t" .. tostring(c) .. "\t" .. os[1]:getName());
+        end
+    end
+end
+
 --local function sessionPropertiesOids()
 --    local l = L.logger("lua/oids-with-properties.tsv");
 --    local oids = {};
