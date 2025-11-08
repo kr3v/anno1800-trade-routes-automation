@@ -5,9 +5,19 @@ install:
 clean/logs:
 	@rm ./anno-1800/modlog.txt || true
 
-run-sample: clean/logs mouse/middle install
+run-sample: interrupt/clean clean/logs mouse/middle install
 	sleep 1
 	cat ./anno-1800/modlog.txt
+
+interrupt:
+	touch ./anno-1800/stop-trade-route-async-watcher
+	touch ./anno-1800/stop-trade-route-loop
+	touch ./anno-1800/stop-trade-executor-heartbeat
+
+interrupt/clean:
+	rm -f ./anno-1800/stop-trade-route-async-watcher || true
+	rm -f ./anno-1800/stop-trade-route-loop || true
+	rm -f ./anno-1800/stop-trade-executor-heartbeat || true
 
 mouse/middle:
 	xdotool mousemove 1920 1080

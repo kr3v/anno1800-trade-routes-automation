@@ -172,6 +172,33 @@ local function table_length(t)
     return count;
 end
 
+local function rename_all_ships_once(L, region)
+    local ships = Anno.Ships_GetAll(region);
+
+    local total = 1;
+
+    for _, oid in pairs(ships) do
+        local route_name = Anno.Ship_TradeRoute_GetName(oid);
+        if route_name and route_name:match("^TRA_" .. region) then
+            local shipName = Anno.Ship_Name_Get(oid);
+            local info = tradeExecutor.Ship_Name_FetchCmdInfo(oid);
+            if info ~= nil then
+                shipName = info.name;
+            end
+
+            local newName = tradeExecutor.numberToBase62(total);
+            total = total + 1;
+
+            if info == nil then
+                Anno.Ship_Name_Set(oid, newName);
+            else
+                info.name = newName;
+                tradeExecutor.Ship_Name_StoreCmdInfo(oid, info);
+            end
+        end
+    end
+end
+
 local function ships_all_region(L, region)
     local available = {};
     local stillMoving = {};
@@ -209,16 +236,18 @@ end
 
 ---
 
-local function trade_execute()
-    L.logf("start at %s time", os.date("%Y-%m-%d %H:%M:%S"));
+local logs_baseDir = "lua/trade-route-automation/";
 
-    -- 1.1. Scan whole (session) map.
-    -- 1.2. Determine grid for areas on the session map.
-    local areas = _areas_in_region();
-    -- 2.1. For each area, scan it in detail if owned by the player.
-    _areas_enrich(areas);
+local function trade_execute_iteration(L, areas)
+    local now = os.date("%Y-%m-%d %H:%M:%S");
+    L.logf("start at %s time", now);
+
     -- 3.1. Find all ships allocated to trade routes automation.
     local available_ships, stillMoving, hasCargo = ships_all_region(L, "OW");
+    if table_length(available_ships) == 0 then
+        L.log("No available ships for trade routes automation, exiting iteration.");
+        return ;
+    end
 
     local _stockFromInFlight = {}; -- table<areaID, table<productID, amount>>
     -- 3.2. In flight
@@ -253,7 +282,7 @@ local function trade_execute()
 
     -- 4. (work in progress) Determine product disbalances in the areas. Assign ship to balance the good
 
-    local areaToProductRequest = AreasRequest.Population();
+    local areaToProductRequest = AreasRequest.All(L);
     local allProducts = {};
     for areaID, products in pairs(areaToProductRequest) do
         for productID, _ in pairs(products) do
@@ -261,31 +290,21 @@ local function trade_execute()
         end
     end
 
-    inspector.Do(L, areaToProductRequest);
-
     -- 4.1. Find areas that can provide or consume the product.
     local supply = {};
     local request = {};
     for areaID, areaData in pairs(areas) do
         local inFlightStock_area = _stockFromInFlight[areaID] or {};
         for productID in pairs(allProducts) do
-            local doesAreaRequestProduct = areaToProductRequest[areaID] and areaToProductRequest[areaID][productID];
-            if not doesAreaRequestProduct then
-                goto continue;
-            end
-
             local productName = GeneratorProducts.Product(productID).Name;
-
             local inFlightStock = inFlightStock_area[productID] or 0;
 
-            local owner = Anno.Area_Owner("OW", areaID);
-            local name = Anno.Area_CityName("OW", areaID);
-            if owner ~= 0 then
-                goto continue;
-            end
-
             local _stock = Anno.Area_GetGood("OW", areaID, productID);
-            local _request = Anno.Area_GetGoodRequest("OW", areaID, productID);
+            local _request = 0;
+            local doesAreaRequestProduct = areaToProductRequest[areaID] and areaToProductRequest[areaID][productID];
+            if doesAreaRequestProduct then
+                _request = 200; -- Use fixed request for now
+            end
             L.logf("Area %s (id=%d) %s stock=%s (+%s) request=%s", name, areaID, productName, _stock, inFlightStock, _request);
             _stock = _stock + inFlightStock;
 
@@ -323,9 +342,7 @@ local function trade_execute()
     local request_orders = {} -- table<orderKeyType, orderValueType>
 
     for areaID, area_requests in pairs(request) do
-        L.logf("areaID=%d rq=%s", areaID, tostring(area_requests));
         for goodID, amount in pairs(area_requests) do
-            L.logf("goodID=%d amount=%d", goodID, amount);
             local supply_areas = supply_goodToAreaID[goodID]
             if supply_areas ~= nil then
                 L.logf("found supply areas for goodID=%d %s", goodID, tostring(supply_areas));
@@ -470,14 +487,20 @@ local function trade_execute()
             shipName = info.name;
         end
 
-        local orderLogKey = string.format("%s-%s-%s-%s-%s", os.date("%Y-%m-%dT%H:%M:%SZ"), shipName, Anno.Area_CityName("OW", order.AreaID_from), Anno.Area_CityName("OW", order.AreaID_to), order.GoodID);
-        local Lo = L.logger("lua/log/" .. orderLogKey .. ".log");
+        local orderLogKey = string.format("%s-%s-%s-%s-%s",
+                os.date("%Y-%m-%dT%H:%M:%SZ"),
+                shipName,
+                Anno.Area_CityName("OW", order.AreaID_from),
+                Anno.Area_CityName("OW", order.AreaID_to),
+                order.GoodID .. "_" .. string.gsub(GeneratorProducts.Product(order.GoodID).Name, " ", "_")
+        );
+        local Lo = L.logger(logs_baseDir .. "trades/" .. orderLogKey .. ".log");
 
         Lo = Lo
                 .with("ship", tostring(ship) .. " (" .. shipName .. ")")
                 .with("aSrc", order.AreaID_from .. " (" .. Anno.Area_CityName("OW", order.AreaID_from) .. ")")
                 .with("aDst", order.AreaID_to .. " (" .. Anno.Area_CityName("OW", order.AreaID_to) .. ")")
-                .with("good", order.GoodID)
+                .with("good", order.GoodID .. " (" .. GeneratorProducts.Product(order.GoodID).Name .. ")")
                 .with("amount", order.Amount)
         Lo.logf("Spawning trade order")
         inspector.Do(Lo, cmd);
@@ -489,27 +512,79 @@ local function trade_execute()
     end
     L.logf("Spawned %d trade order tasks", #spawned_tasks)
 
-    -- ========================================================================
-    -- NEW: Main async loop - run for a limited time or until all tasks complete
-    -- ========================================================================
-
-    local max_ticks = 10000 -- Safety limit
-    local tick_count = 0
-
-    local function file_exists(path)
-        local file = io.open(path, "r")
-        if file then
-            file:close()
-            return true
+    local stillAvailableShips = 0;
+    for _, v in pairs(available_ships) do
+        if v ~= nil then
+            stillAvailableShips = stillAvailableShips + 1;
         end
-        return false
     end
 
-    local tradeRouteLoopInterrupt = "lua/stop-trade-route-loop"
+    local stillExistingRequestsC = 0;
+    local remainingDeficit = {};
+    for areaID, goods in pairs(request) do
+        for goodID, amount in pairs(goods) do
+            if amount >= 50 then
+                local goodIdStr = tostring(goodID);
+
+                if remainingDeficit[goodIdStr] == nil then
+                    remainingDeficit[goodIdStr] = {
+                        Total = 0,
+                        Areas = {},
+                    }
+                end
+                remainingDeficit[goodIdStr].Total = remainingDeficit[goodIdStr].Total + amount;
+                table.insert(remainingDeficit[goodIdStr].Areas, {
+                    AreaID = areaID,
+                    AreaName = Anno.Area_CityName("OW", areaID),
+                    Amount = amount,
+                })
+                stillExistingRequestsC = stillExistingRequestsC + 1;
+            end
+        end
+    end
+
+    local remainingSurplus = {};
+    for areaID, goods in pairs(supply) do
+        for goodID, amount in pairs(goods) do
+            if amount >= 50 then
+                local goodIdStr = tostring(goodID);
+
+                if remainingSurplus[goodIdStr] == nil then
+                    remainingSurplus[goodIdStr] = {
+                        Total = 0,
+                        Areas = {},
+                    }
+                end
+                remainingSurplus[goodIdStr].Total = remainingSurplus[goodIdStr].Total + amount;
+                table.insert(remainingSurplus[goodIdStr].Areas, {
+                    AreaID = areaID,
+                    AreaName = Anno.Area_CityName("OW", areaID),
+                    Amount = amount,
+                })
+            end
+        end
+    end
+
+    if stillAvailableShips == 0 then
+        L.log("No more available ships for trade routes automation.");
+    elseif stillExistingRequestsC == 0 then
+        L.log("No more existing requests for trade routes automation.");
+    else
+        L.logf("Still available ships: %d, still existing requests: %d", stillAvailableShips, stillExistingRequestsC);
+        cache.WriteTo(logs_baseDir .. "remaining-deficit.json", remainingDeficit)
+        cache.WriteTo(logs_baseDir .. "remaining-surplus.json", remainingSurplus)
+    end
+
+    L.logf("end at %s time", os.date("%Y-%m-%d %H:%M:%S"));
+end
+
+local function async_watcher(interrupt)
+    local max_ticks = math.huge -- 10000 -- Safety limit
+    local tick_count = 0
 
     while tick_count < max_ticks do
-        if file_exists(tradeRouteLoopInterrupt) then
-            os.remove(tradeRouteLoopInterrupt)
+        if interrupt() then
+            L.log("Async watcher received interrupt signal, stopping.");
             break
         end
 
@@ -525,11 +600,11 @@ local function trade_execute()
         end
 
         -- Check if all tasks are done
-        local active = async.get_active_tasks()
-        if #active == 0 then
-            L.logf("All tasks completed after %d ticks", tick_count)
-            break
-        end
+        --local active = async.get_active_tasks()
+        --if #active == 0 then
+        --    L.logf("All tasks completed after %d ticks", tick_count)
+        --    break
+        --end
 
         -- Cleanup every 1000 ticks
         if tick_count % 1000 == 0 then
@@ -561,7 +636,99 @@ end
 
 print("------------------------------------------------")
 
---local success, err = pcall(trade_execute);
+local function file_exists(path)
+    local file = io.open(path, "r")
+    if file then
+        file:close()
+        return true
+    end
+    return false
+end
+
+local function interrupt_on_file(path)
+    return function()
+        local y = file_exists(path);
+        if y then
+            os.remove(path);
+        end
+        return y;
+    end
+end
+
+local asyncInterrupt = interrupt_on_file("lua/stop-trade-route-async-watcher");
+local tradeRouteLoopInterrupt = interrupt_on_file("lua/stop-trade-route-loop");
+local heartbeatInterrupt = interrupt_on_file("lua/stop-trade-executor-heartbeat");
+
+local function asyncWorker()
+    async_watcher(asyncInterrupt);
+end
+
+local function trade_route_executor_loop()
+    -- 1.1. Scan whole (session) map.
+    -- 1.2. Determine grid for areas on the session map.
+    local _areas = _areas_in_region();
+    -- 2.1. For each area, scan it in detail if owned by the player.
+    _areas_enrich(_areas);
+
+    local areas = {};
+    for areaID, areaData in pairs(_areas) do
+        local owner = Anno.Area_Owner("OW", areaID);
+        if owner == 0 then
+            areas[areaID] = areaData;
+        end
+    end
+
+    rename_all_ships_once(L, "OW");
+
+    while true do
+
+        if tradeRouteLoopInterrupt() then
+            L.log("Trade route executor loop received interrupt signal, stopping.");
+            break
+        end
+
+        local now = os.date("%Y-%m-%d %H:%M:%S");
+        local Li = L.logger(logs_baseDir .. "trade-execute-iteration." .. now .. ".log");
+
+        L.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
+        Li.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
+
+        local success, err = pcall(function()
+            return trade_execute_iteration(Li, areas);
+        end)
+        if not success then
+            L.logf("Error during trade execute iteration: %s", tostring(err));
+            Li.logf("Error during trade execute iteration: %s", tostring(err));
+        end
+
+        for i = 1, 600 do
+            coroutine.yield();
+        end
+    end
+end
+
+local function heartbeat_loop()
+    while true do
+        if heartbeatInterrupt() then
+            L.log("Trade executor heartbeat received interrupt signal, stopping.");
+            break
+        end
+
+        L.log("Trade executor alive heartbeat at " .. os.date("%Y-%m-%d %H:%M:%S"));
+        for i = 1, 1200 do
+            coroutine.yield();
+        end
+    end
+end
+
+system.start(asyncWorker, "trade-route-async-watcher");
+system.start(trade_route_executor_loop, "trade-route-executor-loop");
+system.start(heartbeat_loop, "trade-executor-alive-heartbeat");
+
+--local success, err = pcall(function()
+--    local q = Anno._AreasToProductionGuids();
+--    inspector.Do(L, q);
+--end)
 
 L.logf("PCALL success: %s", tostring(success));
 L.logf("PCALL error: %s", tostring(err));

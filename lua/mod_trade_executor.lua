@@ -12,11 +12,12 @@ local async = require("lua/utils_async");
 local shipCmd = require("lua/mod_ship_cmd");
 local objectAccessor = require("lua/anno_object_accessor");
 local logger = require("lua/utils_logger");
+local GeneratorProducts = require("lua/generator/products");
 
 ---
 
 
-local function numberToBase62(num)
+function TradeExecutor.numberToBase62(num)
     if num == 0 then
         return "0"
     end
@@ -33,7 +34,7 @@ local function numberToBase62(num)
     return result
 end
 
-local function base62ToNumber(str)
+function TradeExecutor.base62ToNumber(str)
     local chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()-_=+[]{};:,.<>/?~"
     local num = 0
 
@@ -46,7 +47,7 @@ local function base62ToNumber(str)
     return num
 end
 
-local function Ship_Name_StoreCmdInfo(oid, dst)
+function TradeExecutor.Ship_Name_StoreCmdInfo(oid, dst)
     local SEPARATOR = "|";
 
     local x = dst.x;
@@ -60,9 +61,9 @@ local function Ship_Name_StoreCmdInfo(oid, dst)
     end
 
     local info = name .. SEPARATOR ..
-            numberToBase62(x) .. SEPARATOR ..
-            numberToBase62(y) .. SEPARATOR ..
-            numberToBase62(areaID);
+            TradeExecutor.numberToBase62(x) .. SEPARATOR ..
+            TradeExecutor.numberToBase62(y) .. SEPARATOR ..
+            TradeExecutor.numberToBase62(areaID);
     Anno.Ship_Name_Set(oid, info);
 end
 
@@ -81,15 +82,17 @@ function TradeExecutor.Ship_Name_FetchCmdInfo(oid)
 
     local info = {
         name = parts[1],
-        x = base62ToNumber(parts[2]),
-        y = base62ToNumber(parts[3]),
-        area_id = base62ToNumber(parts[4])
+        x = TradeExecutor.base62ToNumber(parts[2]),
+        y = TradeExecutor.base62ToNumber(parts[3]),
+        area_id = TradeExecutor.base62ToNumber(parts[4])
     };
 
     return info;
 end
 
 ---
+
+TradeExecutor.Records = {};
 
 --[[
     Executes a trade order with a ship asynchronously.
@@ -123,6 +126,8 @@ end
     @param cmd table - Command structure
 ]]
 function TradeExecutor._ExecuteTradeOrderWithShip(L, ship_oid, cmd)
+    local start_at = os.date("%Y-%m-%dT%H:%M:%SZ");
+
     local order_key = cmd.Key.Order
     local order_value = cmd.Value.Order
     local aSrc = order_key.AreaID_from;
@@ -139,7 +144,7 @@ function TradeExecutor._ExecuteTradeOrderWithShip(L, ship_oid, cmd)
 
     -- Step 2: Move ship to source area
     L.logf("Moving ship %d to source area %d (x=%d, y=%d)", ship_oid, order_key.AreaID_from, order_value.OrderDistance.src.x, order_value.OrderDistance.src.y)
-    Ship_Name_StoreCmdInfo(ship_oid, {
+    TradeExecutor.Ship_Name_StoreCmdInfo(ship_oid, {
         x = order_value.OrderDistance.src.x,
         y = order_value.OrderDistance.src.y,
         area_id = aSrc
@@ -166,13 +171,13 @@ function TradeExecutor._ExecuteTradeOrderWithShip(L, ship_oid, cmd)
     coroutine.yield();
     coroutine.yield();
 
-    local areaSrcAfter = Anno.Area_GetGood("OW", aSrc, order_key.GoodID);
+    local areaSrcGAfter = Anno.Area_GetGood("OW", aSrc, order_key.GoodID);
 
     L.logf("Loaded %d total units; area src: %d -> %d; moving to dst area (x=%d y=%d)",
-            total_loaded, aSrcGBefore, areaSrcAfter, order_value.OrderDistance.dst.x, order_value.OrderDistance.dst.y)
+            total_loaded, aSrcGBefore, areaSrcGAfter, order_value.OrderDistance.dst.x, order_value.OrderDistance.dst.y)
 
     -- Step 4: Move ship to destination area
-    Ship_Name_StoreCmdInfo(ship_oid, {
+    TradeExecutor.Ship_Name_StoreCmdInfo(ship_oid, {
         x = order_value.OrderDistance.dst.x,
         y = order_value.OrderDistance.dst.y,
         area_id = aDst
@@ -198,8 +203,35 @@ function TradeExecutor._ExecuteTradeOrderWithShip(L, ship_oid, cmd)
     coroutine.yield();
     coroutine.yield();
 
-    local areaDstAfter = Anno.Area_GetGood("OW", aDst, order_key.GoodID)
-    L.logf("Trade order completed: unloaded=%d; src=(%d -> %d); dst=(%d -> %d)", total_unloaded, aSrcGBefore, areaSrcAfter, aDstGBefore, areaDstAfter)
+    local aDstGAfter = Anno.Area_GetGood("OW", aDst, order_key.GoodID)
+    L.logf("Trade order completed: unloaded=%d; src=(%d -> %d); dst=(%d -> %d)", total_unloaded, aSrcGBefore, areaSrcGAfter, aDstGBefore, aDstGAfter)
+
+    local area_src_n = Anno.Area_CityName("OW", order_key.AreaID_from);
+    local area_dst_n = Anno.Area_CityName("OW", order_key.AreaID_to);
+    local ship_name = Anno.Ship_Name_Get(ship_oid);
+    local good_name = GeneratorProducts.Product(order_key.GoodID).Name;
+
+    local end_at = os.date("%Y-%m-%dT%H:%M:%SZ");
+
+    table.insert(TradeExecutor.Records, {
+        _start = start_at,
+        _end = end_at,
+        ship_oid = ship_oid,
+        ship_name = ship_name,
+        area_src = order_key.AreaID_from,
+        area_dst = order_key.AreaID_to,
+        area_src_name = area_src_n,
+        area_dst_name = area_dst_n,
+        good_id = order_key.GoodID,
+        good_name = good_name,
+        good_amount = order_key.Amount,
+        good_loaded = total_loaded,
+        good_unloaded = total_unloaded,
+        good_src_before = aSrcGBefore,
+        good_src_after = areaSrcGAfter,
+        good_dst_before = aDstGBefore,
+        good_dst_after = aDstGAfter
+    })
 
     return {
         success = true,
@@ -231,7 +263,6 @@ function TradeExecutor.SpawnTradeOrder(L, ship_oid, cmd)
 
         if not success then
             L.logf("Error executing trade order for ship %d: %s", ship_oid, tostring(result))
-            error(result)
         end
 
         return result

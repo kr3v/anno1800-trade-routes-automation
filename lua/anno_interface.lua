@@ -121,7 +121,8 @@ end
 function Anno._AreaID_To_ItsOID_Build()
     local ret = {};
     local piers = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.LoadingPier);
-    for oid, _ in pairs(piers) do
+    for _, v in pairs(os) do
+        local oid = serpLight.get_OID(v);
         Anno.Camera_MoveTo_Object(oid);
         coroutine.yield();
         coroutine.yield();
@@ -134,7 +135,8 @@ end
 function Anno._AreasToResidenceGuids()
     local _residenceGuids = {};
     local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Residence7);
-    for oid, _ in pairs(os) do
+    for _, v in pairs(os) do
+        local oid = serpLight.get_OID(v);
         local o = objectAccessor.GameObject(oid);
         local areaID = serpLight.AreatableToAreaID(o.Area.ID);
         local guid = o.Static.Guid;
@@ -156,6 +158,32 @@ function Anno._AreasToResidenceGuids()
     return ret;
 end
 
+function Anno._AreasToProductionGuids()
+    local guids = {};
+    local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Factory7);
+    for _, v in pairs(os) do
+        local oid = serpLight.get_OID(v);
+        local o = objectAccessor.GameObject(oid);
+        local areaID = serpLight.AreatableToAreaID(o.Area.ID);
+        local guid = o.Static.Guid;
+
+        if guids[areaID] == nil then
+            guids[areaID] = {};
+        end
+        guids[areaID][guid] = true;
+    end
+
+    local ret = {};
+    for areaID, guidSet in pairs(guids) do
+        local areaIdStr = tostring(areaID);
+        ret[areaIdStr] = {};
+        for guid, _ in pairs(guidSet) do
+            table.insert(ret[areaIdStr], guid);
+        end
+    end
+    return ret;
+end
+
 function Anno.AreaID_To_ItsOID(region)
     return cache.GetOrSet("Anno.AreaID_To_ItsOID", Anno._AreaID_To_ItsOID_Build, region);
 end
@@ -168,6 +196,9 @@ function Anno.Area_ResidenceGUIDs(region)
     return cache.GetOrSet("Anno.AreasToResidenceGuids", Anno._AreasToResidenceGuids, region);
 end
 
+function Anno.Area_ProductionGUIDs(region)
+    return cache.GetOrSet("Anno.AreasToProductionGuids", Anno._AreasToProductionGuids, region);
+end
 
 ---
 

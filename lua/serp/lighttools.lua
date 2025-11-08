@@ -984,10 +984,6 @@ local function DoForSessionGameObject(ts_embed_string, doreturnstring, keepasstr
         local oldtext = ts.GetAssetData(100939).Text -- does not work to call this directly in SetCompanyName
         ts.Participants.GetParticipant(120).Profile.SetCompanyName(oldtext) -- set it to nil again, so you can notice if sth did not work
         ret = returnstring
-
-        print("oldtext      \t" .. oldtext);
-        print("returnstring \t" .. returnstring);
-
         if returnstring == oldtext then
             -- were not able to put the returned value into the name. most likely invalid character or invalid type
             ret = nil -- ALSO happens for 0 Pointers. For invalid objects ts.GetGameObject(OID).GUID will be 0. But SessionGameObject does not return 0 here, but sth invalid.
@@ -1048,7 +1044,6 @@ local function GetVectorGuidsFromSessionObject(ts_embed_string, InfoToInclude)
                 for info, typ in pairs(InfoToInclude) do
                     local cmd = string.gsub(ts_embed_string, "Count", "At(" .. tostring(i) .. ") " .. info);
                     results[i][info] = g_LTL_Serp.my_to_type(g_LTL_Serp.DoForSessionGameObject(cmd, true, true), typ)
-                    print("GetVectorGuidsFromSessionObject: " .. tostring(cmd) .. " = " .. tostring(results[i][info]), ModID);
                 end
             end
         else

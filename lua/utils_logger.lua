@@ -2,7 +2,6 @@ local default_dst = "lua/modlog.txt";
 
 local function _write_to_file(t, dst)
     local file = io.open(dst, "a+")
-    print("Logging to <" .. dst .. ">\t\t\t: " .. t)
     file:write(t)
     file:close()
 end

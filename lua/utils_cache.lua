@@ -70,7 +70,11 @@ local function getOrSet(func, funcName, ...)
         end
     end
 
-    -- Cache miss - call the function
+    --print(debug.traceback())
+    --error("Cache miss for function '" .. funcName .. "' with provided arguments\n" .. debug.traceback());
+    --return nil;
+
+     --Cache miss - call the function
     local result = func(...)
 
     -- Store result to cache
