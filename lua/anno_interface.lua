@@ -13,6 +13,10 @@ end
 ---
 
 function Anno.Area_AddGood(region, areaID, guid, amount)
+    if amount == 1 then
+        amount = 2;
+    end
+
     local mapping = Anno.AreaID_To_ItsOID(region);
     local oid = mapping[tostring(areaID)];
     local cmd = '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Area Economy AddAmount(' .. tostring(guid) .. ',' .. tostring(amount / 2) .. ')]';
@@ -25,10 +29,6 @@ function Anno.Area_GetGood(region, areaID, guid)
     local cmd = '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Area Economy AvailableAmount(' .. tostring(guid) .. ')]';
     local ret = serpLight.DoForSessionGameObjectRaw(cmd);
     return tonumber(ret);
-end
-
-function Anno.Area_GetGoodRequest(areaID, guid)
-    return 200;
 end
 
 ---
@@ -60,18 +60,18 @@ local type_Cargo = {
 }
 
 function Anno.Ship_Cargo_Get(oid)
-    return serpLight.GetVectorGuidsFromSessionObject(
-            '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer Cargo Count]',
-            type_Cargo
-    );
+    return serpLight.GetVectorGuidsFromSessionObject('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer Cargo Count]', type_Cargo);
 end
 
 function Anno.Ship_Cargo_Set(oid, slot, cargo)
-    objectAccessor.GameObject(oid).ItemContainer.SetCheatItemInSlot(cargo.Guid, cargo.Value);
+    if cargo.Value == 1 then
+        cargo.Value = 2;
+    end
+    return serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer CheatItemInSlot(' .. tostring(cargo.Guid) .. ',' .. tostring(cargo.Value / 2) .. ')]');
 end
 
 function Anno.Ship_Cargo_Clear(oid, slot)
-    objectAccessor.GameObject(oid).ItemContainer.SetClearSlot(slot);
+    return serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer ClearSlot(' .. tostring(slot) .. '))]');
 end
 
 function Anno.Ship_Cargo_SlotCapacity(oid)
@@ -82,7 +82,7 @@ end
 ---
 
 function Anno.Ship_Name_Get(oid)
-    return serpLight.GetGameObjectPath(oid, "Nameable.Name");
+    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") Nameable Name]");
 end
 
 function Anno.Ship_Name_Set(oid, name)
@@ -92,17 +92,17 @@ end
 ---
 
 function Anno.Ship_IsMoving(oid)
-    return serpLight.GetGameObjectPath(oid, "CommandQueue.UI_IsMoving")
+    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") CommandQueue UI_IsMoving]");
 end
 
 function Anno.Ship_MoveTo(oid, x, y)
-    objectAccessor.GameObject(oid).Walking.SetDebugGoto(x, y)
+    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") Walking DebugGoto(" .. tostring(x) .. "," .. tostring(y) .. ")]");
 end
 
 ---
 
 function Anno.Ship_TradeRoute_GetName(oid)
-    return serpLight.GetGameObjectPath(oid, "TradeRouteVehicle.RouteName");
+    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") TradeRouteVehicle RouteName]");
 end
 
 ---
@@ -120,7 +120,7 @@ end
 
 function Anno._AreaID_To_ItsOID_Build()
     local ret = {};
-    local piers = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.LoadingPier);
+    local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.LoadingPier);
     for _, v in pairs(os) do
         local oid = serpLight.get_OID(v);
         Anno.Camera_MoveTo_Object(oid);

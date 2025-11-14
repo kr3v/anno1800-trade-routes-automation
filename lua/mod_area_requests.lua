@@ -46,6 +46,23 @@ function AreaRequests.Production(L)
     return ret;
 end
 
+function AreaRequests.Construction(L)
+    local ret = {};
+
+    local areas = Anno.AreaID_To_ItsOID();
+    for areaID, areaOID in pairs(areas) do
+        areaID = tonumber(areaID);
+
+        ret[areaID][120008] = true; -- Wood
+        ret[areaID][1010205] = true; -- Bricks
+        ret[areaID][1010218] = true; -- Steel Beams
+        ret[areaID][1010207] = true; -- Windows
+        ret[areaID][1010202] = true; -- Reinforced Concrete
+        ret[areaID][134623] = true; -- Elevator
+        ret[areaID][838] = true; -- Aluminium Profiles
+    end
+end
+
 function AreaRequests.All(L)
     local population = AreaRequests.Population(L);
     local production = AreaRequests.Production(L);

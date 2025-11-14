@@ -315,3 +315,101 @@ end
 --SetEnablePython:
 --skipped_debug_call: true
 --tostring: "CScriptManagerTextSource*MT: 0000000018277C08"
+
+
+
+--------------------------------------------
+
+
+--local success, err = pcall(function()
+--    --local oid = serpLight.get_OID(session.selection[1]);
+--    --L.logf("%x", oid);
+--
+--    local names = {};
+--
+--    while true do
+--        if tradeRouteLoopInterrupt() then
+--            L.log("Ship name tracking loop received interrupt signal, stopping.");
+--            break
+--        end
+--
+--        local ships = Anno._Ships_GetAll();
+--        for _, oid in ipairs(ships) do
+--            local name = Anno.Ship_Name_Get(oid);
+--            if names[name] == nil then
+--                names[name] = {
+--                    oid_found = {},
+--                    oid_list = {},
+--                }
+--            end
+--
+--            if names[name].oid_found[oid] == nil then
+--                names[name].oid_found[oid] = true;
+--                table.insert(names[name].oid_list, { oid=oid, time=os.date("%H:%M:%S") });
+--
+--                local line = name .. ": "
+--                local prevOid = nil;
+--                for _, o in ipairs(names[name].oid_list) do
+--                    local oidI = o.oid;
+--                    local time = o.time;
+--
+--                    local delta = -1;
+--                    if prevOid ~= nil then
+--                        delta = oidI - prevOid;
+--                    end
+--                    prevOid = oidI;
+--
+--                    if delta ~= -1 then
+--                        line = line .. string.format("%x (+%d,%s)", oidI, delta, time) .. "\t"
+--                    else
+--                        line = line .. string.format("%x (%s)", oidI, time) .. "\t"
+--                    end
+--                end
+--                L.log(line);
+--            end
+--        end
+--
+--        L.log("----");
+--        for i = 1, 100 do
+--            coroutine.yield()
+--        end
+--    end
+--end)
+
+--success, err = pcall(function()
+--    -- WorldMap Fleet([RefGuid]) Ships Count
+--    local selected = session.selection[1];
+--    local selected_oid = serpLight.get_OID(selected);
+--    local selected_guid = objectAccessor.GameObject(selected_oid).Static.Guid;
+--
+--    L.logf("Selected object OID: %d GUID: %s", selected_oid, selected_guid);
+--
+--    local session_guid = game.MetaGameManager.getSessionGUID();
+--    L.logf("Session GUID: %s", tostring(session_guid));
+--
+--    --inspector.Do(L, objectAccessor.Generic(function()
+--    --    return ts.WorldMap.GetFleet(selected_guid);
+--    --end))
+--
+--    --[WorldMap Fleet([RefGuid]) Ships Count]
+--
+--    --for i = 0, 10 do
+--    --    local ret = serpLight.DoForSessionGameObjectRaw('[WorldMap Fleet(' .. tostring(i) .. ') Ships Count]');
+--    --    L.logf("Fleet(%d) Ships Count: %s", i, ret);
+--    --end
+--
+--    L.logf("%s", serpLight.DoForSessionGameObjectRaw('[WorldMap Fleet(' .. tostring(selected_guid) .. ') Ships Count]'));
+--    L.logf("%s", serpLight.DoForSessionGameObjectRaw('[WorldMap Fleet(' .. tostring(selected_oid) .. ') Ships Count]'));
+--    L.logf("%s", serpLight.DoForSessionGameObjectRaw('[WorldMap Fleet(' .. tostring(session_guid) .. ') Ships Count]'));
+--    L.logf("%s", serpLight.DoForSessionGameObjectRaw('[WorldMap Fleet(' .. tostring(800777) .. ') Ships Count]'));
+--    L.logf("%s", serpLight.DoForSessionGameObjectRaw('[WorldMap Fleet(' .. tostring(6746) .. ') Ships Count]'));
+--    L.logf("%s", serpLight.DoForSessionGameObjectRaw('[WorldMap Fleet(' .. tostring(14859) .. ') Ships Count]'));
+--end)
+
+--local success, err = pcall(function()
+--    local oid = serpLight.get_OID(session.selection[1]);
+--
+--    L.logf("result: %s", tostring(serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Pausable IsPaused]')));
+--    L.logf("result: %s", tostring(serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Pausable TogglePause]')));
+--    L.logf("result: %s", tostring(serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Pausable IsPaused]')));
+--end)

@@ -715,20 +715,18 @@ local function heartbeat_loop()
         end
 
         L.log("Trade executor alive heartbeat at " .. os.date("%Y-%m-%d %H:%M:%S"));
+        cache.WriteTo(logs_baseDir .. "trade-executor-history.json", tradeExecutor.Records);
+
         for i = 1, 1200 do
             coroutine.yield();
         end
     end
 end
 
-system.start(asyncWorker, "trade-route-async-watcher");
+system.start(asyncWorker, "trade-route-async-watcher")
+system.start(heartbeat_loop, "trade-executor-alive-heartbeat")
+
 system.start(trade_route_executor_loop, "trade-route-executor-loop");
-system.start(heartbeat_loop, "trade-executor-alive-heartbeat");
 
---local success, err = pcall(function()
---    local q = Anno._AreasToProductionGuids();
---    inspector.Do(L, q);
---end)
-
-L.logf("PCALL success: %s", tostring(success));
-L.logf("PCALL error: %s", tostring(err));
+--L.logf("PCALL success: %s", tostring(success));
+--L.logf("PCALL error: %s", tostring(err));
