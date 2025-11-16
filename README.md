@@ -8,6 +8,20 @@ requests.
 
 The mod currently handles trades INSIDE a single region. Cross-region trades are not handled.
 
+TL;DR:
+
+1. Mod is difficult to install, but it works on my machine atm.
+2. As a user, you just need to install, start the mod, wait for its 'scan' to complete, and assign ships to a fake trade
+   route like 'TRA_OW' for Old World region automation.
+   The mod will automatically manage those ships AND detect what goods what islands need
+   (residences/factories, even construction goods).
+
+Check [Before/after mod when no in-region trade routes exist (except oil and mail)](#beforeafter-mod-when-no-in-region-trade-routes-exist-except-oil-and-mail)
+for an example.
+
+One of the main goals was to eliminate the manual management of trade routes. Which is tedious and boring for me,
+especially if I want to move some production from one island to another.
+
 ## Installation
 
 This part is not automated and is not up to Anno 1800 mod standards yet.
@@ -51,7 +65,7 @@ After the scanning is done, the camera will stop moving and the mod will start m
 NOTE: copy-pasting commands to console WORKS, as long as you remove `□` characters that appear when copying.
 
 NOTE: if scanning misbehaves, consider checking if that island was properly scanned.
-Check [readme.md](docs/images/readme.md).
+Check [readme.md](docs/images/area-visualzer/readme.md).
 
 (*) - NOTE: the mod does not support multiple save games. The island scanning data is global, not per save game.
 If you start a new save game, delete `<path to Anno 1800 directory>/lua/trade-routes-automation/cache/regions/`.
@@ -62,13 +76,13 @@ It will force a full rescan.
 
 The mod uses ships that are assigned to a fake `TRA_${REGION_NAME}` trade route.
 
-| Trade Route Name | Region Name    |
-|------------------|----------------|
-| `TRA_OW`         | Old World      |
-| `TRA_NW`         | New World      |
-| `TRA_AR`         | Arctic         |
-| `TRA_EN`         | Enbesa         |
-| `TRA_CT`         | Cape Trelawney |
+| Trade Route Name | Region Name        |
+|------------------|--------------------|
+| `TRA_OW`         | Old World          |
+| `TRA_NW`         | New World          |
+| `TRA_AR`         | Arctic (*)         |
+| `TRA_EN`         | Enbesa (*)         |
+| `TRA_CT`         | Cape Trelawney (*) |
 
 The trade route must be created manually, the ships should also be assigned to it manually.
 The ships MUST be in the relevant region, mod DOES NOT move ships between regions.
@@ -83,15 +97,29 @@ At the moment, the ship can only be added to the trade route IF:
 However, the mod automatically handles the above when it is restarted.
 
 NOTE: the mod stores ship assignments in the ship names. A name like 'k-7n-gd-2lA' is not a bug, but an encoded 4-tuple
-of
-ship short name, ship destination X and Y coordinates, and the destination area ID.
+of ship short name, ship destination X and Y coordinates, and the destination area ID.
+
+(*) - islands not supported, but it should be relatively easy to add support.
+
+### Hub cities
+
+If the mod has 'idle' ships (ships assigned to automation, but not currently executing any trade), it will try to
+send goods to hub cities (ones that have "(h)" in the end of their name).
+
+The hub city will automatically request all goods from all other islands until 90% of its total capacity is used.
 
 ## Before/after mod when no in-region trade routes exist (except oil and mail)
 
 ![trade-routes.png](docs/images/before-after/trade-routes.png)
 ^^ trade routes example.
 
-| Before mod                                                                    | After mod                                                                                     |
+Routes groups like "A-O", "O-E", "N-O" are cross-region trade routes. I don't have any in-region routes except oil and
+mail.
+
+That alpaca wool trade route is to Isabel trader to sell surplus wool from my NW island to keep generating
+dung/fertilizer.
+
+| Without mod                                                                   | With mod                                                                                      |
 |-------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
 | old world city supply![c4-before.png](docs/images/before-after/c4-before.png) | no hot sauce in the region<br/>![c4-after.png](docs/images/before-after/c4-after.png)         |
 | new world city supply![n3-before.png](docs/images/before-after/n3-before.png) | no Enbesa Teff available in region<br/>![n3-after.png](docs/images/before-after/n3-after.png) |
@@ -114,6 +142,7 @@ ship short name, ship destination X and Y coordinates, and the destination area 
         - unload the good at the destination island (fully)
     - detect all islands' goods stock, requests, and total capacity,
         - requests are also automated, the mod checks island's buildings/residences and their consumptions (**),
+    -
 
 Notes:
 (*) - the scanning process is quite slow (it automatically moves camera around to find islands).

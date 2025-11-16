@@ -1,6 +1,6 @@
 `<path to Anno 1800 directory>/lua/*.tsv` has island scan data that can be visualized using matplotlib.
 
-You could use the following script ([area-visualizer-online.py](../../utils/area-visualizer-online.py)) with https://matplotlib.online/ to visualize the island scan results.
+You could use the following script ([area-visualizer-online.py](../../../utils/area-visualizer-online.py)) with https://matplotlib.online/ to visualize the island scan results.
 
 ## Example
 
