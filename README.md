@@ -119,12 +119,13 @@ mail.
 That alpaca wool trade route is to Isabel trader to sell surplus wool from my NW island to keep generating
 dung/fertilizer.
 
-| Without mod                                                                   | With mod                                                                                      |
-|-------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| old world city supply![c4-before.png](docs/images/before-after/c4-before.png) | no hot sauce in the region<br/>![c4-after.png](docs/images/before-after/c4-after.png)         |
-| new world city supply![n3-before.png](docs/images/before-after/n3-before.png) | no Enbesa Teff available in region<br/>![n3-after.png](docs/images/before-after/n3-after.png) |
-| new world population![nw-before.png](docs/images/before-after/nw-before.png)  | <br/>![nw-after.png](docs/images/before-after/nw-after.png)                                   |
-| old world population![ow-before.png](docs/images/before-after/ow-before.png)  | <br/>![ow-after.png](docs/images/before-after/ow-after.png)                                   |
+| Without mod                                                                                  | With mod                                                                                                                  |
+|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| old world city supply![c4-before.png](docs/images/before-after/c4-before.png)                | no hot sauce in the region<br/>![c4-after.png](docs/images/before-after/c4-after.png)                                     |
+| new world city supply![n3-before.png](docs/images/before-after/n3-before.png)                | no Enbesa Teff available in region<br/>![n3-after.png](docs/images/before-after/n3-after.png)                             |
+| new world population![nw-before.png](docs/images/before-after/nw-before.png)                 | <br/>![nw-after.png](docs/images/before-after/nw-after.png)                                                               |
+| old world population![ow-before.png](docs/images/before-after/ow-before.png)                 | <br/>![ow-after.png](docs/images/before-after/ow-after.png)                                                               |
+| old world 'deficit'![ow-deficits-before.png](docs/images/before-after/ow-deficit-before.png) | most solved, others require players' attention<br/>![ow-deficit-after.png](docs/images/before-after/ow-deficit-after.png) |
 
 # Implementation details
 
@@ -142,7 +143,6 @@ dung/fertilizer.
         - unload the good at the destination island (fully)
     - detect all islands' goods stock, requests, and total capacity,
         - requests are also automated, the mod checks island's buildings/residences and their consumptions (**),
-    -
 
 Notes:
 (*) - the scanning process is quite slow (it automatically moves camera around to find islands).

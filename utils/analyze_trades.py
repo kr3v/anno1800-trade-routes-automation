@@ -171,8 +171,8 @@ def main():
     # trades_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'trade-executor-history.json'
     # analyze_trades(trades_file, texts_file)
 
-    deficit_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'NW' / 'remaining-deficit.json'
-    surplus_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'NW' / 'remaining-surplus.json'
+    deficit_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'OW' / 'remaining-deficit.json'
+    surplus_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'OW' / 'remaining-surplus.json'
     analyze_deficit_surplus(deficit_file, surplus_file, texts_file)
 
 if __name__ == '__main__':
