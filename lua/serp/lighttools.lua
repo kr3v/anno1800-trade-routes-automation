@@ -963,11 +963,24 @@ local function t_FnViaTextEmbed(PID)
     end)
 end
 
+local lock = 0
+
 local function DoForSessionGameObjectRaw (cmd)
-    game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(cmd) .. " )]")
-    local ret = ts.Participants.GetParticipant(120).Profile.CompanyName
-    local old = ts.GetAssetData(100939).Text
-    ts.Participants.GetParticipant(120).Profile.SetCompanyName(old)
+    while lock == 1 do
+        coroutine.yield() -- wait until unlocked
+    end
+    lock = 1
+    local ret = nil
+    local success, err = xpcall(function()
+        game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(cmd) .. " )]")
+        ret = ts.Participants.GetParticipant(120).Profile.CompanyName;
+        local old = ts.GetAssetData(100939).Text
+        ts.Participants.GetParticipant(120).Profile.SetCompanyName(old)
+    end, debug.traceback)
+    lock = 0
+    if not success then
+        error(string.format("DoForSessionGameObjectRaw failed for cmd '%s' with error: %s", tostring(cmd), tostring(err)))
+    end
     return ret
 end
 
@@ -978,12 +991,24 @@ end
 -- Also works for things like: "[Quests Quest(QuestID) QuestObjectives MainObjectives AT(0) DeliveryObjects AT(0) Product]"
 local function DoForSessionGameObject(ts_embed_string, doreturnstring, keepasstring)
     if doreturnstring then
-        -- we want to get what the textembed returns, but game.TextSourceManager.setDebugTextSource does not return anything. I only know a workarkund to get it, by setting and reading out the name of a namable helper object
-        game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(ts_embed_string) .. " )]")
-        local returnstring = ts.Participants.GetParticipant(120).Profile.CompanyName
-        local oldtext = ts.GetAssetData(100939).Text -- does not work to call this directly in SetCompanyName
-        ts.Participants.GetParticipant(120).Profile.SetCompanyName(oldtext) -- set it to nil again, so you can notice if sth did not work
-        ret = returnstring
+        while lock == 1 do
+            coroutine.yield() -- wait until unlocked
+        end
+        lock = 1
+        local returnstring, ret, oldtext;
+        local success, err = xpcall(function()
+            -- we want to get what the textembed returns, but game.TextSourceManager.setDebugTextSource does not return anything. I only know a workarkund to get it, by setting and reading out the name of a namable helper object
+            game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(ts_embed_string) .. " )]")
+            returnstring = ts.Participants.GetParticipant(120).Profile.CompanyName
+            oldtext = ts.GetAssetData(100939).Text -- does not work to call this directly in SetCompanyName
+            ts.Participants.GetParticipant(120).Profile.SetCompanyName(oldtext) -- set it to nil again, so you can notice if sth did not work
+            ret = returnstring
+        end, debug.traceback)
+        lock = 0
+        if not success then
+            error(string.format("DoForSessionGameObjectRaw failed for cmd '%s' with error: %s", tostring(ts_embed_string), tostring(err)))
+        end
+
         if returnstring == oldtext then
             -- were not able to put the returned value into the name. most likely invalid character or invalid type
             ret = nil -- ALSO happens for 0 Pointers. For invalid objects ts.GetGameObject(OID).GUID will be 0. But SessionGameObject does not return 0 here, but sth invalid.

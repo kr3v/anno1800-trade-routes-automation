@@ -17,24 +17,36 @@ function Anno.Area_AddGood(region, areaID, guid, amount)
         amount = 2;
     end
 
-    local mapping = Anno.AreaID_To_ItsOID(region);
+    local mapping = Anno.Region_AreaID_To_OID(region);
     local oid = mapping[tostring(areaID)];
     local cmd = '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Area Economy AddAmount(' .. tostring(guid) .. ',' .. tostring(amount / 2) .. ')]';
     return serpLight.DoForSessionGameObjectRaw(cmd);
 end
 
 function Anno.Area_GetGood(region, areaID, guid)
-    local mapping = Anno.AreaID_To_ItsOID(region);
+    local mapping = Anno.Region_AreaID_To_OID(region);
     local oid = mapping[tostring(areaID)];
     local cmd = '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Area Economy AvailableAmount(' .. tostring(guid) .. ')]';
     local ret = serpLight.DoForSessionGameObjectRaw(cmd);
     return tonumber(ret);
 end
 
+function Anno.Area_GetGoodCapacity(region, areaID, guid)
+    local mapping = Anno.Region_AreaID_To_OID(region);
+    local oid = mapping[tostring(areaID)];
+    local cmd = '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Area Economy StorageCapacity(' .. tostring(guid) .. ')]';
+    local ret = serpLight.DoForSessionGameObjectRaw(cmd);
+    local cap = tonumber(ret);
+    if cap >= 2147483647 or cap < 0 or cap == nil then
+        return { got = cap, orig = ret, args = {region = region, areaID = areaID, guid = guid} };
+    end
+    return cap;
+end
+
 ---
 
 function Anno.Area_Owner(region, areaID)
-    local mapping = Anno.AreaID_To_ItsOID(region);
+    local mapping = Anno.Region_AreaID_To_OID(region);
     local oid = mapping[tostring(areaID)];
     local cmd = '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Area Owner]';
     local ret = serpLight.DoForSessionGameObjectRaw(cmd);
@@ -42,7 +54,7 @@ function Anno.Area_Owner(region, areaID)
 end
 
 function Anno.Area_CityName(region, areaID)
-    local mapping = Anno.AreaID_To_ItsOID(region);
+    local mapping = Anno.Region_AreaID_To_OID(region);
     local oid = mapping[tostring(areaID)];
     if not oid then
         return nil;
@@ -59,7 +71,7 @@ local type_Cargo = {
     Value = "number"
 }
 
-function Anno.Ship_Cargo_Get(oid)
+function Anno. Ship_Cargo_Get(oid)
     return serpLight.GetVectorGuidsFromSessionObject('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer Cargo Count]', type_Cargo);
 end
 
@@ -74,9 +86,23 @@ function Anno.Ship_Cargo_Clear(oid, slot)
     return serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer ClearSlot(' .. tostring(slot) .. '))]');
 end
 
+local guidToCargoSlotCapacity = {
+    ["100438"] = 2, -- Schooner
+    ["100441"] = 4, -- Clipper
+    ["100443"] = 2, -- Monitor
+    ["101121"] = 3, -- Flagship
+    ["100439"] = 3, -- Frigate
+    ["118718"] = 8, -- The Great Eastern
+    ["1010062"] = 6, -- Cargo Ship
+    ["132404"] = 6, -- World-Class Reefer
+
+    ["1058"] = 3,
+    ["1060"] = 8,
+}
+
 function Anno.Ship_Cargo_SlotCapacity(oid)
-    -- TODO
-    return 4;
+    local guid = serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Static Guid]');
+    return guidToCargoSlotCapacity[tostring(guid)] or -1;
 end
 
 ---
@@ -92,7 +118,8 @@ end
 ---
 
 function Anno.Ship_IsMoving(oid)
-    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") CommandQueue UI_IsMoving]");
+    local ret = serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") Walking IsMoving(true)]");
+    return ret == "true";
 end
 
 function Anno.Ship_MoveTo(oid, x, y)
@@ -107,9 +134,31 @@ end
 
 ---
 
+Anno.Region_OldWorld = "OW";
+Anno.Region_NewWorld = "NW";
+Anno.Region_Enbesa = "EN";
+Anno.Region_Arctic = "AR";
+Anno.Region_CapeTrelawney = "CT";
+
+local sessions = {
+    ["180023"] = Anno.Region_OldWorld,
+    ["180025"] = Anno.Region_NewWorld,
+    ["112132"] = Anno.Region_Enbesa,
+    ["180045"] = Anno.Region_Arctic,
+    ["110934"] = Anno.Region_CapeTrelawney,
+}
+
+function Anno.Region_Current()
+    local _session = session.getSessionGUID();
+    local region = sessions[tostring(_session)];
+    return region;
+end
+
+---
+
 ----- high level region functions -----
 
-function Anno._Ships_GetAll()
+local function _Ships_GetAll()
     local objs = serpLight.GetCurrentSessionObjectsFromLocaleByProperty("Walking");
     local ret = {};
     for oid, _ in pairs(objs) do
@@ -118,21 +167,19 @@ function Anno._Ships_GetAll()
     return ret;
 end
 
-function Anno._AreaID_To_ItsOID_Build()
+local function _AreaID_To_ItsOID_Build()
     local ret = {};
     local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.LoadingPier);
     for _, v in pairs(os) do
         local oid = serpLight.get_OID(v);
-        Anno.Camera_MoveTo_Object(oid);
-        coroutine.yield();
-        coroutine.yield();
-        local areaID = serpLight.AreatableToAreaID(ts.Area.Current.ID);
+        local o = objectAccessor.GameObject(oid);
+        local areaID = serpLight.AreatableToAreaID(o.Area.ID);
         ret[tostring(areaID)] = oid;
     end
     return ret;
 end
 
-function Anno._AreasToResidenceGuids()
+local function _AreasToResidenceGuids()
     local _residenceGuids = {};
     local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Residence7);
     for _, v in pairs(os) do
@@ -158,7 +205,7 @@ function Anno._AreasToResidenceGuids()
     return ret;
 end
 
-function Anno._AreasToProductionGuids()
+local function _AreasToProductionGuids()
     local guids = {};
     local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Factory7);
     for _, v in pairs(os) do
@@ -184,20 +231,57 @@ function Anno._AreasToProductionGuids()
     return ret;
 end
 
-function Anno.AreaID_To_ItsOID(region)
-    return cache.GetOrSet("Anno.AreaID_To_ItsOID", Anno._AreaID_To_ItsOID_Build, region);
+function Anno.Region_AreaID_To_OID(region)
+    local currentRegion = Anno.Region_Current();
+    if currentRegion ~= region then
+        return cache.Get("Anno.AreaID_To_ItsOID", region);
+    end
+    return cache.GetOrSet("Anno.AreaID_To_ItsOID", _AreaID_To_ItsOID_Build, region);
 end
 
-function Anno.Ships_GetAll(region)
-    return cache.GetOrSet("Anno.Ships_GetAll", Anno._Ships_GetAll, region);
+function Anno.Ships_GetInRegion(region)
+    local currentRegion = Anno.Region_Current();
+    if currentRegion ~= region then
+        return cache.Get("Anno.Ships_GetAll", region);
+    end
+    return cache.GetOrSet("Anno.Ships_GetAll", _Ships_GetAll, region);
 end
 
-function Anno.Area_ResidenceGUIDs(region)
-    return cache.GetOrSet("Anno.AreasToResidenceGuids", Anno._AreasToResidenceGuids, region);
+function Anno.Region_ResidenceGUIDs(region)
+    local currentRegion = Anno.Region_Current();
+    if currentRegion ~= region then
+        return cache.Get("Anno.AreasToResidenceGuids", region);
+    end
+    return cache.GetOrSet("Anno.AreasToResidenceGuids", _AreasToResidenceGuids, region);
 end
 
-function Anno.Area_ProductionGUIDs(region)
-    return cache.GetOrSet("Anno.AreasToProductionGuids", Anno._AreasToProductionGuids, region);
+function Anno.Region_ProductionGUIDs(region)
+    local currentRegion = Anno.Region_Current();
+    if currentRegion ~= region then
+        return cache.Get("Anno.AreasToProductionGuids", region);
+    end
+    return cache.GetOrSet("Anno.AreasToProductionGuids", _AreasToProductionGuids, region);
+end
+
+function Anno.Region_IsCached(region)
+    return cache.Exists("Anno.AreaID_To_ItsOID", region)
+            and cache.Exists("Anno.Ships_GetAll", region)
+            and cache.Exists("Anno.AreasToResidenceGuids", region)
+            and cache.Exists("Anno.AreasToProductionGuids", region);
+end
+
+function Anno.Region_CanCache(region)
+    local currentRegion = Anno.Region_Current();
+    return currentRegion == region;
+end
+
+-- no camera jumps
+function Anno.Region_RefreshCache()
+    local currentRegion = Anno.Region_Current();
+    cache.Set("Anno.AreaID_To_ItsOID", _AreaID_To_ItsOID_Build, currentRegion);
+    cache.Set("Anno.Ships_GetAll", _Ships_GetAll, currentRegion);
+    cache.Set("Anno.AreasToResidenceGuids", _AreasToResidenceGuids, currentRegion);
+    cache.Set("Anno.AreasToProductionGuids", _AreasToProductionGuids, currentRegion);
 end
 
 ---

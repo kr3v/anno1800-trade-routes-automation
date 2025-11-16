@@ -99,7 +99,7 @@ local function discoverResidences(L, productsInfo)
     return residencesInfo;
 end
 
-local TsVectorType = {
+GeneratorProducts.TsVectorType = {
     Guid = "number",
     Icon = "string",
     Text = "string",
@@ -108,7 +108,7 @@ local TsVectorType = {
 
 function GeneratorProducts.discoverFactories()
     local function _test(guid)
-        local _consumption = serpLight.GetVectorGuidsFromSessionObject("[FactoryAssetData(" .. tostring(guid) .. ") Consumption Count]", TsVectorType);
+        local _consumption = serpLight.GetVectorGuidsFromSessionObject("[FactoryAssetData(" .. tostring(guid) .. ") Consumption Count]", GeneratorProducts.TsVectorType);
         if _consumption == nil or #_consumption == 0 then
             return nil;
         end

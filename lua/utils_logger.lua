@@ -2,6 +2,9 @@ local default_dst = "lua/modlog.txt";
 
 local function _write_to_file(t, dst)
     local file = io.open(dst, "a+")
+    if file == nil then
+        error("io.open failed for " .. tostring(dst))
+    end
     file:write(t)
     file:close()
 end
@@ -38,10 +41,15 @@ local function newLogger(dst)
     end
 
     l.log = function(msg)
-        local date = os.date("%Y-%m-%dT%H:%M:%SZ")
-        local fields = formatFields();
+        local ret;
+        if not l.disableDate then
+            local date = os.date("%Y-%m-%dT%H:%M:%SZ")
+            ret = date .. "\t";
+        else
+            ret = "";
+        end
 
-        local ret = date .. "\t";
+        local fields = formatFields();
         if fields ~= "" then
             ret = ret .. fields .. "\t";
         end
@@ -76,4 +84,11 @@ local function newLogger(dst)
     return l
 end
 
+---@class Logger
+---@field log fun(msg: string)
+---@field logf fun(fmt: string, ...: any)
+---@field with fun(key: string, value: any): Logger
+---@field logger fun(dst: string): Logger
+
+---@return Logger
 return newLogger(default_dst)

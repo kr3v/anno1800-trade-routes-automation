@@ -3,13 +3,10 @@ local base64 = require("lua/iskolbin/base64");
 
 local baseDir = "lua/cache";
 
--- Helper function to make base64 filesystem-safe
 local function makeFilenameSafe(str)
-    -- Replace + with - and / with _ for URL-safe base64
     return str:gsub("%+", "-"):gsub("/", "_")
 end
 
--- Helper function to check if file exists
 local function fileExists(path)
     local f = io.open(path, "r")
     if f then
@@ -19,7 +16,6 @@ local function fileExists(path)
     return false
 end
 
--- Helper function to read file
 local function readFile(path)
     local f = io.open(path, "r")
     if not f then
@@ -30,7 +26,6 @@ local function readFile(path)
     return content
 end
 
--- Helper function to write file
 local function writeFile(path, content)
     -- Ensure directory exists
     local f = io.open(path, "w")
@@ -41,12 +36,7 @@ local function writeFile(path, content)
     f:close()
 end
 
--- Main caching function
--- Usage: cache.getOrSet(myFunction, "myFunction", arg1, arg2, ...)
--- The function will be called with the provided arguments if cache miss
-local function getOrSet(func, funcName, ...)
-    -- Create key from function name + arguments
-    local args = { ... }
+local function cacheFilePath(funcName, args)
     local keyData = {
         func = funcName,
         args = args
@@ -57,6 +47,11 @@ local function getOrSet(func, funcName, ...)
     local keyEncoded = base64.encode(keyJson)
     local filename = makeFilenameSafe(keyEncoded) .. ".json"
     local filepath = baseDir .. "/" .. filename
+    return filepath
+end
+
+local function getOrSet(func, funcName, ...)
+    local filepath = cacheFilePath(funcName, { ... })
 
     -- Check if cached file exists
     if fileExists(filepath) then
@@ -70,11 +65,11 @@ local function getOrSet(func, funcName, ...)
         end
     end
 
-    --print(debug.traceback())
-    --error("Cache miss for function '" .. funcName .. "' with provided arguments\n" .. debug.traceback());
-    --return nil;
+    if not func then
+        return nil
+    end
 
-     --Cache miss - call the function
+    --Cache miss - call the function
     local result = func(...)
 
     -- Store result to cache
@@ -84,10 +79,33 @@ local function getOrSet(func, funcName, ...)
     return result
 end
 
+local function get(funcName, ...)
+    return getOrSet(nil, funcName, ...)
+end
+
+local function set(funcName, func, ...)
+    os.remove(cacheFilePath(funcName, { ... }))
+    return getOrSet(func, funcName, ...)
+end
+
 return {
-    getOrSet = getOrSet,
+    GetOrSetR = function(func, funcName, ...)
+        return getOrSet(func, funcName, ...)
+    end,
     GetOrSet = function(funcName, func, ...)
         return getOrSet(func, funcName, ...)
+    end,
+    Get = get,
+    Set = set,
+    Exists = function(funcName, ...)
+        local ret = get(funcName, ...)
+        return ret ~= nil
+    end,
+    Remove = function(funcName, ...)
+        local filepath = cacheFilePath(funcName, { ... })
+        if fileExists(filepath) then
+            os.remove(filepath)
+        end
     end,
 
     WriteTo = function(dst, content)

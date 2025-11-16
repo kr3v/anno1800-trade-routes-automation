@@ -167,7 +167,7 @@ local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marke
                 else
                     log("    " .. prop.name .. ":")
                     log("      type: \"" .. _type .. "\"")
-                    if prop.is_property and prop.name ~= "Online" then
+                    if prop.is_property and prop.name ~= "Online" and _type ~= "property<CGameObject>" then
                         if depth <= 12 then
                             local success, err = pcall(function()
                                 _inspect_object_yaml(L, prop.object, "fields", allowGetFuncCall, depth + 3, marked)

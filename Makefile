@@ -11,12 +11,14 @@ run-sample: interrupt/clean clean/logs mouse/middle install
 
 interrupt:
 	touch ./anno-1800/stop-trade-route-async-watcher
-	touch ./anno-1800/stop-trade-route-loop
+	touch ./anno-1800/stop-trade-route-loop-ow
+	touch ./anno-1800/stop-trade-route-loop-nw
 	touch ./anno-1800/stop-trade-executor-heartbeat
 
 interrupt/clean:
 	rm -f ./anno-1800/stop-trade-route-async-watcher || true
-	rm -f ./anno-1800/stop-trade-route-loop || true
+	rm -f ./anno-1800/stop-trade-route-loop-ow || true
+	rm -f ./anno-1800/stop-trade-route-loop-nw || true
 	rm -f ./anno-1800/stop-trade-executor-heartbeat || true
 
 mouse/middle:
