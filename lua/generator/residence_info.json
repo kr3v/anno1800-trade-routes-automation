@@ -1,1 +1,1248 @@
-{"601891":{"Name":"Investor Skyscraper: Level 5","Request":{"135233":{"Guid":135233,"Name":"Violins"},"1010225":{"Guid":1010225,"Name":"Steam Carriages"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"5395":{"Guid":5395,"Name":"Fans"},"120016":{"Guid":120016,"Name":"Champagne"},"120032":{"Guid":120032,"Name":"Coffee"},"5388":{"Guid":5388,"Name":"Perfumes"},"1010209":{"Guid":1010209,"Name":"Furs"},"135234":{"Guid":135234,"Name":"Cognac"},"1010248":{"Guid":1010248,"Name":"Gramophones"},"112695":{"Guid":112695,"Name":"Bear Fur"},"5392":{"Guid":5392,"Name":"Film Reel"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"120030":{"Guid":120030,"Name":"Spectacles"},"135230":{"Guid":135230,"Name":"Typewriter"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"135186":{"Guid":135186,"Name":"Chewing Gum"},"135229":{"Guid":135229,"Name":"Biscuits"},"1010259":{"Guid":1010259,"Name":"Cigars"},"114404":{"Guid":114404,"Name":"Tapestries"},"135232":{"Guid":135232,"Name":"Billiard Tables"},"1010250":{"Guid":1010250,"Name":"Jewellery"},"135231":{"Guid":135231,"Name":"Toys"}},"PopulationGUID":15000004,"Guid":601891},"1010343":{"Name":"Farmer Residence","Request":{"1010216":{"Guid":1010216,"Name":"Schnapps"},"1010200":{"Guid":1010200,"Name":"Fish"},"1010235":{"Guid":1010235,"Name":"Flour"},"5383":{"Guid":5383,"Name":"Herbs"},"1010237":{"Guid":1010237,"Name":"Work Clothes"},"1010239":{"Guid":1010239,"Name":"Sugar"},"114364":{"Guid":114364,"Name":"Hibiscus Petals"},"133183":{"Guid":133183,"Name":"Jam"},"1010203":{"Guid":1010203,"Name":"Soap"}},"PopulationGUID":15000000,"Guid":1010343},"601889":{"Name":"Engineer Skyscraper: Level 2","Request":{"135186":{"Guid":135186,"Name":"Chewing Gum"},"1010206":{"Guid":1010206,"Name":"Sewing Machines"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"5397":{"Guid":5397,"Name":"Medicine"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010247":{"Guid":1010247,"Name":"Fur Coats"},"1010257":{"Guid":1010257,"Name":"Rum"},"1010203":{"Guid":1010203,"Name":"Soap"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"133181":{"Guid":133181,"Name":"Shampoo"},"5382":{"Guid":5382,"Name":"Ice Cream"},"120030":{"Guid":120030,"Name":"Spectacles"},"6600":{"Guid":6600,"Name":"Mezcal"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"120032":{"Guid":120032,"Name":"Coffee"},"1010217":{"Guid":1010217,"Name":"Canned Food"}},"PopulationGUID":15000003,"Guid":601889},"601890":{"Name":"Engineer Skyscraper: Level 3","Request":{"135233":{"Guid":135233,"Name":"Violins"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"6600":{"Guid":6600,"Name":"Mezcal"},"1010217":{"Guid":1010217,"Name":"Canned Food"},"1010203":{"Guid":1010203,"Name":"Soap"},"120032":{"Guid":120032,"Name":"Coffee"},"135186":{"Guid":135186,"Name":"Chewing Gum"},"1010206":{"Guid":1010206,"Name":"Sewing Machines"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"135230":{"Guid":135230,"Name":"Typewriter"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"5382":{"Guid":5382,"Name":"Ice Cream"},"120030":{"Guid":120030,"Name":"Spectacles"},"5397":{"Guid":5397,"Name":"Medicine"},"1010247":{"Guid":1010247,"Name":"Fur Coats"},"1010257":{"Guid":1010257,"Name":"Rum"},"133181":{"Guid":133181,"Name":"Shampoo"}},"PopulationGUID":15000003,"Guid":601890},"406":{"Name":"Skyline Tower","Request":{"1010225":{"Guid":1010225,"Name":"Steam Carriages"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"120016":{"Guid":120016,"Name":"Champagne"},"120032":{"Guid":120032,"Name":"Coffee"},"1010259":{"Guid":1010259,"Name":"Cigars"},"120030":{"Guid":120030,"Name":"Spectacles"},"1010250":{"Guid":1010250,"Name":"Jewellery"},"1010248":{"Guid":1010248,"Name":"Gramophones"}},"PopulationGUID":15000004,"Guid":406},"114445":{"Name":"Scholar Residence","Request":{"114431":{"Guid":114431,"Name":"Telephones"},"114414":{"Guid":114414,"Name":"Clay Pipes"},"5392":{"Guid":5392,"Name":"Film Reel"},"114404":{"Guid":114404,"Name":"Tapestries"},"1010217":{"Guid":1010217,"Name":"Canned Food"},"5395":{"Guid":5395,"Name":"Fans"},"114430":{"Guid":114430,"Name":"Tailored Suits"},"114390":{"Guid":114390,"Name":"Hibiscus Tea"},"5391":{"Guid":5391,"Name":"Scooter"},"120037":{"Guid":120037,"Name":"Bombins"},"1010257":{"Guid":1010257,"Name":"Rum"},"1010232":{"Guid":1010232,"Name":"Saltpetre"},"114428":{"Guid":114428,"Name":"Leather Boots"},"114410":{"Guid":114410,"Name":"Seafood Stew"},"1010248":{"Guid":1010248,"Name":"Gramophones"}},"PopulationGUID":118745,"Guid":114445},"601882":{"Name":"Investor Skyscraper: Level 1","Request":{"1010225":{"Guid":1010225,"Name":"Steam Carriages"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"5395":{"Guid":5395,"Name":"Fans"},"120016":{"Guid":120016,"Name":"Champagne"},"120032":{"Guid":120032,"Name":"Coffee"},"1010209":{"Guid":1010209,"Name":"Furs"},"5388":{"Guid":5388,"Name":"Perfumes"},"5392":{"Guid":5392,"Name":"Film Reel"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"112695":{"Guid":112695,"Name":"Bear Fur"},"1010259":{"Guid":1010259,"Name":"Cigars"},"114404":{"Guid":114404,"Name":"Tapestries"},"120030":{"Guid":120030,"Name":"Spectacles"},"1010250":{"Guid":1010250,"Name":"Jewellery"},"1010248":{"Guid":1010248,"Name":"Gramophones"}},"PopulationGUID":15000004,"Guid":601882},"601888":{"Name":"Engineer Skyscraper: Level 1","Request":{"1010206":{"Guid":1010206,"Name":"Sewing Machines"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"5397":{"Guid":5397,"Name":"Medicine"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010247":{"Guid":1010247,"Name":"Fur Coats"},"1010257":{"Guid":1010257,"Name":"Rum"},"1010203":{"Guid":1010203,"Name":"Soap"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"133181":{"Guid":133181,"Name":"Shampoo"},"5382":{"Guid":5382,"Name":"Ice Cream"},"120030":{"Guid":120030,"Name":"Spectacles"},"6600":{"Guid":6600,"Name":"Mezcal"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"120032":{"Guid":120032,"Name":"Coffee"},"1010217":{"Guid":1010217,"Name":"Canned Food"}},"PopulationGUID":15000003,"Guid":601888},"1010345":{"Name":"Artisan Residence","Request":{"5388":{"Guid":5388,"Name":"Perfumes"},"1010213":{"Guid":1010213,"Name":"Bread"},"1010206":{"Guid":1010206,"Name":"Sewing Machines"},"1010238":{"Guid":1010238,"Name":"Sausages"},"1010201":{"Guid":1010201,"Name":"Clay"},"1010257":{"Guid":1010257,"Name":"Rum"},"1010197":{"Guid":1010197,"Name":"Wool"},"1010217":{"Guid":1010217,"Name":"Canned Food"},"1010214":{"Guid":1010214,"Name":"Beer"},"1010203":{"Guid":1010203,"Name":"Soap"},"5803":{"Guid":5803,"Name":"Soccer Balls"},"117702":{"Guid":117702,"Name":"Paper"},"1010247":{"Guid":1010247,"Name":"Fur Coats"},"5391":{"Guid":5391,"Name":"Scooter"}},"PopulationGUID":15000002,"Guid":1010345},"601883":{"Name":"Investor Skyscraper: Level 2","Request":{"1010225":{"Guid":1010225,"Name":"Steam Carriages"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"5395":{"Guid":5395,"Name":"Fans"},"120016":{"Guid":120016,"Name":"Champagne"},"120032":{"Guid":120032,"Name":"Coffee"},"1010209":{"Guid":1010209,"Name":"Furs"},"135186":{"Guid":135186,"Name":"Chewing Gum"},"5392":{"Guid":5392,"Name":"Film Reel"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"5388":{"Guid":5388,"Name":"Perfumes"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"120030":{"Guid":120030,"Name":"Spectacles"},"112695":{"Guid":112695,"Name":"Bear Fur"},"135229":{"Guid":135229,"Name":"Biscuits"},"114404":{"Guid":114404,"Name":"Tapestries"},"1010259":{"Guid":1010259,"Name":"Cigars"},"1010250":{"Guid":1010250,"Name":"Jewellery"},"1010248":{"Guid":1010248,"Name":"Gramophones"}},"PopulationGUID":15000004,"Guid":601883},"601886":{"Name":"Investor Skyscraper: Level 4","Request":{"1010225":{"Guid":1010225,"Name":"Steam Carriages"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"5395":{"Guid":5395,"Name":"Fans"},"120016":{"Guid":120016,"Name":"Champagne"},"120032":{"Guid":120032,"Name":"Coffee"},"1010209":{"Guid":1010209,"Name":"Furs"},"135234":{"Guid":135234,"Name":"Cognac"},"5388":{"Guid":5388,"Name":"Perfumes"},"112695":{"Guid":112695,"Name":"Bear Fur"},"5392":{"Guid":5392,"Name":"Film Reel"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"120030":{"Guid":120030,"Name":"Spectacles"},"135230":{"Guid":135230,"Name":"Typewriter"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"135186":{"Guid":135186,"Name":"Chewing Gum"},"135229":{"Guid":135229,"Name":"Biscuits"},"1010259":{"Guid":1010259,"Name":"Cigars"},"114404":{"Guid":114404,"Name":"Tapestries"},"135232":{"Guid":135232,"Name":"Billiard Tables"},"1010250":{"Guid":1010250,"Name":"Jewellery"},"1010248":{"Guid":1010248,"Name":"Gramophones"}},"PopulationGUID":15000004,"Guid":601886},"601884":{"Name":"Investor Skyscraper: Level 3","Request":{"1010225":{"Guid":1010225,"Name":"Steam Carriages"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"5395":{"Guid":5395,"Name":"Fans"},"120016":{"Guid":120016,"Name":"Champagne"},"120032":{"Guid":120032,"Name":"Coffee"},"1010209":{"Guid":1010209,"Name":"Furs"},"135186":{"Guid":135186,"Name":"Chewing Gum"},"5392":{"Guid":5392,"Name":"Film Reel"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"1010248":{"Guid":1010248,"Name":"Gramophones"},"120030":{"Guid":120030,"Name":"Spectacles"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"112695":{"Guid":112695,"Name":"Bear Fur"},"5388":{"Guid":5388,"Name":"Perfumes"},"1010259":{"Guid":1010259,"Name":"Cigars"},"114404":{"Guid":114404,"Name":"Tapestries"},"135229":{"Guid":135229,"Name":"Biscuits"},"1010250":{"Guid":1010250,"Name":"Jewellery"},"135234":{"Guid":135234,"Name":"Cognac"}},"PopulationGUID":15000004,"Guid":601884},"601445":{"Name":"Hotel","Request":{"5388":{"Guid":5388,"Name":"Perfumes"},"1010213":{"Guid":1010213,"Name":"Bread"},"133183":{"Guid":133183,"Name":"Jam"},"6600":{"Guid":6600,"Name":"Mezcal"},"1010247":{"Guid":1010247,"Name":"Fur Coats"},"133532":{"Guid":133532,"Name":"Souvenirs"},"133181":{"Guid":133181,"Name":"Shampoo"},"5382":{"Guid":5382,"Name":"Ice Cream"},"120037":{"Guid":120037,"Name":"Bombins"},"114428":{"Guid":114428,"Name":"Leather Boots"},"133185":{"Guid":133185,"Name":"Lemonade"},"1010250":{"Guid":1010250,"Name":"Jewellery"},"1010248":{"Guid":1010248,"Name":"Gramophones"}},"PopulationGUID":601379,"Guid":601445},"1010344":{"Name":"Worker Residence","Request":{"1010213":{"Guid":1010213,"Name":"Bread"},"114414":{"Guid":114414,"Name":"Clay Pipes"},"1010200":{"Guid":1010200,"Name":"Fish"},"1010193":{"Guid":1010193,"Name":"Beef"},"1010237":{"Guid":1010237,"Name":"Work Clothes"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"1010203":{"Guid":1010203,"Name":"Soap"},"1010214":{"Guid":1010214,"Name":"Beer"},"25506":{"Guid":25506,"Name":"Hot Sauce"},"5803":{"Guid":5803,"Name":"Soccer Balls"},"1010216":{"Guid":1010216,"Name":"Schnapps"},"1010238":{"Guid":1010238,"Name":"Sausages"},"1010257":{"Guid":1010257,"Name":"Rum"}},"PopulationGUID":15000001,"Guid":1010344},"1010346":{"Name":"Engineer Residence","Request":{"1010206":{"Guid":1010206,"Name":"Sewing Machines"},"1010258":{"Guid":1010258,"Name":"Chocolate"},"5397":{"Guid":5397,"Name":"Medicine"},"1010246":{"Guid":1010246,"Name":"Pocket Watches"},"1010247":{"Guid":1010247,"Name":"Fur Coats"},"1010257":{"Guid":1010257,"Name":"Rum"},"1010203":{"Guid":1010203,"Name":"Soap"},"1010245":{"Guid":1010245,"Name":"Penny Farthings"},"133181":{"Guid":133181,"Name":"Shampoo"},"5382":{"Guid":5382,"Name":"Ice Cream"},"120030":{"Guid":120030,"Name":"Spectacles"},"6600":{"Guid":6600,"Name":"Mezcal"},"1010208":{"Guid":1010208,"Name":"Light Bulbs"},"120032":{"Guid":120032,"Name":"Coffee"},"1010217":{"Guid":1010217,"Name":"Canned Food"}},"PopulationGUID":15000003,"Guid":1010346}}
+{
+  "601891": {
+    "Name": "Investor Skyscraper: Level 5",
+    "Request": {
+      "135233": {
+        "Guid": 135233,
+        "Name": "Violins"
+      },
+      "1010225": {
+        "Guid": 1010225,
+        "Name": "Steam Carriages"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "5395": {
+        "Guid": 5395,
+        "Name": "Fans"
+      },
+      "120016": {
+        "Guid": 120016,
+        "Name": "Champagne"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "5388": {
+        "Guid": 5388,
+        "Name": "Perfumes"
+      },
+      "1010209": {
+        "Guid": 1010209,
+        "Name": "Furs"
+      },
+      "135234": {
+        "Guid": 135234,
+        "Name": "Cognac"
+      },
+      "1010248": {
+        "Guid": 1010248,
+        "Name": "Gramophones"
+      },
+      "112695": {
+        "Guid": 112695,
+        "Name": "Bear Fur"
+      },
+      "5392": {
+        "Guid": 5392,
+        "Name": "Film Reel"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "135230": {
+        "Guid": 135230,
+        "Name": "Typewriter"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "135186": {
+        "Guid": 135186,
+        "Name": "Chewing Gum"
+      },
+      "135229": {
+        "Guid": 135229,
+        "Name": "Biscuits"
+      },
+      "1010259": {
+        "Guid": 1010259,
+        "Name": "Cigars"
+      },
+      "114404": {
+        "Guid": 114404,
+        "Name": "Tapestries"
+      },
+      "135232": {
+        "Guid": 135232,
+        "Name": "Billiard Tables"
+      },
+      "1010250": {
+        "Guid": 1010250,
+        "Name": "Jewellery"
+      },
+      "135231": {
+        "Guid": 135231,
+        "Name": "Toys"
+      }
+    },
+    "PopulationGUID": 15000004,
+    "Guid": 601891
+  },
+  "1010343": {
+    "Name": "Farmer Residence",
+    "Request": {
+      "1010216": {
+        "Guid": 1010216,
+        "Name": "Schnapps"
+      },
+      "1010200": {
+        "Guid": 1010200,
+        "Name": "Fish"
+      },
+      "1010235": {
+        "Guid": 1010235,
+        "Name": "Flour"
+      },
+      "5383": {
+        "Guid": 5383,
+        "Name": "Herbs"
+      },
+      "1010237": {
+        "Guid": 1010237,
+        "Name": "Work Clothes"
+      },
+      "1010239": {
+        "Guid": 1010239,
+        "Name": "Sugar"
+      },
+      "114364": {
+        "Guid": 114364,
+        "Name": "Hibiscus Petals"
+      },
+      "133183": {
+        "Guid": 133183,
+        "Name": "Jam"
+      },
+      "1010203": {
+        "Guid": 1010203,
+        "Name": "Soap"
+      }
+    },
+    "PopulationGUID": 15000000,
+    "Guid": 1010343
+  },
+  "601889": {
+    "Name": "Engineer Skyscraper: Level 2",
+    "Request": {
+      "135186": {
+        "Guid": 135186,
+        "Name": "Chewing Gum"
+      },
+      "1010206": {
+        "Guid": 1010206,
+        "Name": "Sewing Machines"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "5397": {
+        "Guid": 5397,
+        "Name": "Medicine"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010247": {
+        "Guid": 1010247,
+        "Name": "Fur Coats"
+      },
+      "1010257": {
+        "Guid": 1010257,
+        "Name": "Rum"
+      },
+      "1010203": {
+        "Guid": 1010203,
+        "Name": "Soap"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "133181": {
+        "Guid": 133181,
+        "Name": "Shampoo"
+      },
+      "5382": {
+        "Guid": 5382,
+        "Name": "Ice Cream"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "6600": {
+        "Guid": 6600,
+        "Name": "Mezcal"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "1010217": {
+        "Guid": 1010217,
+        "Name": "Canned Food"
+      }
+    },
+    "PopulationGUID": 15000003,
+    "Guid": 601889
+  },
+  "601890": {
+    "Name": "Engineer Skyscraper: Level 3",
+    "Request": {
+      "135233": {
+        "Guid": 135233,
+        "Name": "Violins"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "6600": {
+        "Guid": 6600,
+        "Name": "Mezcal"
+      },
+      "1010217": {
+        "Guid": 1010217,
+        "Name": "Canned Food"
+      },
+      "1010203": {
+        "Guid": 1010203,
+        "Name": "Soap"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "135186": {
+        "Guid": 135186,
+        "Name": "Chewing Gum"
+      },
+      "1010206": {
+        "Guid": 1010206,
+        "Name": "Sewing Machines"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "135230": {
+        "Guid": 135230,
+        "Name": "Typewriter"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "5382": {
+        "Guid": 5382,
+        "Name": "Ice Cream"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "5397": {
+        "Guid": 5397,
+        "Name": "Medicine"
+      },
+      "1010247": {
+        "Guid": 1010247,
+        "Name": "Fur Coats"
+      },
+      "1010257": {
+        "Guid": 1010257,
+        "Name": "Rum"
+      },
+      "133181": {
+        "Guid": 133181,
+        "Name": "Shampoo"
+      }
+    },
+    "PopulationGUID": 15000003,
+    "Guid": 601890
+  },
+  "406": {
+    "Name": "Skyline Tower",
+    "Request": {
+      "1010225": {
+        "Guid": 1010225,
+        "Name": "Steam Carriages"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "120016": {
+        "Guid": 120016,
+        "Name": "Champagne"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "1010259": {
+        "Guid": 1010259,
+        "Name": "Cigars"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "1010250": {
+        "Guid": 1010250,
+        "Name": "Jewellery"
+      },
+      "1010248": {
+        "Guid": 1010248,
+        "Name": "Gramophones"
+      }
+    },
+    "PopulationGUID": 15000004,
+    "Guid": 406
+  },
+  "114445": {
+    "Name": "Scholar Residence",
+    "Request": {
+      "114431": {
+        "Guid": 114431,
+        "Name": "Telephones"
+      },
+      "114414": {
+        "Guid": 114414,
+        "Name": "Clay Pipes"
+      },
+      "5392": {
+        "Guid": 5392,
+        "Name": "Film Reel"
+      },
+      "114404": {
+        "Guid": 114404,
+        "Name": "Tapestries"
+      },
+      "1010217": {
+        "Guid": 1010217,
+        "Name": "Canned Food"
+      },
+      "5395": {
+        "Guid": 5395,
+        "Name": "Fans"
+      },
+      "114430": {
+        "Guid": 114430,
+        "Name": "Tailored Suits"
+      },
+      "114390": {
+        "Guid": 114390,
+        "Name": "Hibiscus Tea"
+      },
+      "5391": {
+        "Guid": 5391,
+        "Name": "Scooter"
+      },
+      "120037": {
+        "Guid": 120037,
+        "Name": "Bombins"
+      },
+      "1010257": {
+        "Guid": 1010257,
+        "Name": "Rum"
+      },
+      "1010232": {
+        "Guid": 1010232,
+        "Name": "Saltpetre"
+      },
+      "114428": {
+        "Guid": 114428,
+        "Name": "Leather Boots"
+      },
+      "114410": {
+        "Guid": 114410,
+        "Name": "Seafood Stew"
+      },
+      "1010248": {
+        "Guid": 1010248,
+        "Name": "Gramophones"
+      }
+    },
+    "PopulationGUID": 118745,
+    "Guid": 114445
+  },
+  "601882": {
+    "Name": "Investor Skyscraper: Level 1",
+    "Request": {
+      "1010225": {
+        "Guid": 1010225,
+        "Name": "Steam Carriages"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "5395": {
+        "Guid": 5395,
+        "Name": "Fans"
+      },
+      "120016": {
+        "Guid": 120016,
+        "Name": "Champagne"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "1010209": {
+        "Guid": 1010209,
+        "Name": "Furs"
+      },
+      "5388": {
+        "Guid": 5388,
+        "Name": "Perfumes"
+      },
+      "5392": {
+        "Guid": 5392,
+        "Name": "Film Reel"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "112695": {
+        "Guid": 112695,
+        "Name": "Bear Fur"
+      },
+      "1010259": {
+        "Guid": 1010259,
+        "Name": "Cigars"
+      },
+      "114404": {
+        "Guid": 114404,
+        "Name": "Tapestries"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "1010250": {
+        "Guid": 1010250,
+        "Name": "Jewellery"
+      },
+      "1010248": {
+        "Guid": 1010248,
+        "Name": "Gramophones"
+      }
+    },
+    "PopulationGUID": 15000004,
+    "Guid": 601882
+  },
+  "601888": {
+    "Name": "Engineer Skyscraper: Level 1",
+    "Request": {
+      "1010206": {
+        "Guid": 1010206,
+        "Name": "Sewing Machines"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "5397": {
+        "Guid": 5397,
+        "Name": "Medicine"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010247": {
+        "Guid": 1010247,
+        "Name": "Fur Coats"
+      },
+      "1010257": {
+        "Guid": 1010257,
+        "Name": "Rum"
+      },
+      "1010203": {
+        "Guid": 1010203,
+        "Name": "Soap"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "133181": {
+        "Guid": 133181,
+        "Name": "Shampoo"
+      },
+      "5382": {
+        "Guid": 5382,
+        "Name": "Ice Cream"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "6600": {
+        "Guid": 6600,
+        "Name": "Mezcal"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "1010217": {
+        "Guid": 1010217,
+        "Name": "Canned Food"
+      }
+    },
+    "PopulationGUID": 15000003,
+    "Guid": 601888
+  },
+  "1010345": {
+    "Name": "Artisan Residence",
+    "Request": {
+      "5388": {
+        "Guid": 5388,
+        "Name": "Perfumes"
+      },
+      "1010213": {
+        "Guid": 1010213,
+        "Name": "Bread"
+      },
+      "1010206": {
+        "Guid": 1010206,
+        "Name": "Sewing Machines"
+      },
+      "1010238": {
+        "Guid": 1010238,
+        "Name": "Sausages"
+      },
+      "1010201": {
+        "Guid": 1010201,
+        "Name": "Clay"
+      },
+      "1010257": {
+        "Guid": 1010257,
+        "Name": "Rum"
+      },
+      "1010197": {
+        "Guid": 1010197,
+        "Name": "Wool"
+      },
+      "1010217": {
+        "Guid": 1010217,
+        "Name": "Canned Food"
+      },
+      "1010214": {
+        "Guid": 1010214,
+        "Name": "Beer"
+      },
+      "1010203": {
+        "Guid": 1010203,
+        "Name": "Soap"
+      },
+      "5803": {
+        "Guid": 5803,
+        "Name": "Soccer Balls"
+      },
+      "117702": {
+        "Guid": 117702,
+        "Name": "Paper"
+      },
+      "1010247": {
+        "Guid": 1010247,
+        "Name": "Fur Coats"
+      },
+      "5391": {
+        "Guid": 5391,
+        "Name": "Scooter"
+      }
+    },
+    "PopulationGUID": 15000002,
+    "Guid": 1010345
+  },
+  "601883": {
+    "Name": "Investor Skyscraper: Level 2",
+    "Request": {
+      "1010225": {
+        "Guid": 1010225,
+        "Name": "Steam Carriages"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "5395": {
+        "Guid": 5395,
+        "Name": "Fans"
+      },
+      "120016": {
+        "Guid": 120016,
+        "Name": "Champagne"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "1010209": {
+        "Guid": 1010209,
+        "Name": "Furs"
+      },
+      "135186": {
+        "Guid": 135186,
+        "Name": "Chewing Gum"
+      },
+      "5392": {
+        "Guid": 5392,
+        "Name": "Film Reel"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "5388": {
+        "Guid": 5388,
+        "Name": "Perfumes"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "112695": {
+        "Guid": 112695,
+        "Name": "Bear Fur"
+      },
+      "135229": {
+        "Guid": 135229,
+        "Name": "Biscuits"
+      },
+      "114404": {
+        "Guid": 114404,
+        "Name": "Tapestries"
+      },
+      "1010259": {
+        "Guid": 1010259,
+        "Name": "Cigars"
+      },
+      "1010250": {
+        "Guid": 1010250,
+        "Name": "Jewellery"
+      },
+      "1010248": {
+        "Guid": 1010248,
+        "Name": "Gramophones"
+      }
+    },
+    "PopulationGUID": 15000004,
+    "Guid": 601883
+  },
+  "601886": {
+    "Name": "Investor Skyscraper: Level 4",
+    "Request": {
+      "1010225": {
+        "Guid": 1010225,
+        "Name": "Steam Carriages"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "5395": {
+        "Guid": 5395,
+        "Name": "Fans"
+      },
+      "120016": {
+        "Guid": 120016,
+        "Name": "Champagne"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "1010209": {
+        "Guid": 1010209,
+        "Name": "Furs"
+      },
+      "135234": {
+        "Guid": 135234,
+        "Name": "Cognac"
+      },
+      "5388": {
+        "Guid": 5388,
+        "Name": "Perfumes"
+      },
+      "112695": {
+        "Guid": 112695,
+        "Name": "Bear Fur"
+      },
+      "5392": {
+        "Guid": 5392,
+        "Name": "Film Reel"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "135230": {
+        "Guid": 135230,
+        "Name": "Typewriter"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "135186": {
+        "Guid": 135186,
+        "Name": "Chewing Gum"
+      },
+      "135229": {
+        "Guid": 135229,
+        "Name": "Biscuits"
+      },
+      "1010259": {
+        "Guid": 1010259,
+        "Name": "Cigars"
+      },
+      "114404": {
+        "Guid": 114404,
+        "Name": "Tapestries"
+      },
+      "135232": {
+        "Guid": 135232,
+        "Name": "Billiard Tables"
+      },
+      "1010250": {
+        "Guid": 1010250,
+        "Name": "Jewellery"
+      },
+      "1010248": {
+        "Guid": 1010248,
+        "Name": "Gramophones"
+      }
+    },
+    "PopulationGUID": 15000004,
+    "Guid": 601886
+  },
+  "601884": {
+    "Name": "Investor Skyscraper: Level 3",
+    "Request": {
+      "1010225": {
+        "Guid": 1010225,
+        "Name": "Steam Carriages"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "5395": {
+        "Guid": 5395,
+        "Name": "Fans"
+      },
+      "120016": {
+        "Guid": 120016,
+        "Name": "Champagne"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "1010209": {
+        "Guid": 1010209,
+        "Name": "Furs"
+      },
+      "135186": {
+        "Guid": 135186,
+        "Name": "Chewing Gum"
+      },
+      "5392": {
+        "Guid": 5392,
+        "Name": "Film Reel"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "1010248": {
+        "Guid": 1010248,
+        "Name": "Gramophones"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "112695": {
+        "Guid": 112695,
+        "Name": "Bear Fur"
+      },
+      "5388": {
+        "Guid": 5388,
+        "Name": "Perfumes"
+      },
+      "1010259": {
+        "Guid": 1010259,
+        "Name": "Cigars"
+      },
+      "114404": {
+        "Guid": 114404,
+        "Name": "Tapestries"
+      },
+      "135229": {
+        "Guid": 135229,
+        "Name": "Biscuits"
+      },
+      "1010250": {
+        "Guid": 1010250,
+        "Name": "Jewellery"
+      },
+      "135234": {
+        "Guid": 135234,
+        "Name": "Cognac"
+      }
+    },
+    "PopulationGUID": 15000004,
+    "Guid": 601884
+  },
+  "601445": {
+    "Name": "Hotel",
+    "Request": {
+      "5388": {
+        "Guid": 5388,
+        "Name": "Perfumes"
+      },
+      "1010213": {
+        "Guid": 1010213,
+        "Name": "Bread"
+      },
+      "133183": {
+        "Guid": 133183,
+        "Name": "Jam"
+      },
+      "6600": {
+        "Guid": 6600,
+        "Name": "Mezcal"
+      },
+      "1010247": {
+        "Guid": 1010247,
+        "Name": "Fur Coats"
+      },
+      "133532": {
+        "Guid": 133532,
+        "Name": "Souvenirs"
+      },
+      "133181": {
+        "Guid": 133181,
+        "Name": "Shampoo"
+      },
+      "5382": {
+        "Guid": 5382,
+        "Name": "Ice Cream"
+      },
+      "120037": {
+        "Guid": 120037,
+        "Name": "Bombins"
+      },
+      "114428": {
+        "Guid": 114428,
+        "Name": "Leather Boots"
+      },
+      "133185": {
+        "Guid": 133185,
+        "Name": "Lemonade"
+      },
+      "1010250": {
+        "Guid": 1010250,
+        "Name": "Jewellery"
+      },
+      "1010248": {
+        "Guid": 1010248,
+        "Name": "Gramophones"
+      }
+    },
+    "PopulationGUID": 601379,
+    "Guid": 601445
+  },
+  "1010344": {
+    "Name": "Worker Residence",
+    "Request": {
+      "1010213": {
+        "Guid": 1010213,
+        "Name": "Bread"
+      },
+      "114414": {
+        "Guid": 114414,
+        "Name": "Clay Pipes"
+      },
+      "1010200": {
+        "Guid": 1010200,
+        "Name": "Fish"
+      },
+      "1010193": {
+        "Guid": 1010193,
+        "Name": "Beef"
+      },
+      "1010237": {
+        "Guid": 1010237,
+        "Name": "Work Clothes"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "1010203": {
+        "Guid": 1010203,
+        "Name": "Soap"
+      },
+      "1010214": {
+        "Guid": 1010214,
+        "Name": "Beer"
+      },
+      "25506": {
+        "Guid": 25506,
+        "Name": "Hot Sauce"
+      },
+      "5803": {
+        "Guid": 5803,
+        "Name": "Soccer Balls"
+      },
+      "1010216": {
+        "Guid": 1010216,
+        "Name": "Schnapps"
+      },
+      "1010238": {
+        "Guid": 1010238,
+        "Name": "Sausages"
+      },
+      "1010257": {
+        "Guid": 1010257,
+        "Name": "Rum"
+      }
+    },
+    "PopulationGUID": 15000001,
+    "Guid": 1010344
+  },
+  "1010346": {
+    "Name": "Engineer Residence",
+    "Request": {
+      "1010206": {
+        "Guid": 1010206,
+        "Name": "Sewing Machines"
+      },
+      "1010258": {
+        "Guid": 1010258,
+        "Name": "Chocolate"
+      },
+      "5397": {
+        "Guid": 5397,
+        "Name": "Medicine"
+      },
+      "1010246": {
+        "Guid": 1010246,
+        "Name": "Pocket Watches"
+      },
+      "1010247": {
+        "Guid": 1010247,
+        "Name": "Fur Coats"
+      },
+      "1010257": {
+        "Guid": 1010257,
+        "Name": "Rum"
+      },
+      "1010203": {
+        "Guid": 1010203,
+        "Name": "Soap"
+      },
+      "1010245": {
+        "Guid": 1010245,
+        "Name": "Penny Farthings"
+      },
+      "133181": {
+        "Guid": 133181,
+        "Name": "Shampoo"
+      },
+      "5382": {
+        "Guid": 5382,
+        "Name": "Ice Cream"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "6600": {
+        "Guid": 6600,
+        "Name": "Mezcal"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "1010217": {
+        "Guid": 1010217,
+        "Name": "Canned Food"
+      }
+    },
+    "PopulationGUID": 15000003,
+    "Guid": 1010346
+  },
+  "101255": {
+    "PopulationGUID": 15000006,
+    "Guid": 101255,
+    "Request": {
+      "135230": {
+        "Guid": 135230,
+        "Name": "Typewriter"
+      },
+      "117698": {
+        "Guid": 117698,
+        "Name": "Illuminated Script"
+      },
+      "120037": {
+        "Guid": 120037,
+        "Name": "Bombins"
+      },
+      "120033": {
+        "Guid": 120033,
+        "Name": "Fried Plantains"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "120035": {
+        "Guid": 120035,
+        "Name": "Tortillas"
+      },
+      "120043": {
+        "Guid": 120043,
+        "Name": "Ponchos"
+      },
+      "120030": {
+        "Guid": 120030,
+        "Name": "Spectacles"
+      },
+      "1010257": {
+        "Guid": 1010257,
+        "Name": "Rum"
+      },
+      "1010259": {
+        "Guid": 1010259,
+        "Name": "Cigars"
+      },
+      "1010206": {
+        "Guid": 1010206,
+        "Name": "Sewing Machines"
+      },
+      "5391": {
+        "Guid": 5391,
+        "Name": "Scooter"
+      },
+      "1010214": {
+        "Guid": 1010214,
+        "Name": "Beer"
+      }
+    },
+    "Name": "Obrero Residence"
+  },
+  "5405": {
+    "PopulationGUID": 5403,
+    "Guid": 5405,
+    "Request": {
+      "1010250": {
+        "Guid": 1010250,
+        "Name": "Jewellery"
+      },
+      "5381": {
+        "Guid": 5381,
+        "Name": "Jalea"
+      },
+      "120032": {
+        "Guid": 120032,
+        "Name": "Coffee"
+      },
+      "133532": {
+        "Guid": 133532,
+        "Name": "Souvenirs"
+      },
+      "5395": {
+        "Guid": 5395,
+        "Name": "Fans"
+      },
+      "5382": {
+        "Guid": 5382,
+        "Name": "Ice Cream"
+      },
+      "120016": {
+        "Guid": 120016,
+        "Name": "Champagne"
+      },
+      "1010214": {
+        "Guid": 1010214,
+        "Name": "Beer"
+      },
+      "1010208": {
+        "Guid": 1010208,
+        "Name": "Light Bulbs"
+      },
+      "6600": {
+        "Guid": 6600,
+        "Name": "Mezcal"
+      },
+      "120035": {
+        "Guid": 120035,
+        "Name": "Tortillas"
+      },
+      "120037": {
+        "Guid": 120037,
+        "Name": "Bombins"
+      },
+      "135232": {
+        "Guid": 135232,
+        "Name": "Billiard Tables"
+      },
+      "117699": {
+        "Guid": 117699,
+        "Name": "Lanterns"
+      },
+      "5803": {
+        "Guid": 5803,
+        "Name": "Soccer Balls"
+      },
+      "5388": {
+        "Guid": 5388,
+        "Name": "Perfumes"
+      },
+      "1010206": {
+        "Guid": 1010206,
+        "Name": "Sewing Machines"
+      },
+      "1010259": {
+        "Guid": 1010259,
+        "Name": "Cigars"
+      },
+      "5391": {
+        "Guid": 5391,
+        "Name": "Scooter"
+      }
+    },
+    "Name": "Artista Residence"
+  },
+  "101254": {
+    "PopulationGUID": 15000005,
+    "Guid": 101254,
+    "Request": {
+      "114367": {
+        "Guid": 114367,
+        "Name": "Teff"
+      },
+      "5803": {
+        "Guid": 5803,
+        "Name": "Soccer Balls"
+      },
+      "1010237": {
+        "Guid": 1010237,
+        "Name": "Work Clothes"
+      },
+      "120044": {
+        "Guid": 120044,
+        "Name": "Felt"
+      },
+      "120043": {
+        "Guid": 120043,
+        "Name": "Ponchos"
+      },
+      "120033": {
+        "Guid": 120033,
+        "Name": "Fried Plantains"
+      },
+      "1010257": {
+        "Guid": 1010257,
+        "Name": "Rum"
+      }
+    },
+    "Name": "Jornalero Residence"
+  }
+}

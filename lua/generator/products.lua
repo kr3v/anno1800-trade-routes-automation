@@ -5,6 +5,7 @@ local session = require("lua/anno_session");
 local serpLight = require("lua/serp/lighttools");
 local json = require("lua/rxi/json");
 local cache = require("lua/utils_cache");
+local utable = require("lua/utils_table");
 
 local base = "lua/generator/";
 
@@ -42,7 +43,7 @@ local function detectProducts(L)
     return productsInfo;
 end
 
-local function discoverResidences(L, productsInfo)
+function GeneratorProducts.discoverResidences(L, productsInfo)
     local discoveredResidences = {};
     local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Residence7);
     for _, residence in pairs(os) do
@@ -109,7 +110,7 @@ GeneratorProducts.TsVectorType = {
 function GeneratorProducts.discoverFactories()
     local function _test(guid)
         local _consumption = serpLight.GetVectorGuidsFromSessionObject("[FactoryAssetData(" .. tostring(guid) .. ") Consumption Count]", GeneratorProducts.TsVectorType);
-        if _consumption == nil or #_consumption == 0 then
+        if _consumption == nil or utable.length(_consumption) == 0 then
             return nil;
         end
         local consumption = {};

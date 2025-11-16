@@ -1,35 +1,130 @@
 # Anno 1800 mod that automates goods management between islands
 
-The script ([sample1.lua](sample1.lua):
+Inspired by https://www.reddit.com/r/anno/comments/hp5uac/automatic_trade_routes_anno_1800/,
+but implemented in game's Lua.
 
-1. Finds available ships
-2. Finds islands that have a single good in surplus (>= 400 units)
-3. Finds islands that have a single good in deficit (<= 150 units)
-4. Builds a list of available 'trades' (from surplus islands to deficit islands).
-5. Picks a random ship and assigns it to the most optimal trade (shortest distance).
+The mod manages a set of ships to transfer goods between islands inside a region, based on islands' goods stock and
+requests.
 
-So it is not a full automation, but a proof of concept that can be extended further.
+The mod currently handles trades INSIDE a single region. Cross-region trades are not handled.
 
-Some details regarding the script:
+## Installation
 
-1. It automatically finds all the islands in the region, as well as their piers' locations.
-   Note: the process is quite slow and stupid (it moves camera around to find islands). It took me 7 minutes for the Old
-   World region where I had 9 islands (incl. big ones).
-   Note: the computation is cached, kept on disk, but not associated with a specific game or save.
-2. Ship management is also automated - ships are fonud, moved from/to piers, loaded/unloaded fully automatically.
+This part is not automated and is not up to Anno 1800 mod standards yet.
 
-## TODO list
+Good luck :kekw:
 
-- Cross-region management (manage ships in OW while game is active in NW region).
-- Code cleanup, it is a big mess right now.
-- Further automate - atm it is just "execute first trade for one resource", should be extended to:
-    - multiple trades for single resource,
-    - multiple resources for multiple resources,
-    - continuously generate trades to be executed.
-- Maintain the state between game saves (save/load). Atm all is in memory.
-- Maintain the state per game save (atm the island discovery is global, not per save).
-- Cross-region trades - I did not see any good functions to move ships between regions yet;
-  I read somewhere that ships are 'deleted' and 'recreated' when moving between regions,
-  so I wonder if it that would be possible to do from Lua/XML.
-- Figure out reasonable user interface to control the automation (start/stop, configure,
-  view current trades/ship assignments, etc).
+In theory:
+
+1. Install https://mod.io/g/anno-1800/m/console.
+2. Execute the following:
+
+```shell
+make install "INSTALL_BASEDIR=<path to Anno 1800 directory (NOT MODS, NOT SAVEGAMES, real game dir)>/lua"
+```
+
+3. Start the game with the console mod enabled.
+4. Set game speed to either "Slow Down" or "Regular" _on first mod run_.
+5. Open the console (Shift+F1 by default) and execute:
+
+```lua
+dofile("lua/_executor.lua")
+```
+
+6. Close the console as soon as possible - write `console.toggleVisibility()`.
+7. The mod should start working for this game session in the current region.
+8. Wait for the current region to be fully scanned (for the camera to stop moving). Once done, the mod will start
+   managing ships in the current region.
+9. Switch to other regions and wait for them to be scanned as well (just visit them in the game, the mod will start
+   working automatically).
+10. Once all regions are scanned, you can set game speed back to the preferred one.
+11. Check [Ship assignment](#ship-assignment) section below to assign ships to the mod.
+
+If you restart the game, you have to re-execute step 5. But the mod will remember all islands and ship assignments from
+previous runs.
+As long as it is the same game session (same save game), you do not need to rescan islands (*).
+
+BEWARE: the camera will start moving on its own. This is the mod scanning islands in the region.
+The scanning process is relatively slow (it will take several minutes per region).
+After the scanning is done, the camera will stop moving and the mod will start managing ships in the current region.
+
+NOTE: copy-pasting commands to console WORKS, as long as you remove `□` characters that appear when copying.
+
+NOTE: if scanning misbehaves, consider checking if that island was properly scanned.
+Check [readme.md](docs/images/readme.md).
+
+(*) - NOTE: the mod does not support multiple save games. The island scanning data is global, not per save game.
+If you start a new save game, delete `<path to Anno 1800 directory>/lua/trade-routes-automation/cache/regions/`.
+
+It will force a full rescan.
+
+### Ship assignment
+
+The mod uses ships that are assigned to a fake `TRA_${REGION_NAME}` trade route.
+
+| Trade Route Name | Region Name    |
+|------------------|----------------|
+| `TRA_OW`         | Old World      |
+| `TRA_NW`         | New World      |
+| `TRA_AR`         | Arctic         |
+| `TRA_EN`         | Enbesa         |
+| `TRA_CT`         | Cape Trelawney |
+
+The trade route must be created manually, the ships should also be assigned to it manually.
+The ships MUST be in the relevant region, mod DOES NOT move ships between regions.
+
+TODO - better handle when ships are added to the trade route after the mod starts.
+At the moment, the ship can only be added to the trade route IF:
+
+- the ship name is at most 2 letters; otherwise, the mod might fail to use the ship (the mod will misbehave when using
+  the ship).
+- the ship _cargo_ must be empty; otherwise the mod will not use the ship.
+
+However, the mod automatically handles the above when it is restarted.
+
+NOTE: the mod stores ship assignments in the ship names. A name like 'k-7n-gd-2lA' is not a bug, but an encoded 4-tuple
+of
+ship short name, ship destination X and Y coordinates, and the destination area ID.
+
+## Before/after mod when no in-region trade routes exist (except oil and mail)
+
+![trade-routes.png](docs/images/before-after/trade-routes.png)
+^^ trade routes example.
+
+| Before mod                                                                    | After mod                                                                                     |
+|-------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| old world city supply![c4-before.png](docs/images/before-after/c4-before.png) | no hot sauce in the region<br/>![c4-after.png](docs/images/before-after/c4-after.png)         |
+| new world city supply![n3-before.png](docs/images/before-after/n3-before.png) | no Enbesa Teff available in region<br/>![n3-after.png](docs/images/before-after/n3-after.png) |
+| new world population![nw-before.png](docs/images/before-after/nw-before.png)  | <br/>![nw-after.png](docs/images/before-after/nw-after.png)                                   |
+| old world population![ow-before.png](docs/images/before-after/ow-before.png)  | <br/>![ow-after.png](docs/images/before-after/ow-after.png)                                   |
+
+# Implementation details
+
+## List of "low-level" features
+
+- scanning
+    - scan current region to detect all islands (*),
+    - scan all detected islands to detect players' islands with approximate coast locations (*),
+    - scan all players' ships and detect ships assigned to this mod (through a specific trade route name),
+- trading
+    - given a ship, a source and destination island, and a specific good, the mod can:
+        - move the ship to the source island's pier,
+        - load the good from the source island to the ship,
+        - move the ship to the destination island's pier,
+        - unload the good at the destination island (fully)
+    - detect all islands' goods stock, requests, and total capacity,
+        - requests are also automated, the mod checks island's buildings/residences and their consumptions (**),
+
+Notes:
+(*) - the scanning process is quite slow (it automatically moves camera around to find islands).
+It takes me 7 minutes for the Old World region where I have 9 islands (incl. big ones).
+This process result is _cached_ on disk, but not YET associated with a specific game or save.
+
+(**) - there are two known problems so far:
+
+1. Residences and factories consumption info is hardcoded per building type. If a mod changes that, this mod will not be
+   aware of it.
+   But, the detection is automated. The current implementation could be extended to dynamically scan all buildings'
+   consumption.
+   Plus, not all residences were scanned yet, so some goods requests may be incomplete.
+2. Trade unions and harbormasters items that change consumption items are not handled yet.

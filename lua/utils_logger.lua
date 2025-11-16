@@ -89,6 +89,7 @@ end
 ---@field logf fun(fmt: string, ...: any)
 ---@field with fun(key: string, value: any): Logger
 ---@field logger fun(dst: string): Logger
+---@field dst string -- <internal>
 
 ---@return Logger
 return newLogger(default_dst)

@@ -14,24 +14,26 @@ package.loaded["lua/mod_area_requests"] = nil;
 package.loaded["lua/mod_map_scanner"] = nil;
 package.loaded["lua/mod_ship_cmd"] = nil;
 package.loaded["lua/mod_trade_executor"] = nil;
+package.loaded["lua/mod_trade_planner_ll"] = nil;
 
 package.loaded["lua/generator/products"] = nil;
 
 local Anno = require("lua/anno_interface");
-local AreasRequest = require("lua/mod_area_requests");
 local inspector = require("lua/anno_object_inspector");
 local objectAccessor = require("lua/anno_object_accessor");
 local session = require("lua/anno_session");
 
-local serpLight = require("lua/serp/lighttools");
 ---@type Logger
 local L = require("lua/utils_logger");
+local serpLight = require("lua/serp/lighttools");
 local json = require("lua/rxi/json");
 local cache = require("lua/utils_cache");
 local base64 = require("lua/iskolbin/base64");
 local async = require("lua/utils_async");
+local utable = require("lua/utils_table");
 
-local TradePlanner = require("lua/mod_trade_planner");
+local AreasRequest = require("lua/mod_area_requests");
+local TradePlannerLL = require("lua/mod_trade_planner_ll");
 local map_scanner = require("lua/mod_map_scanner");
 local shipCmd = require("lua/mod_ship_cmd");
 local TradeExecutor = require("lua/mod_trade_executor");
@@ -43,50 +45,10 @@ local Config = {
     AllowForceCleanup = true,
 }
 
---- @alias Coordinate { x: number, y: number }
-
----
-
----@param coord1 Coordinate
----@param coord2 Coordinate
----@return number
-local function CalculateDistanceBetweenCoordinates(coord1, coord2)
-    local dx = coord1.x - coord2.x;
-    local dy = coord1.y - coord2.y;
-    return math.sqrt(dx * dx + dy * dy);
-end
-
-local function CalculateDistanceBetweenAreas(areas, areaID1, areaID2)
-    local area1 = areas[areaID1];
-    local area2 = areas[areaID2];
-
-    if area1 == nil or area1.water_points == nil then
-        L.logf("Area %d has no water points", areaID1);
-        return { dist = math.huge };
-    end
-    if area2 == nil or area2.water_points == nil then
-        L.logf("Area %d has no water points", areaID2);
-        return { dist = math.huge };
-    end
-
-    local options = {};
-    for _, point1 in ipairs(areas[areaID1].water_points) do
-        for _, point2 in ipairs(areas[areaID2].water_points) do
-            local dist = CalculateDistanceBetweenCoordinates(point1, point2);
-            table.insert(options, { src = point1, dst = point2, dist = dist });
-        end
-    end
-    table.sort(options, function(a, b)
-        return a.dist < b.dist
-    end);
-
-    return options[1];
-end
-
----
-
----@alias AreaID number
+---@alias Coordinate { x: number, y: number }
 ---@alias CoordinateString string
+---@alias AreaID number
+---@alias ShipID number
 
 ---@class AreaData
 ---@field city_name string
@@ -102,16 +64,15 @@ local function _areas_in_region(region)
             end,
             "map_scanner.Session(P11)", region
     );
-
     return map_scanner.SessionAreas(ret);
 end
 
 local function _areas_scan(
-    L,
-    areas,
-    region,
-    areaID,
-    step
+        L,
+        areas,
+        region,
+        areaID,
+        step
 )
     local scan = cache.GetOrSetR(
             function(_, areaID, step)
@@ -219,17 +180,28 @@ local function _areas_enrich(areas, region)
     return ret;
 end
 
----
+local function tradeExecutor_areas(L, region)
+    -- 1.1. Scan whole (session) map.
+    -- 1.2. Determine grid for areas on the session map.
+    local _areas = _areas_in_region(region);
+    -- 2.1. For each area, scan it in detail if owned by the player.
+    _areas = _areas_enrich(_areas, region);
 
-local function table_length(t)
-    local count = 0;
-    for _, _ in pairs(t) do
-        count = count + 1;
+    ---@type table<AreaID, AreaData>
+    local areas = {};
+    for areaID, areaData in pairs(_areas) do
+        local owner = Anno.Area_Owner(region, areaID);
+        if owner == 0 then
+            areas[areaID] = areaData;
+        end
     end
-    return count;
+
+    return areas;
 end
 
-local function rename_all_ships_once(L, region)
+---
+
+local function tradeExecutor_ships_automationRenameAll(L, region)
     local ships = Anno.Ships_GetInRegion(region);
 
     local total = 1;
@@ -256,7 +228,7 @@ local function rename_all_ships_once(L, region)
     end
 end
 
-local function ships_all_region(L, region)
+local function tradeExecutor_ships_availableForAutomation(L, region)
     local available = {};
     local stillMoving = {};
     local notEmpty = {};
@@ -297,325 +269,13 @@ local function ships_all_region(L, region)
         end
     end
 
-    L.logf("Total available trade route automation ships: %d", table_length(available));
+    L.logf("Total available trade route automation ships: %d", utable.length(available));
     return available, stillMoving, notEmpty;
 end
 
 ---
 
 local logs_baseDir = "lua/trade-route-automation/";
-
-local function trade_execute_iteration(L, areas, region)
-    local now = os.date("%Y-%m-%d %H:%M:%S");
-    L.logf("start at %s time", now);
-
-    -- 3.1. Find all ships allocated to trade routes automation.
-    local available_ships, stillMoving, hasCargo = ships_all_region(L, region);
-    if table_length(available_ships) == 0 then
-        L.log("No available ships for trade routes automation, exiting iteration.");
-        return ;
-    end
-
-    local _stockFromInFlight = {}; -- table<areaID, table<productID, amount>>
-    -- 3.2. In flight
-    for ship, _ in pairs(stillMoving) do
-        L.logf("%s", tostring(ship));
-        local info = TradeExecutor.Ship_Name_FetchCmdInfo(ship);
-        if info == nil then
-            goto continue;
-        end
-
-        local area_id = info.area_id;
-
-        local cargo = Anno.Ship_Cargo_Get(ship);
-        for _, cargo_item in pairs(cargo) do
-            if cargo_item.Value == 0 then
-                goto continue_j;
-            end
-
-            if _stockFromInFlight[area_id] == nil then
-                _stockFromInFlight[area_id] = {};
-            end
-            if _stockFromInFlight[area_id][cargo_item.Guid] == nil then
-                _stockFromInFlight[area_id][cargo_item.Guid] = 0;
-            end
-            _stockFromInFlight[area_id][cargo_item.Guid] = _stockFromInFlight[area_id][cargo_item.Guid] + cargo_item.Value;
-
-            :: continue_j ::
-        end
-
-        :: continue ::
-    end
-
-    -- 4. (work in progress) Determine product disbalances in the areas. Assign ship to balance the good
-
-    local q = TradePlanner.GenerateSupplyRequest(L, region, _stockFromInFlight, areas);
-    local supply = q.Supply;   -- table<areaID, table<goodID, amount>>
-    local request = q.Request; -- table<areaID, table<goodID, amount>>
-    local supplyG = q.Supply_GoodToAreaID; -- table<goodID, table<areaID, amount>>
-
-    L.log("supplyToGoodToAreaID - done");
-
-    local request_orders = {} -- table<orderKeyType, orderValueType>
-
-    for areaID, area_requests in pairs(request) do
-        for goodID, amount in pairs(area_requests) do
-            local supply_areas = supplyG[goodID]
-            if supply_areas ~= nil then
-                L.logf("found supply areas for goodID=%d %s", goodID, tostring(supply_areas));
-                for supply_areaID, supply_amount in pairs(supply_areas) do
-                    local transfer_amount = math.min(amount, supply_amount)
-                    local distance = CalculateDistanceBetweenAreas(areas, supply_areaID, areaID)
-
-                    if distance.dist == math.huge then
-                        L.logf("Skipping order from area %d to area %d for good %d due to no water route",
-                                supply_areaID, areaID, goodID);
-                        goto continue;
-                    end
-                    if transfer_amount < 50 then
-                        L.logf("Skipping order from area %d to area %d for good %d due to insufficient transfer amount: %d < 50 (needed=%d available=%d)",
-                                supply_areaID, areaID, goodID, transfer_amount, amount, supply_amount);
-                        goto continue;
-                    end
-
-                    local key = {
-                        AreaID_from = supply_areaID,
-                        AreaID_to = areaID,
-                        GoodID = goodID,
-                        Amount = transfer_amount,
-                    }
-                    local value = {
-                        OrderDistance = distance,
-                    }
-
-                    request_orders[key] = value
-
-                    :: continue ::
-                end
-            end
-        end
-    end
-
-    L.log("request_orders - done");
-
-    local available_commands = {}
-
-    for ship, _ in pairs(available_ships) do
-        local slots_cap = Anno.Ship_Cargo_SlotCapacity(ship);
-        local cap = slots_cap * 50;
-
-        if cap < 50 then
-            L.logf("Skipping ship %d due to insufficient cargo capacity: %d slots (%d total)", ship, slots_cap, cap);
-            goto continue;
-        end
-
-        for order_key, order_value in pairs(request_orders) do
-            local ship_position = order_value.OrderDistance.src
-
-            local info = TradeExecutor.Ship_Name_FetchCmdInfo(ship)
-            if info ~= nil then
-                ship_position = { x = info.x, y = info.y }
-            end
-
-            local distance_to_pickup = CalculateDistanceBetweenCoordinates(
-                    ship_position,
-                    order_value.OrderDistance.src
-            )
-
-            local total_distance = distance_to_pickup + order_value.OrderDistance.dist
-            local amount = math.min(order_key.Amount, cap)
-            if amount < 50 then
-                L.logf("Skipping command for ship %d due to insufficient transfer amount: %d < 50",
-                        ship, amount);
-                goto continue;
-            end
-
-            local command_key = {
-                ShipID = ship,
-                Order = order_key,
-            }
-            local command_value = {
-                Order = order_value,
-                ShipDistance = total_distance,
-                Amount = math.min(order_key.Amount, cap),
-                ShipSlots = slots_cap,
-            }
-
-            available_commands[command_key] = command_value
-        end
-
-        :: continue ::
-    end
-
-    local available_commands_kv = {};
-    for k, v in pairs(available_commands) do
-        table.insert(available_commands_kv, { Key = k, Value = v });
-    end
-
-    table.sort(available_commands_kv, function(a, b)
-        return a.Value.ShipDistance < b.Value.ShipDistance
-    end);
-
-    L.log("available_commands - done");
-
-    -- ========================================================================
-    -- NEW: Spawn async tasks for trade orders
-    -- ========================================================================
-
-    local spawned_tasks = {}
-    for _, kv in ipairs(available_commands_kv) do
-        local command_key = kv.Key
-        local command_value = kv.Value
-
-        local ship = command_key.ShipID
-        local order = command_key.Order
-        local order_value = command_value.Order
-        local amount = command_value.Amount
-
-        local available_supply = supply[order.AreaID_from][order.GoodID]
-        local available_request = request[order.AreaID_to][order.GoodID]
-
-        if available_supply < amount then
-            L.logf("Skipping order: insufficient supply: available_supply=%d < order=%d",
-                    available_supply, amount);
-            goto continue;
-        end
-        if available_request < 50 then
-            L.logf("Skipping order: insufficient request: available_request=%d (type=%s) < 50 %s",
-                    available_request, type(available_request), available_request < 50);
-            goto continue;
-        end
-        if available_ships[ship] == nil then
-            L.logf("Skipping order: ship %d no longer available", ship);
-            goto continue;
-        end
-
-        supply[order.AreaID_from][order.GoodID] = supply[order.AreaID_from][order.GoodID] - amount
-        request[order.AreaID_to][order.GoodID] = request[order.AreaID_to][order.GoodID] - amount
-        available_ships[ship] = nil;
-
-        -- Spawn async task
-
-        local cmd = {
-            Key = {
-                ShipID = ship,
-                Order = {
-                    AreaID_from = order.AreaID_from,
-                    AreaID_to = order.AreaID_to,
-                    GoodID = order.GoodID,
-                    Amount = amount,
-                }
-            },
-            Value = {
-                Order = {
-                    OrderDistance = {
-                        src = order_value.OrderDistance.src,
-                        dst = order_value.OrderDistance.dst,
-                        dist = order_value.OrderDistance.dist,
-                    },
-                },
-                ShipDistance = command_value.ShipDistance,
-            }
-        }
-
-        local shipName = Anno.Ship_Name_Get(ship);
-        local info = TradeExecutor.Ship_Name_FetchCmdInfo(ship);
-        if info ~= nil then
-            shipName = info.name;
-        end
-
-        local orderLogKey = string.format("%s-%s-%s-%s-%s",
-                shipName,
-                os.date("%Y-%m-%dT%H:%M:%SZ"),
-                Anno.Area_CityName(region, order.AreaID_from),
-                Anno.Area_CityName(region, order.AreaID_to),
-                order.GoodID .. "_" .. string.gsub(GeneratorProducts.Product(order.GoodID).Name, " ", "_")
-        );
-
-        local Lo = L.logger(logs_baseDir .. region .. "/trades/" .. (orderLogKey .. ".log"));
-
-        Lo = Lo
-                .with("ship", tostring(ship) .. " (" .. shipName .. ")")
-                .with("aSrc", order.AreaID_from .. " (" .. Anno.Area_CityName(region, order.AreaID_from) .. ")")
-                .with("aDst", order.AreaID_to .. " (" .. Anno.Area_CityName(region, order.AreaID_to) .. ")")
-                .with("good", order.GoodID .. " (" .. GeneratorProducts.Product(order.GoodID).Name .. ")")
-                .with("amount", amount)
-        Lo.logf("Spawning trade order")
-        inspector.Do(Lo, cmd);
-
-        local task_id = TradeExecutor.SpawnTradeOrder(Lo, region, ship, cmd)
-        table.insert(spawned_tasks, task_id)
-
-        :: continue ::
-    end
-    L.logf("Spawned %d trade order tasks", #spawned_tasks)
-
-    local stillAvailableShips = 0;
-    for _, v in pairs(available_ships) do
-        if v ~= nil then
-            stillAvailableShips = stillAvailableShips + 1;
-        end
-    end
-
-    local stillExistingRequestsC = 0;
-    local remainingDeficit = {};
-    for areaID, goods in pairs(request) do
-        for goodID, amount in pairs(goods) do
-            if amount >= 50 then
-                local goodIdStr = tostring(goodID);
-
-                if remainingDeficit[goodIdStr] == nil then
-                    remainingDeficit[goodIdStr] = {
-                        Total = 0,
-                        Areas = {},
-                    }
-                end
-                remainingDeficit[goodIdStr].Total = remainingDeficit[goodIdStr].Total + amount;
-                table.insert(remainingDeficit[goodIdStr].Areas, {
-                    AreaID = areaID,
-                    AreaName = Anno.Area_CityName(region, areaID),
-                    Amount = amount,
-                })
-                stillExistingRequestsC = stillExistingRequestsC + 1;
-            end
-        end
-    end
-
-    local remainingSurplus = {};
-    for areaID, goods in pairs(supply) do
-        for goodID, amount in pairs(goods) do
-            if amount >= 50 then
-                local goodIdStr = tostring(goodID);
-
-                if remainingSurplus[goodIdStr] == nil then
-                    remainingSurplus[goodIdStr] = {
-                        Total = 0,
-                        Areas = {},
-                    }
-                end
-                remainingSurplus[goodIdStr].Total = remainingSurplus[goodIdStr].Total + amount;
-                table.insert(remainingSurplus[goodIdStr].Areas, {
-                    AreaID = areaID,
-                    AreaName = Anno.Area_CityName(region, areaID),
-                    Amount = amount,
-                })
-            end
-        end
-    end
-
-    if stillAvailableShips == 0 then
-        L.log("No more available ships for trade routes automation.");
-    elseif stillExistingRequestsC == 0 then
-        L.log("No more existing requests for trade routes automation.");
-    else
-        L.logf("Still available ships: %d, still existing requests: %d", stillAvailableShips, stillExistingRequestsC);
-    end
-
-    cache.WriteTo(logs_baseDir .. region .. "/remaining-deficit.json", remainingDeficit);
-    cache.WriteTo(logs_baseDir .. region .. "/remaining-surplus.json", remainingSurplus);
-
-    L.logf("end at %s time", os.date("%Y-%m-%d %H:%M:%S"));
-end
 
 local function async_watcher(interrupt)
     local max_ticks = math.huge -- 10000 -- Safety limit
@@ -701,143 +361,6 @@ local function asyncWorker()
     async_watcher(asyncInterrupt);
 end
 
-local function region_trade_executor_loop(region, interrupt)
-    while true do
-        if Anno.Region_IsCached(region) then
-            break
-        end
-        if Anno.Region_CanCache(region) then
-            Anno.Region_RefreshCache(region);
-        end
-
-        for i = 1, 10 do
-            coroutine.yield();
-        end
-    end
-
-    rename_all_ships_once(L, region);
-    coroutine.yield();
-    coroutine.yield();
-    coroutine.yield();
-
-    -- 1.1. Scan whole (session) map.
-    -- 1.2. Determine grid for areas on the session map.
-    local _areas = _areas_in_region(region);
-    -- 2.1. For each area, scan it in detail if owned by the player.
-    _areas = _areas_enrich(_areas, region);
-
-    ---@type table<AreaID, AreaData>
-    local areas = {};
-    for areaID, areaData in pairs(_areas) do
-        local owner = Anno.Area_Owner(region, areaID);
-        if owner == 0 then
-            areas[areaID] = areaData;
-        end
-    end
-
-    local trades = {};
-    local _, _, hasCargo = ships_all_region(L, region);
-    for ship, _ in pairs(hasCargo) do
-        L.logf("Ship %d has cargo, waiting for it to unload before starting automation.", ship);
-
-        local sGuid, sValue = nil, 0;
-
-        local cargo = Anno.Ship_Cargo_Get(ship);
-        for _, cargo_item in pairs(cargo) do
-            local guid, value = cargo_item.Guid, cargo_item.Value;
-            if sGuid == nil then
-                sGuid = guid;
-            elseif sGuid ~= guid then
-                L.logf("Ship %d has mixed cargo, cannot proceed with automation.", ship);
-                goto continue;
-            end
-            sValue = sValue + value;
-        end
-        if sGuid == nil then
-            L.logf("Ship %d has no cargo, cannot proceed with automation.", ship);
-            goto continue;
-        end
-
-        local areaToStorageT = {};
-        local areaToStorageD = {};
-        for areaID, areaData in pairs(areas) do
-            local capacity = areaData.capacity;
-            local current = Anno.Area_GetGood(region, areaID, sGuid);
-            local availableCap = capacity - current;
-            if availableCap <= 50 then
-                goto continueA;
-            end
-
-            table.insert(areaToStorageT, {
-                AreaID = areaID,
-                Available = availableCap,
-            });
-            areaToStorageD[areaID] = availableCap;
-
-            :: continueA ::
-        end
-        table.sort(areaToStorageT, function(a, b)
-            return a.Available > b.Available
-        end);
-
-        for _, areaInfo in ipairs(areaToStorageT) do
-            local areaID = areaInfo.AreaID;
-            local availableCap = areaToStorageD[areaID];
-            local areaData = areas[areaID];
-
-            if availableCap >= sValue then
-                table.insert(trades, {
-                    ship_oid = ship,
-                    good_id = sGuid,
-                    areaID_dst = areaID,
-                    area_dst_coords = areaData.water_points[1],
-                });
-                areaToStorageD[areaID] = availableCap - sValue;
-            end
-        end
-
-        :: continue ::
-    end
-    for _, trade in ipairs(trades) do
-        TradeExecutor._ExecuteUnloadWithShip(
-                L,
-                region,
-                trade.ship_oid,
-                trade.good_id,
-                trade.areaID_dst,
-                trade.area_dst_coords
-        );
-    end
-    coroutine.yield();
-    coroutine.yield();
-    coroutine.yield();
-
-    while true do
-        if interrupt() then
-            L.log("Trade route executor loop received interrupt signal, stopping.");
-            break
-        end
-
-        local now = os.date("%Y-%m-%d %H:%M:%S");
-        local Li = L.logger(logs_baseDir .. region .. "/trade-execute-iteration." .. now .. ".log");
-
-        L.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
-        Li.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
-
-        local success, err = xpcall(function()
-            return trade_execute_iteration(Li, areas, region);
-        end, debug.traceback);
-        if not success then
-            L.logf("[Error] trade execute iteration: %s", tostring(err));
-            Li.logf("[Error] trade execute iteration: %s", tostring(err));
-        end
-
-        for i = 1, 600 do
-            coroutine.yield();
-        end
-    end
-end
-
 local function heartbeat_loop()
     while true do
         if heartbeatInterrupt() then
@@ -849,6 +372,217 @@ local function heartbeat_loop()
         cache.WriteTo(logs_baseDir .. "trade-executor-history.json", TradeExecutor.Records);
 
         for i = 1, 1200 do
+            coroutine.yield();
+        end
+    end
+end
+
+---@param region RegionID
+---@param supplyRequest TradePlanner.SupplyRequestTable
+local function tradeExecutor_remainingSurplusDeficit(
+        region,
+        supplyRequest
+)
+    local supply = supplyRequest.Supply;
+    local request = supplyRequest.Request;
+
+    local stillExistingRequestsC = 0;
+    local remainingDeficit = {};
+    for areaID, goods in pairs(request) do
+        for goodID, amount in pairs(goods) do
+            if amount >= 50 then
+                local goodIdStr = tostring(goodID);
+
+                if remainingDeficit[goodIdStr] == nil then
+                    remainingDeficit[goodIdStr] = {
+                        Total = 0,
+                        Areas = {},
+                    }
+                end
+                remainingDeficit[goodIdStr].Total = remainingDeficit[goodIdStr].Total + amount;
+                table.insert(remainingDeficit[goodIdStr].Areas, {
+                    AreaID = areaID,
+                    AreaName = Anno.Area_CityName(region, areaID),
+                    Amount = amount,
+                })
+                stillExistingRequestsC = stillExistingRequestsC + 1;
+            end
+        end
+    end
+    local remainingSurplus = {};
+    for areaID, goods in pairs(supply) do
+        for goodID, amount in pairs(goods) do
+            if amount >= 50 then
+                local goodIdStr = tostring(goodID);
+
+                if remainingSurplus[goodIdStr] == nil then
+                    remainingSurplus[goodIdStr] = {
+                        Total = 0,
+                        Areas = {},
+                    }
+                end
+                remainingSurplus[goodIdStr].Total = remainingSurplus[goodIdStr].Total + amount;
+                table.insert(remainingSurplus[goodIdStr].Areas, {
+                    AreaID = areaID,
+                    AreaName = Anno.Area_CityName(region, areaID),
+                    Amount = amount,
+                })
+            end
+        end
+    end
+    cache.WriteTo(logs_baseDir .. region .. "/remaining-deficit.json", remainingDeficit);
+    cache.WriteTo(logs_baseDir .. region .. "/remaining-surplus.json", remainingSurplus);
+
+    return stillExistingRequestsC;
+end
+
+---@param L Logger
+---@param areas table<AreaID, AreaData>
+---@param region RegionID
+local function tradeExecutor_iteration(L, areas, region)
+    local now = os.date("%Y-%m-%d %H:%M:%S");
+    L.logf("start at %s time", now);
+
+    -- 3.1. Find all ships allocated to trade routes automation.
+    local available_ships, stillMoving, _ = tradeExecutor_ships_availableForAutomation(L, region);
+    if utable.length(available_ships) == 0 then
+        L.log("No available ships for trade routes automation, exiting iteration.");
+        return ;
+    end
+
+    -- 4. (work in progress) Determine product disbalances in the areas. Assign ship to balance the good
+    local srt = TradePlannerLL.SupplyRequest_Build(
+            L,
+            region,
+            TradePlannerLL.Ships_StockInFlight(L, region, stillMoving),
+            areas
+    );
+    L.log("supply request table - done");
+
+    local request_orders = TradePlannerLL.SupplyRequest_ToOrders(L, srt, areas);
+    L.log("request_orders - done");
+
+    local available_commands_kv = TradePlannerLL.SupplyRequestOrders_ToShipCommands(L, available_ships, request_orders);
+    L.log("available_commands - done");
+
+    -- ========================================================================
+    -- NEW: Spawn async tasks for trade orders
+    -- ========================================================================
+
+    local tasks = TradePlannerLL.SupplyRequestShipCommands_Execute(
+            L, region, logs_baseDir,
+            srt, available_commands_kv, available_ships
+    )
+    L.logf("Spawned %d async tasks for trade route execution.", #tasks);
+
+    local stillAvailableShips = 0;
+    for _, v in pairs(available_ships) do
+        if v ~= nil then
+            stillAvailableShips = stillAvailableShips + 1;
+        end
+    end
+    local stillExistingRequestsC = tradeExecutor_remainingSurplusDeficit(region, srt);
+    if stillAvailableShips == 0 then
+        L.log("No more available ships for trade routes automation.");
+    elseif stillExistingRequestsC == 0 then
+        L.log("No more existing requests for trade routes automation.");
+    else
+        L.logf("Still available ships: %d, still existing requests: %d", stillAvailableShips, stillExistingRequestsC);
+    end
+
+    if stillAvailableShips > 0 then
+        for _ = 1, 10 do
+            coroutine.yield();
+        end
+
+        L.log("Attempting hub run with remaining available ships.");
+        local L_dest = L.dst .. ".hub";
+        L = L.logger(L_dest);
+
+        local shipsAvailable, shipsMoving, _ = tradeExecutor_ships_availableForAutomation(L, region);
+        if utable.length(shipsAvailable) == 0 then
+            L.log("No available ships for trade routes automation, exiting iteration.");
+            return ;
+        end
+        local srt = TradePlannerLL.SupplyRequest_BuildHubs(
+                L,
+                region,
+                TradePlannerLL.Ships_StockInFlight(L, region, shipsMoving),
+                areas
+        );
+        local rq = TradePlannerLL.SupplyRequest_ToOrders(L, srt, areas);
+        local acs = TradePlannerLL.SupplyRequestOrders_ToShipCommands(L, shipsAvailable, rq);
+        local tasks = TradePlannerLL.SupplyRequestShipCommands_Execute(
+                L, region, logs_baseDir,
+                srt, acs, shipsAvailable
+        )
+        L.logf("Spawned %d async tasks for trade route execution (hub run).", #tasks);
+    end
+
+    L.logf("end at %s time", os.date("%Y-%m-%d %H:%M:%S"));
+end
+
+local function tradeExecutor_loop(region, interrupt)
+    while true do
+        if interrupt() then
+            L.log("Trade executor loop received interrupt signal, stopping.");
+            break
+        end
+
+        if Anno.Region_CanCache(region) then
+            Anno.Region_RefreshCache(region);
+        end
+        if Anno.Region_IsCached(region) then
+            break
+        end
+
+        for _ = 1, 10 do
+            coroutine.yield();
+        end
+    end
+
+    tradeExecutor_ships_automationRenameAll(L, region);
+    coroutine.yield();
+    coroutine.yield();
+    coroutine.yield();
+
+    local areas = tradeExecutor_areas(L, region);
+    coroutine.yield();
+    coroutine.yield();
+    coroutine.yield();
+
+    local _, _, withCargo = tradeExecutor_ships_availableForAutomation(L, region);
+    local Lu = L.logger(logs_baseDir .. region .. "/force-unload-ships." .. os.date("%Y-%m-%d %H:%M:%S") .. ".log");
+    TradePlannerLL.Ships_ForceUnloadStoppedShips(Lu, logs_baseDir, region, areas, withCargo);
+    coroutine.yield();
+    coroutine.yield();
+    coroutine.yield();
+
+    while true do
+        if interrupt() then
+            L.log("Trade route executor loop received interrupt signal, stopping.");
+            break
+        end
+
+        if Anno.Region_CanCache(region) then
+            Anno.Region_RefreshCache(region);
+        end
+
+        local now = os.date("%Y-%m-%d %H:%M:%S");
+        local Li = L.logger(logs_baseDir .. region .. "/trade-execute-iteration." .. now .. ".log");
+
+        L.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
+        Li.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
+
+        local success, err = xpcall(function()
+            return tradeExecutor_iteration(Li, areas, region);
+        end, debug.traceback);
+        if not success then
+            L.logf("[Error] trade execute iteration: %s", tostring(err));
+            Li.logf("[Error] trade execute iteration: %s", tostring(err));
+        end
+
+        for i = 1, 600 do
             coroutine.yield();
         end
     end
@@ -872,7 +606,7 @@ system.start(heartbeat_loop, "trade-executor-alive-heartbeat")
 local tradeRouteLoopInterruptOW = interrupt_on_file("lua/stop-trade-route-loop-ow");
 system.start(function()
     local success, err = xpcall(function()
-        return region_trade_executor_loop(Anno.Region_OldWorld, tradeRouteLoopInterruptOW);
+        return tradeExecutor_loop(Anno.Region_OldWorld, tradeRouteLoopInterruptOW);
     end, debug.traceback);
     L.logf("Trade executor loop (OW) exited with success=%s, err=%s", tostring(success), tostring(err));
 end, "trade-route-executor-loop-ow");
@@ -880,73 +614,33 @@ end, "trade-route-executor-loop-ow");
 local tradeRouteLoopInterruptNW = interrupt_on_file("lua/stop-trade-route-loop-nw");
 system.start(function()
     local success, err = xpcall(function()
-        return region_trade_executor_loop(Anno.Region_NewWorld, tradeRouteLoopInterruptNW);
+        return tradeExecutor_loop(Anno.Region_NewWorld, tradeRouteLoopInterruptNW);
     end, debug.traceback);
     L.logf("Trade executor loop (NW) exited with success=%s, err=%s", tostring(success), tostring(err));
 end, "trade-route-executor-loop-nw");
 
 --local success, err = pcall(function()
---    local guids = {
---        "1010291",
---        "118733",
---        "110935",
---        "1010283",
---        "1010263",
---        "1010298",
---        "100416",
---        "1010304",
---        "1010308",
---        "1010321",
---        "1010278",
---        "1010313",
---        "1010315",
---        "118571",
---        "1010319",
---        "1010262",
---        "1010264",
---        "1010558",
---        "1010305",
---        "1010309",
---        "1010266",
---        "1010314",
---        "1010320",
---        "1010471",
---        "101331",
---        "135088",
---        "133496",
---        "135085",
---        "1010269",
---        "538",
---        "3741",
---        "1010265",
---        "100654",
---        "1010312",
---        "1010288",
---        "1010310",
---        "1010560",
---        "100451",
---        "1010294",
---        "1010267",
---        "1010316",
---        "1010281",
---        "1010296",
---        "100655",
---        "1010307",
---        "1010470",
---    }
+--    local __oid = serpLight.get_OID(session.selection[1]);
+--    L.logf("oid=%s", __oid);
+--    local guid = objectAccessor.GameObject(__oid).Static.Guid;
+--    L.logf("guid=%s", tostring(guid));
+--    local _consumption = serpLight.GetVectorGuidsFromSessionObject("[FactoryAssetData(" .. tostring(guid) .. ") Consumption Count]", GeneratorProducts.TsVectorType);
+--    inspector.Do(L, _consumption);
 --
---    --local oid = serpLight.get_OID(session.selection[1]);
---    --local oa = objectAccessor.GameObject(oid);
---    --local guid = oa.Static.Guid;
---
---    --local Li = L.logger("lua/inspector_selected_object.yaml");
---    --Li.disableDate = true;
---    --inspector.Do(Li, oa);
---
---    for _, guid in ipairs(guids) do
---        local _consumption = serpLight.GetVectorGuidsFromSessionObject("[FactoryAssetData(" .. tostring(guid) .. ") Consumption Count]", GeneratorProducts.TsVectorType);
---        inspector.Do(L, _consumption);
---    end
+--    --inspector.Do(L.logger("lua/prod.yaml"), Anno.Internal._AreasToProductionGuids())
+--    --for i, v in pairs(serpLight.PropertiesStringToID) do
+--    --    local os = session.getObjectGroupByProperty(v);
+--    --    for _, obj in pairs(os) do
+--    --        local obj_str = tostring(obj:getName());
+--    --        local oid = tonumber(obj_str:match("oid (%d+)"));
+--    --        if oid then
+--    --            if oid == __oid then
+--    --                L.logf("Found object by property %s: oid=%d name=%s", i, oid, tostring(obj:getName()));
+--    --            end
+--    --        end
+--    --    end
+--    --end
+--    --inspector.Do(L.logger("lua/obj-inspect-fertilizer.yaml"), objectAccessor.GameObject(__oid));
 --end)
 
 L.logf("PCALL success: %s", tostring(success));

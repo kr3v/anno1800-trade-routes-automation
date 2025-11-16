@@ -233,7 +233,9 @@ end
 
 return {
     Do = function(L, obj, title)
+        L.disableDate = true
         inspectL(L, obj, title or "object", false)
+        L.disableDate = false
     end,
     DoF = function(L, obj, title)
         inspectL(L, obj, title or "object", true)

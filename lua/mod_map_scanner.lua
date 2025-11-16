@@ -1,6 +1,8 @@
 local serpLight = require("lua/serp/lighttools");
 local objectAccessor = require("lua/anno_object_accessor");
 
+local Anno = require("lua/anno_interface");
+
 local function MoveCameraTo(x, y)
     ts.SessionCamera.ToWorldPos(x, y);
 end
@@ -101,21 +103,27 @@ local P25 = 25;
 local P11 = 11;
 
 local presets = {
-    P25 = {
-        X0 = 420, -- it is more of 450
-        Y0 = 350, -- it should be 250 (450 * 9/16)
-        DeltaX = 420,
-        DeltaY = 233, -- 350 * (2/3)
-        X1 = 1900,
-        Y1 = 1750
-    },
+    --P25 = {
+    --    X0 = 420, -- it is more of 450
+    --    Y0 = 350, -- it should be 250 (450 * 9/16)
+    --    DeltaX = 420,
+    --    DeltaY = 233, -- 350 * (2/3)
+    --    X1 = 1900,
+    --    Y1 = 1750
+    --},
     P11 = {
         X0 = 250,
         Y0 = 250,
         DeltaX = 90,
         DeltaY = 50,
-        X1 = 1820,
-        Y1 = 1820
+        X1 = {
+            [Anno.Region_OldWorld] = 1820,
+            [Anno.Region_NewWorld] = 2120,
+        },
+        Y1 = {
+            [Anno.Region_OldWorld] = 1820,
+            [Anno.Region_NewWorld] = 2120,
+        }
     }
 };
 
@@ -156,10 +164,12 @@ local function getCityShortName(cityName)
 end
 
 local function sessionScanner()
+    local region = Anno.Region_Current()
+
     local results = {};
 
-    for y = presets[preset].Y1, presets[preset].Y0, -presets[preset].DeltaY do
-        for x = presets[preset].X0, presets[preset].X1, presets[preset].DeltaX do
+    for y = presets[preset].Y1[region], presets[preset].Y0, -presets[preset].DeltaY do
+        for x = presets[preset].X0, presets[preset].X1[region], presets[preset].DeltaX do
             x = math.floor(x);
             y = math.floor(y);
 

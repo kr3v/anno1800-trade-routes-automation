@@ -1,0 +1,3 @@
+local TradePlannerHL = {};
+
+return TradePlannerHL;

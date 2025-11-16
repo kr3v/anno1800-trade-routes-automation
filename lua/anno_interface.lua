@@ -134,12 +134,20 @@ end
 
 ---
 
+---@alias RegionID string
+
+---@type RegionID
 Anno.Region_OldWorld = "OW";
+---@type RegionID
 Anno.Region_NewWorld = "NW";
+---@type RegionID
 Anno.Region_Enbesa = "EN";
+---@type RegionID
 Anno.Region_Arctic = "AR";
+---@type RegionID
 Anno.Region_CapeTrelawney = "CT";
 
+---@type table<string, RegionID>
 local sessions = {
     ["180023"] = Anno.Region_OldWorld,
     ["180025"] = Anno.Region_NewWorld,
@@ -148,6 +156,7 @@ local sessions = {
     ["110934"] = Anno.Region_CapeTrelawney,
 }
 
+---@return RegionID
 function Anno.Region_Current()
     local _session = session.getSessionGUID();
     local region = sessions[tostring(_session)];
@@ -205,11 +214,27 @@ local function _AreasToResidenceGuids()
     return ret;
 end
 
-local function _AreasToProductionGuids()
+Anno.Internal = Anno.Internal or {}
+
+function Anno.Internal._AreasToProductionGuids()
+
+    local os = {};
+    local factories = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Factory7);
+    for _, v in pairs(factories) do
+        table.insert(os, serpLight.get_OID(v));
+    end
+    local recipeBuildings = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.RecipeBuilding);
+    for _, v in pairs(recipeBuildings) do
+        table.insert(os, serpLight.get_OID(v));
+    end
+    local buffFactories = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.BuffFactory);
+    for _, v in pairs(buffFactories) do
+        table.insert(os, serpLight.get_OID(v));
+    end
+
     local guids = {};
-    local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Factory7);
-    for _, v in pairs(os) do
-        local oid = serpLight.get_OID(v);
+    for _, v in ipairs(os) do
+        local oid = (v);
         local o = objectAccessor.GameObject(oid);
         local areaID = serpLight.AreatableToAreaID(o.Area.ID);
         local guid = o.Static.Guid;
@@ -260,7 +285,7 @@ function Anno.Region_ProductionGUIDs(region)
     if currentRegion ~= region then
         return cache.Get("Anno.AreasToProductionGuids", region);
     end
-    return cache.GetOrSet("Anno.AreasToProductionGuids", _AreasToProductionGuids, region);
+    return cache.GetOrSet("Anno.AreasToProductionGuids", Anno.Internal._AreasToProductionGuids, region);
 end
 
 function Anno.Region_IsCached(region)
@@ -281,7 +306,7 @@ function Anno.Region_RefreshCache()
     cache.Set("Anno.AreaID_To_ItsOID", _AreaID_To_ItsOID_Build, currentRegion);
     cache.Set("Anno.Ships_GetAll", _Ships_GetAll, currentRegion);
     cache.Set("Anno.AreasToResidenceGuids", _AreasToResidenceGuids, currentRegion);
-    cache.Set("Anno.AreasToProductionGuids", _AreasToProductionGuids, currentRegion);
+    cache.Set("Anno.AreasToProductionGuids", Anno.Internal._AreasToProductionGuids, currentRegion);
 end
 
 ---

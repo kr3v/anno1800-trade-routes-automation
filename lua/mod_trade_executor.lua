@@ -295,7 +295,10 @@ end
 ---@param area_dst_coords Coordinate
 function TradeExecutor._ExecuteUnloadWithShip(L, region, ship_oid, good_id, areaID_dst, area_dst_coords)
     return async.spawn(function()
+        L.logf("Moving ship %d to unload at area %d (x=%d, y=%d)", ship_oid, areaID_dst, area_dst_coords.x, area_dst_coords.y)
         dst_moveTo(ship_oid, area_dst_coords, areaID_dst)
+
+        L.logf("Ship %d arrived at unload area %d, unloading good %d", ship_oid, areaID_dst, good_id)
         dst_unload(region, ship_oid, good_id, areaID_dst)
     end)
 end

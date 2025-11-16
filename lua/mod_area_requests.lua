@@ -9,6 +9,11 @@ function AreaRequests.Population(L, region)
     for areaID, residenceGUIDs in pairs(q) do
         for _, guid in pairs(residenceGUIDs) do
             local residence = GeneratorProducts.ResidencesInfo[tonumber(guid)];
+            L.logf("residence GUID: %d -> %s", tonumber(guid), tostring(residence));
+            if residence == nil or residence.Request == nil then
+                L.logf("Warning: Residence GUID %d not found in GeneratorProducts.ResidencesInfo", tonumber(guid));
+                goto continue;
+            end
             for _, product in pairs(residence.Request) do
                 local areaID_num = tonumber(areaID);
                 if ret[areaID_num] == nil then
@@ -16,6 +21,7 @@ function AreaRequests.Population(L, region)
                 end
                 ret[areaID_num][tonumber(product.Guid)] = true;
             end
+            :: continue ::
         end
     end
     return ret;

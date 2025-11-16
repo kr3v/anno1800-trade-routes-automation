@@ -161,14 +161,18 @@ def analyze_deficit_surplus(deficit_file, surplus_file, texts_file):
 
 
 def main():
+    # note: the script assumes that `repo_root / 'anno-1800'` is a symlink to `<anno 1800 installation>/lua/` like
+    # `anno-1800 -> '/data/games/steam/steamapps/common/Anno 1800/lua/'`
+
     script_dir = Path(__file__).parent
     repo_root = script_dir.parent
     texts_file = repo_root / 'anno-1800' / 'texts.json'
-    deficit_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'OW' / 'remaining-deficit.json'
-    surplus_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'OW' / 'remaining-surplus.json'
-    trades_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'trade-executor-history.json'
 
+    # trades_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'trade-executor-history.json'
     # analyze_trades(trades_file, texts_file)
+
+    deficit_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'NW' / 'remaining-deficit.json'
+    surplus_file = repo_root / 'anno-1800' / 'trade-route-automation' / 'NW' / 'remaining-surplus.json'
     analyze_deficit_surplus(deficit_file, surplus_file, texts_file)
 
 if __name__ == '__main__':
