@@ -61,6 +61,7 @@ function AreaRequests.Construction(L, region)
             ret[areaID] = {};
         end
         ret[areaID][120008] = true; -- Wood
+        ret[areaID][1010196] = true; -- Timber
         ret[areaID][1010205] = true; -- Bricks
         ret[areaID][1010218] = true; -- Steel Beams
         ret[areaID][1010207] = true; -- Windows

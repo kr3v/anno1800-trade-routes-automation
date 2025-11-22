@@ -145,7 +145,7 @@ function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas
             L.logf("Area %s (id=%d) %s stock=%s (+%s) request=%s", areaData.city_name, areaID, productName, _stock, inFlightStock, _request);
             _stock = _stock + inFlightStock;
 
-            if _stock >= _request * 2 and _stock >= 50 then
+            if _stock >= _request + 50 and _stock >= 50 then
                 if supply[areaID] == nil then
                     supply[areaID] = {};
                 end
@@ -265,6 +265,7 @@ function TradePlannerLL.SupplyRequest_ToOrders(
                 L.logf("found supply areas for goodID=%d %s", goodID, tostring(supply_areas));
                 for supply_areaID, supply_amount in pairs(supply_areas) do
                     local transfer_amount = math.min(amount, supply_amount)
+
                     local distance = CalculateDistanceBetweenAreas(L, areas, supply_areaID, areaID)
 
                     if distance.dist == math.huge then
@@ -282,7 +283,8 @@ function TradePlannerLL.SupplyRequest_ToOrders(
                         AreaID_from = supply_areaID,
                         AreaID_to = areaID,
                         GoodID = goodID,
-                        Amount = transfer_amount,
+                        RequestAmount = amount,
+                        SupplyAmount = supply_amount,
                     }
                     local value = {
                         OrderDistance = distance,
@@ -334,7 +336,15 @@ function TradePlannerLL.SupplyRequestOrders_ToShipCommands(
             )
 
             local total_distance = distance_to_pickup + order_value.OrderDistance.dist
-            local amount = math.min(order_key.Amount, cap)
+
+            local amount;
+            -- load to ship as much as we can, as long as supply is met
+            if order_key.SupplyAmount >= cap then
+                amount = cap;
+            else
+                amount = order_key.SupplyAmount;
+            end
+
             if amount < 50 then
                 L.logf("Skipping command for ship %d due to insufficient transfer amount: %d < 50",
                         ship, amount);
@@ -350,7 +360,7 @@ function TradePlannerLL.SupplyRequestOrders_ToShipCommands(
             local command_value = {
                 Order = order_value,
                 ShipDistance = total_distance,
-                Amount = math.min(order_key.Amount, cap),
+                Amount = amount,
                 ShipSlots = slots_cap,
             }
 
@@ -589,7 +599,8 @@ end
 ---@field AreaID_from AreaID
 ---@field AreaID_to AreaID
 ---@field GoodID ProductGUID
----@field Amount Amount
+---@field RequestAmount Amount
+---@field SupplyAmount Amount
 
 ---@class TradePlanner.OrderValue
 ---@field Distance Distance

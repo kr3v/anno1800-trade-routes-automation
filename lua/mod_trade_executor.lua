@@ -183,8 +183,9 @@ function TradeExecutor._ExecuteTradeOrderWithShip(L, region, ship_oid, cmd)
     local aSrc = order_key.AreaID_from;
     local aDst = order_key.AreaID_to;
 
-    local L = L.with("loc", "TradeExecutor._ExecuteTradeOrderWithShip");
+    L = L.with("loc", "TradeExecutor._ExecuteTradeOrderWithShip");
 
+    L.logf("start");
     local aSrcGBefore = Anno.Area_GetGood(region, aSrc, order_key.GoodID)
     local aDstGBefore = Anno.Area_GetGood(region, aDst, order_key.GoodID)
     L.logf("before: source = %d, destination = %d", aSrcGBefore, aDstGBefore)

@@ -42,17 +42,15 @@ make install "INSTALL_BASEDIR=<path to Anno 1800 directory (NOT MODS, NOT SAVEGA
 5. Open the console (Shift+F1 by default) and execute:
 
 ```lua
-dofile("lua/_executor.lua")
+dofile("lua/_executor.lua"); console.toggleVisibility()
 ```
-
-6. Close the console as soon as possible - write `console.toggleVisibility()`.
-7. The mod should start working for this game session in the current region.
-8. Wait for the current region to be fully scanned (for the camera to stop moving). Once done, the mod will start
+6. The mod should start working for this game session in the current region.
+7. Wait for the current region to be fully scanned (for the camera to stop moving). Once done, the mod will start
    managing ships in the current region.
-9. Switch to other regions and wait for them to be scanned as well (just visit them in the game, the mod will start
+8. Switch to other regions and wait for them to be scanned as well (just visit them in the game, the mod will start
    working automatically).
-10. Once all regions are scanned, you can set game speed back to the preferred one.
-11. Check [Ship assignment](#ship-assignment) section below to assign ships to the mod.
+9. Once all regions are scanned, you can set game speed back to the preferred one.
+10. Check [Ship assignment](#ship-assignment) section below to assign ships to the mod.
 
 If you restart the game, you have to re-execute step 5. But the mod will remember all islands and ship assignments from
 previous runs.

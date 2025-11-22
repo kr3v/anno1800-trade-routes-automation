@@ -40,7 +40,7 @@ clean/logs/trade:
 	-@rm ./anno-1800/trade-route-automation/$(REGION)/trades/*.log
 
 clean:
-	-#make clean/interrupt
+	-make clean/interrupt
 	-make clean/logs
 	-for region in $(REGIONS); do \
 		make clean/logs/trade REGION="$$region"; \
