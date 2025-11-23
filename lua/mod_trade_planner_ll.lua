@@ -59,6 +59,11 @@ local function CalculateDistanceBetweenAreas(L, areas, areaID1, areaID2)
         return a.dist < b.dist
     end);
 
+    if #options == 0 then
+        L.logf("No water route found between area %d and area %d", areaID1, areaID2);
+        return { dist = math.huge };
+    end
+
     return options[1];
 end
 
@@ -450,25 +455,32 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
             shipName = info.name;
         end
 
-        local orderLogKey = string.format("%s-%s-%s-%s-%s",
-                shipName,
-                os.date("%Y-%m-%dT%H:%M:%SZ"),
-                Anno.Area_CityName(region, order.AreaID_from),
-                Anno.Area_CityName(region, order.AreaID_to),
-                order.GoodID .. "_" .. string.gsub(GeneratorProducts.Product(order.GoodID).Name, " ", "_")
-        );
+        --local orderLogKey = string.format("%s-%s-%s-%s-%s",
+        --        shipName,
+        --        os.date("%Y-%m-%dT%H:%M:%SZ"),
+        --        Anno.Area_CityName(region, order.AreaID_from),
+        --        Anno.Area_CityName(region, order.AreaID_to),
+        --        order.GoodID .. "_" .. string.gsub(GeneratorProducts.Product(order.GoodID).Name, " ", "_")
+        --);
 
-        local Lo = L.logger(logs_baseDir .. region .. "/trades/" .. (orderLogKey .. ".log"));
+        local tags = {
+            ship = tostring(ship) .. " (" .. shipName .. ")",
+            aSrc = order.AreaID_from .. " (" .. Anno.Area_CityName(region, order.AreaID_from) .. ")",
+            aDst = order.AreaID_to .. " (" .. Anno.Area_CityName(region, order.AreaID_to) .. ")",
+            good = order.GoodID .. " (" .. GeneratorProducts.Product(order.GoodID).Name .. ")",
+            amount = tostring(amount),
+        }
+        local L1 = L;
+        for k, v in pairs(tags) do
+            L1 = L1.with(k, v);
+        end
+        local Lo = L.logger(logs_baseDir .. region .. "/trades.log");
+        for k, v in pairs(tags) do
+            Lo = Lo.with(k, v);
+        end
 
-        Lo = Lo
-                .with("ship", tostring(ship) .. " (" .. shipName .. ")")
-                .with("aSrc", order.AreaID_from .. " (" .. Anno.Area_CityName(region, order.AreaID_from) .. ")")
-                .with("aDst", order.AreaID_to .. " (" .. Anno.Area_CityName(region, order.AreaID_to) .. ")")
-                .with("good", order.GoodID .. " (" .. GeneratorProducts.Product(order.GoodID).Name .. ")")
-                .with("amount", amount)
-        L.logf("Spawning trade order")
-        Lo.logf("Spawning trade order")
-        inspector.Do(Lo, cmd);
+        L1.logf("Spawning trade order");
+        Lo.logf("Spawning trade order");
 
         local task_id = TradeExecutor.SpawnTradeOrder(Lo, region, ship, cmd)
         table.insert(spawned_tasks, task_id)

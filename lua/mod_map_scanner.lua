@@ -312,10 +312,13 @@ local function areaScanner_dfs(L, minX, minY, maxX, maxY, resolution)
     local visited = {};
     local visitedResult = {};
 
-    local function _visit(_x, _y)
-        if _x < minX or _x > maxX or _y < minY or _y > maxY then
+    local function _visit(_x, _y, srcResult)
+        local outOfBounds = _x < minX or _x > maxX or _y < minY or _y > maxY;
+        local srcIsNotAccessible = srcResult == NOT_ACCESSIBLE;
+        if outOfBounds and srcIsNotAccessible then
             return true, NOT_ACCESSIBLE;
         end
+
         local key = PackCoordinates(_x, _y);
         if visited[key] then
             return true, visitedResult[key];
@@ -351,7 +354,7 @@ local function areaScanner_dfs(L, minX, minY, maxX, maxY, resolution)
 
     -- go to bottom until we hit something
     while y0 >= minY do
-        local _, res = _visit(x0, y0);
+        local _, res = _visit(x0, y0, NOT_ACCESSIBLE);
         L.logf("%d,%d,%s,%s", x0, y0, encodeResult(res), encodeDirection(DOWN));
         if res ~= NOT_ACCESSIBLE then
             break ;
@@ -412,7 +415,10 @@ local function areaScanner_dfs(L, minX, minY, maxX, maxY, resolution)
             local tX = x + t.dx;
             local tY = y + t.dy;
 
-            local isVisited, res = _visit(tX, tY);
+            local xy = PackCoordinates(tX, tY);
+            local xy_res = visitedResult[xy];
+
+            local isVisited, res = _visit(tX, tY, xy_res);
             log_dfs(tX, tY, res, t);
             if isVisited or res == NOT_ACCESSIBLE then
                 if halt_on_origin(tX, tY) then

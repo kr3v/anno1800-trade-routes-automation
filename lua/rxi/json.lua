@@ -85,13 +85,21 @@ local function encode_table(val, stack)
         return "[" .. table.concat(res, ",") .. "]"
 
     else
-        -- Treat as an object
-        for k, v in pairs(val) do
+        local keys = {};
+        for k in pairs(val) do
             if type(k) ~= "string" then
                 error("invalid table: mixed or invalid key types")
             end
-            table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
+            table.insert(keys, k)
         end
+        table.sort(keys)
+
+        for k in ipairs(keys) do
+            local key = keys[k]
+            local v = val[key]
+            table.insert(res, encode(key, stack) .. ":" .. encode(v, stack))
+        end
+
         stack[val] = nil
         return "{" .. table.concat(res, ",") .. "}"
     end

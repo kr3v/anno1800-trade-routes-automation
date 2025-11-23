@@ -9,12 +9,16 @@ package.loaded["lua/utils_async"] = nil;
 package.loaded["lua/rxi/json"] = nil;
 package.loaded["lua/utils_cache"] = nil;
 package.loaded["lua/iskolbin/base64"] = nil;
+package.loaded["lua/utils_table"] = nil;
 
 package.loaded["lua/mod_area_requests"] = nil;
 package.loaded["lua/mod_map_scanner"] = nil;
 package.loaded["lua/mod_ship_cmd"] = nil;
 package.loaded["lua/mod_trade_executor"] = nil;
 package.loaded["lua/mod_trade_planner_ll"] = nil;
+
+package.loaded["lua/mod_map_scanner_hl"] = nil;
+package.loaded["lua/ui_cmds"] = nil;
 
 package.loaded["lua/generator/products"] = nil;
 
@@ -41,6 +45,9 @@ local TradeExecutor = require("lua/mod_trade_executor");
 local GeneratorProducts = require("lua/generator/products");
 GeneratorProducts.Load(L);
 
+local TrRAt_UI = require("lua/ui_cmds");
+TrRAt_UI.L = L;
+
 local Config = {
     AllowForceCleanup = true,
 }
@@ -65,6 +72,19 @@ local function _areas_in_region(region)
             "map_scanner.Session(P11)", region
     );
     return map_scanner.SessionAreas(ret);
+end
+
+local function _areas_scan_existsByStep(
+        L,
+        areas,
+        region,
+        areaID,
+        step
+)
+    return cache.Exists(
+            "areaScanner_dfs",
+            region, areaID, step
+    );
 end
 
 local function _areas_scan(
@@ -129,6 +149,9 @@ local function _areas_scan(
     return scan, water_points_moved;
 end
 
+local AreaScanSteps = { 30, 20, 15 };
+local AreaScanStepsReversed = { 15, 20, 30 };
+
 ---@param areas table<AreaID, AreaData>
 ---@return table<AreaID, AreaData>
 local function _areas_enrich(areas, region)
@@ -150,11 +173,26 @@ local function _areas_enrich(areas, region)
         areas[areaID].city_name = cityName;
 
         local scan, water_points_moved;
-        for _, step in ipairs({ 30, 20, 15 }) do
-            L.logf("  scanning area with step=%d", step);
-            scan, water_points_moved = _areas_scan(L, areas, region, areaID, step);
-            if #water_points_moved >= 1 then
-                break ;
+
+        -- 1. Try to reuse existing scan with smallest step first. Smaller step - better accuracy.
+        for _, step in ipairs(AreaScanStepsReversed) do
+            if _areas_scan_existsByStep(L, areas, region, areaID, step) then
+                L.logf("  reusing existing scan for area with step=%d", step);
+                scan, water_points_moved = _areas_scan(L, areas, region, areaID, step);
+                if #water_points_moved >= 1 then
+                    break ;
+                end
+            end
+        end
+
+        if water_points_moved == nil or  #water_points_moved < 1 then
+            -- 2. If no existing scan found, do new scan with decreasing step until water points found. Bigger step - faster scan.
+            for _, step in ipairs(AreaScanSteps) do
+                L.logf("  scanning area with step=%d", step);
+                scan, water_points_moved = _areas_scan(L, areas, region, areaID, step);
+                if #water_points_moved >= 1 then
+                    break ;
+                end
             end
         end
 
@@ -270,6 +308,13 @@ local function tradeExecutor_ships_availableForAutomation(L, region)
     end
 
     L.logf("Total available trade route automation ships: %d", utable.length(available));
+    L.logf("Total still moving trade route automation ships: %d", utable.length(stillMoving));
+
+    local notEmptyL = utable.length(notEmpty);
+    if notEmptyL > 0 then
+        L.logf("[warn] total not empty trade route automation ships: %d", utable.length(notEmpty));
+    end
+
     return available, stillMoving, notEmpty;
 end
 
@@ -444,11 +489,14 @@ local function tradeExecutor_iteration(L, areas, region)
     L.logf("start at %s time", now);
 
     -- 3.1. Find all ships allocated to trade routes automation.
-    local available_ships, stillMoving, _ = tradeExecutor_ships_availableForAutomation(L, region);
+    local available_ships, stillMoving, hasCargo = tradeExecutor_ships_availableForAutomation(L, region);
     if utable.length(available_ships) == 0 then
         L.log("No available ships for trade routes automation, exiting iteration.");
         return ;
     end
+
+    local Lu = L.logger(logs_baseDir .. region .. "/force-unload-ships." .. os.date("%Y-%m-%d %H:%M:%S") .. ".log");
+    TradePlannerLL.Ships_ForceUnloadStoppedShips(Lu, logs_baseDir, region, areas, hasCargo);
 
     -- 4. (work in progress) Determine product disbalances in the areas. Assign ship to balance the good
     local srt = TradePlannerLL.SupplyRequest_Build(
@@ -558,14 +606,21 @@ local function tradeExecutor_loop(region, interrupt)
     coroutine.yield();
     coroutine.yield();
 
+    table.insert(TrRAt_UI.Events_Area_Rescan,
+            function(_region, _areaID)
+                if _region ~= region then
+                    return ;
+                end
+
+                L.logf("Area rescan event received for region=%s areaID=%d", tostring(_region), tostring(_areaID));
+                areas = nil;
+            end
+    );
+
     while true do
         if interrupt() then
             L.log("Trade route executor loop received interrupt signal, stopping.");
             break
-        end
-
-        if Anno.Region_CanCache(region) then
-            Anno.Region_RefreshCache(region);
         end
 
         local now = os.date("%Y-%m-%d %H:%M:%S");
@@ -573,6 +628,19 @@ local function tradeExecutor_loop(region, interrupt)
 
         L.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
         Li.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
+
+        if Anno.Region_CanCache(region) then
+            Anno.Region_RefreshCache(region);
+        end
+
+        if areas == nil then
+            L.log("Rescanning areas due to area rescan event.");
+            Li.log("Rescanning areas due to area rescan event.");
+            areas = tradeExecutor_areas(L, region);
+            coroutine.yield();
+            coroutine.yield();
+            coroutine.yield();
+        end
 
         local success, err = xpcall(function()
             return tradeExecutor_iteration(Li, areas, region);

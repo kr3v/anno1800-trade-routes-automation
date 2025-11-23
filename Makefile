@@ -66,6 +66,9 @@ area-visualizations:
 	@for f in $(wildcard ./anno-1800/area*.tsv); do \
 		python3 ./utils/area-visualizer.py "$$f" "$$f.png"; \
 	done
+	for f in $(ls ./anno-1800/area*.tsv); do \
+		python3 ./utils/area-visualizer.py "$f" "$f.png"; \
+	done
 
 texts-to-yaml:
 	python3 ./utils/texts-to-guid.py ./lua/texts.json /data/games/steam/steamapps/common/Anno\ 1800/maindata/data*.rda.unpack/data/config/gui/texts_english.xml

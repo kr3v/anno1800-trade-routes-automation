@@ -40,20 +40,28 @@ local function newLogger(dst)
         return ret;
     end
 
+    local function formatField(k, v)
+        if string.find(v, " ") then
+            v = '"' .. v .. '"'
+        end
+        local kv = string.format("%s=%s", tostring(k), tostring(v));
+        return kv
+    end
+
     l.log = function(msg)
         local ret;
         if not l.disableDate then
             local date = os.date("%Y-%m-%dT%H:%M:%SZ")
-            ret = date .. "\t";
+            ret = date .. " ";
         else
             ret = "";
         end
 
         local fields = formatFields();
         if fields ~= "" then
-            ret = ret .. fields .. "\t";
+            ret = ret .. fields .. " ";
         end
-        ret = ret .. msg;
+        ret = ret .. formatField("msg", msg);
         _write_to_file(ret .. "\n", l.dst)
     end
     l.logf = function(fmt, ...)

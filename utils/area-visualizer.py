@@ -8,16 +8,25 @@ with open(f, 'r') as file:
     points = file.read()
 dst = sys.argv[2] if len(sys.argv) > 2 else 'rectangle.png'
 
+warned = False
+
 # Parse points with optional color code and arrow direction
 coords = []
 point_types = []
 arrow_dirs = []
 for line in points.strip().split('\n'):
-    line = line.split('\t')[1]
+    lineS = line.split(' ')
+    if len(lineS) == 1:
+        if not warned:
+            print("some lines are not parseable: file={} line={}".format(f, line))
+            warned = True
+        continue
+    line = lineS[1]
+
     parts = line.split(',')
     if len(parts) < 3:
         continue
-    x, y = int(parts[0]), int(parts[1])
+    x, y = int(parts[0].strip("msg=")), int(parts[1])
     point_type = parts[2].strip() if len(parts) > 2 else None
     arrow_dir = parts[3].strip() if len(parts) > 3 else None
     coords.append((x, y))
@@ -115,4 +124,4 @@ plt.tight_layout()
 plt.savefig(dst, dpi=300, bbox_inches='tight')
 print(f"Rectangle bounds: X=[{min_x}, {max_x}], Y=[{min_y}, {max_y}]")
 print(f"Width={max_x - min_x}, Height={max_y - min_y}")
-print("Image saved to rectangle.png")
+print("Image saved to {}".format(dst))
