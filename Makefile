@@ -54,6 +54,9 @@ run-clean: clean mouse/middle install
 
 run: mouse/middle install
 	sleep 1
+	@echo ""
+	@echo "########"
+	@echo ""
 	cat ./anno-1800/modlog.txt
 
 ###

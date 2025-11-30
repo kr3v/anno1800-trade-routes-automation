@@ -78,7 +78,12 @@ local function newLogger(dst)
         ret.fields = fields_copy;
         return ret;
     end
-    l.logger = function(dst)
+    l.logger = function(dst, forceRemoval)
+        if forceRemoval then
+            os.remove(dst)
+            logs_removed[dst] = true
+        end
+
         local fields_copy = {};
         for k, v in pairs(l.fields) do
             fields_copy[k] = v;
@@ -96,7 +101,7 @@ end
 ---@field log fun(msg: string)
 ---@field logf fun(fmt: string, ...: any)
 ---@field with fun(key: string, value: any): Logger
----@field logger fun(dst: string): Logger
+---@field logger fun(dst: string, forceRemoval: boolean?): Logger
 ---@field dst string -- <internal>
 
 ---@return Logger

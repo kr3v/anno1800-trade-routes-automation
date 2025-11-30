@@ -1,0 +1,22 @@
+{
+	"Version": "0.0.1",
+	"ModID": "TradeRoutesAutomation_DEV",
+	"DeprecateIds": [],
+	"LoadAfterIds": [],
+	"IncompatibleIds": null,
+	"ModDependencies": null,
+	"Category": {
+		"English": "Misc"
+	},
+	"ModName": {
+		"English": "Trade Routes Automation (Dev Version)"
+	},
+	"Description": {
+		"English": "Assign ships to a special trade route, let the mod scan your region, and let the mod handle resource delivery within that region. Dev version, don't use unless you know what you're doing."
+	},
+	"KnownIssues": null,
+	"DLCDependencies": null,
+	"CreatorName": "kr3v",
+	"CreatorContact": null,
+	"Image": null
+}

@@ -39,6 +39,8 @@ make install "INSTALL_BASEDIR=<path to Anno 1800 directory (NOT MODS, NOT SAVEGA
 
 3. Start the game with the console mod enabled.
 4. Set game speed to either "Slow Down" or "Regular" _on first mod run_.
+   - It appears that "Fast" speed sometimes works.
+   - But the "Fastest" speed definitely breaks the scanning process.
 5. Open the console (Shift+F1 by default) and execute:
 
 ```lua

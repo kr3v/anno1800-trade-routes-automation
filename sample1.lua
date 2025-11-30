@@ -39,6 +39,7 @@ local utable = require("lua/utils_table");
 local AreasRequest = require("lua/mod_area_requests");
 local TradePlannerLL = require("lua/mod_trade_planner_ll");
 local map_scanner = require("lua/mod_map_scanner");
+local mapScannerHL = require("lua/mod_map_scanner_hl");
 local shipCmd = require("lua/mod_ship_cmd");
 local TradeExecutor = require("lua/mod_trade_executor");
 
@@ -62,17 +63,6 @@ local Config = {
 ---@field scan table<CoordinateString, string>
 ---@field water_points Coordinate[]
 ---@field capacity number
-
-local function _areas_in_region(region)
-    local ret = cache.GetOrSetR(
-            function()
-                session.setCameraToPreset(11);
-                return map_scanner.Session()
-            end,
-            "map_scanner.Session(P11)", region
-    );
-    return map_scanner.SessionAreas(ret);
-end
 
 local function _areas_scan_existsByStep(
         L,
@@ -174,21 +164,9 @@ local function _areas_enrich(areas, region)
 
         local scan, water_points_moved;
 
-        -- 1. Try to reuse existing scan with smallest step first. Smaller step - better accuracy.
         for _, step in ipairs(AreaScanStepsReversed) do
             if _areas_scan_existsByStep(L, areas, region, areaID, step) then
                 L.logf("  reusing existing scan for area with step=%d", step);
-                scan, water_points_moved = _areas_scan(L, areas, region, areaID, step);
-                if #water_points_moved >= 1 then
-                    break ;
-                end
-            end
-        end
-
-        if water_points_moved == nil or  #water_points_moved < 1 then
-            -- 2. If no existing scan found, do new scan with decreasing step until water points found. Bigger step - faster scan.
-            for _, step in ipairs(AreaScanSteps) do
-                L.logf("  scanning area with step=%d", step);
                 scan, water_points_moved = _areas_scan(L, areas, region, areaID, step);
                 if #water_points_moved >= 1 then
                     break ;
@@ -201,7 +179,7 @@ local function _areas_enrich(areas, region)
         areas[areaID].capacity = Anno.Area_GetGoodCapacity(region, areaID, 120008);
 
         -- 2.1.debug. Save scan results in tsv, use `make area-visualizations` and `utils/area-visualizer.py` to visualize.
-        local lq = L.logger("lua/area_scan_" .. cityName .. ".tsv");
+        local lq = L.logger("lua/area_scan_" .. cityName .. ".tsv", true);
         for k, v in pairs(scan) do
             local x, y = map_scanner.UnpackCoordinates(k);
             lq.logf("%d,%d,%s", x, y, map_scanner.Coordinate_ToLetter(v));
@@ -221,7 +199,7 @@ end
 local function tradeExecutor_areas(L, region)
     -- 1.1. Scan whole (session) map.
     -- 1.2. Determine grid for areas on the session map.
-    local _areas = _areas_in_region(region);
+    local _areas = mapScannerHL.Region_AllAreas_Get(region);
     -- 2.1. For each area, scan it in detail if owned by the player.
     _areas = _areas_enrich(_areas, region);
 
@@ -571,10 +549,20 @@ local function tradeExecutor_iteration(L, areas, region)
 end
 
 local function tradeExecutor_loop(region, interrupt)
+    local _yields = 0;
+    -- 1. Wait for region cache to be ready.
     while true do
         if interrupt() then
             L.log("Trade executor loop received interrupt signal, stopping.");
             break
+        end
+
+        local reason = "";
+
+        -- user must cache this manually
+        if mapScannerHL.Region_AllAreas_Get(region) == nil then
+            reason = "please scan the region " .. region .. " first using the map scanner";
+            goto continue;
         end
 
         if Anno.Region_CanCache(region) then
@@ -583,9 +571,15 @@ local function tradeExecutor_loop(region, interrupt)
         if Anno.Region_IsCached(region) then
             break
         end
+        reason = "please enter region " .. region .. " to cache it";
 
+        :: continue ::
         for _ = 1, 10 do
             coroutine.yield();
+        end
+        _yields = _yields + 10;
+        if _yields % 600 == 0 then
+            L.logf("Waiting for region %s to be cached, reason=%s", region, reason);
         end
     end
 
@@ -606,7 +600,7 @@ local function tradeExecutor_loop(region, interrupt)
     coroutine.yield();
     coroutine.yield();
 
-    table.insert(TrRAt_UI.Events_Area_Rescan,
+    table.insert(TrRAt_UI.AreaRescan.Events,
             function(_region, _areaID)
                 if _region ~= region then
                     return ;
@@ -668,24 +662,24 @@ end
 -- consider using waitForGameTimeDelta
 
 
-system.start(asyncWorker, "trade-route-async-watcher")
-system.start(heartbeat_loop, "trade-executor-alive-heartbeat")
-
-local tradeRouteLoopInterruptOW = interrupt_on_file("lua/stop-trade-route-loop-ow");
-system.start(function()
-    local success, err = xpcall(function()
-        return tradeExecutor_loop(Anno.Region_OldWorld, tradeRouteLoopInterruptOW);
-    end, debug.traceback);
-    L.logf("Trade executor loop (OW) exited with success=%s, err=%s", tostring(success), tostring(err));
-end, "trade-route-executor-loop-ow");
-
-local tradeRouteLoopInterruptNW = interrupt_on_file("lua/stop-trade-route-loop-nw");
-system.start(function()
-    local success, err = xpcall(function()
-        return tradeExecutor_loop(Anno.Region_NewWorld, tradeRouteLoopInterruptNW);
-    end, debug.traceback);
-    L.logf("Trade executor loop (NW) exited with success=%s, err=%s", tostring(success), tostring(err));
-end, "trade-route-executor-loop-nw");
+--system.start(asyncWorker, "trade-route-async-watcher")
+--system.start(heartbeat_loop, "trade-executor-alive-heartbeat")
+--
+--local tradeRouteLoopInterruptOW = interrupt_on_file("lua/stop-trade-route-loop-ow");
+--system.start(function()
+--    local success, err = xpcall(function()
+--        return tradeExecutor_loop(Anno.Region_OldWorld, tradeRouteLoopInterruptOW);
+--    end, debug.traceback);
+--    L.logf("Trade executor loop (OW) exited with success=%s, err=%s", tostring(success), tostring(err));
+--end, "trade-route-executor-loop-ow");
+--
+--local tradeRouteLoopInterruptNW = interrupt_on_file("lua/stop-trade-route-loop-nw");
+--system.start(function()
+--    local success, err = xpcall(function()
+--        return tradeExecutor_loop(Anno.Region_NewWorld, tradeRouteLoopInterruptNW);
+--    end, debug.traceback);
+--    L.logf("Trade executor loop (NW) exited with success=%s, err=%s", tostring(success), tostring(err));
+--end, "trade-route-executor-loop-nw");
 
 --local success, err = pcall(function()
 --    local __oid = serpLight.get_OID(session.selection[1]);
@@ -710,6 +704,51 @@ end, "trade-route-executor-loop-nw");
 --    --end
 --    --inspector.Do(L.logger("lua/obj-inspect-fertilizer.yaml"), objectAccessor.GameObject(__oid));
 --end)
+
+local success, err = xpcall(function()
+    local settingsFileName = ts.GameSetup.SettingsFileName;
+    local profileName = ts.Participants.Current.Profile.CompanyName;
+    L.logf("settingsFileName=%s", tostring(settingsFileName));
+    L.logf("profileName=%s", tostring(profileName));
+
+    local profileNameSafe = profileName:gsub('[^%w%s%.%-%_\\]', '_');
+    L.logf("profileNameSafe=%s", tostring(profileNameSafe));
+
+    local base = settingsFileName:match("^(.*)\\GameSettings\\Setup.xml$");
+    L.logf("base=%s", tostring(base));
+
+    --local
+
+    --1. keep ships info
+    --2. print json with the non-empty request/supply info
+    --4. print generated orders and their execution log
+    --5. maintain everything in one big log (per region)
+
+    -- TODOs:
+    -- maintain separate file with formatted request-supply info (per region)
+    -- maintain separate file with pretty-printed
+    --      remaining-deficit.json
+    --      remaining-surplus.json
+    --      trade-history.json
+    -- gdp global/per city/per region?
+    -- 
+
+    local baseFileName = base .. "\\log\\TrRAt_" .. profileNameSafe .. "_";
+
+    -- $ l
+    -- accounts
+    -- benchmarks
+    -- config
+    -- desync
+    -- feedback
+    -- log
+    -- mods
+    -- photography
+    -- screenshot
+    -- shaders
+    -- stamps
+
+end, debug.traceback);
 
 L.logf("PCALL success: %s", tostring(success));
 L.logf("PCALL error: %s", tostring(err));

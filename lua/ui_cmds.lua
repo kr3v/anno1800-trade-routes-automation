@@ -19,10 +19,31 @@ local TradeExecutor = require("lua/mod_trade_executor");
 
 local TrRAt_UI = {
     L = nil,
-    Events_Area_Rescan = {},
 };
 
-function TrRAt_UI._Region_Area_Rescan(step)
+local function _execute_in_thread_with_xpcall(name, func)
+    system.start(
+        function()
+            local success, err = xpcall(
+                function()
+                    func();
+                end,
+                debug.traceback
+            );
+            TrRAt_UI.L.logf("[info] %s success=%s err=%s", name, tostring(success), tostring(err));
+        end,
+        "TrRAt_UI." .. name
+    );
+
+end
+
+----- Area Rescan -----
+
+TrRAt_UI.AreaRescan = {
+    Events = {},
+};
+
+function TrRAt_UI.AreaRescan.impl(step)
     local region = Anno.Region_Current();
     local areaID = serpLight.AreatableToAreaID(ts.Area.Current.ID);
     local areaName = Anno.Area_CityName(region, areaID);
@@ -57,33 +78,61 @@ function TrRAt_UI._Region_Area_Rescan(step)
     );
 
     -- Trigger events
-    for _, callback in ipairs(TrRAt_UI.Events_Area_Rescan) do
+    for _, callback in ipairs(TrRAt_UI.AreaRescan.Events) do
         callback(region, areaID);
     end
 end
 
-function TrRAt_UI.Region_Area_Rescan(step)
-    local success, err = xpcall(
-            function()
-                system.start(function()
-                    local s1, e1 = xpcall(
-                            function()
-                                TrRAt_UI._Region_Area_Rescan(step);
-                            end,
-                            debug.traceback
-                    );
-                    TrRAt_UI.L.logf("[info] Region_Area_Rescan step=%d inner success=%s err=%s", step, tostring(s1), tostring(e1));
-                    print(string.format("Region_Area_Rescan step=%d inner success=%s err=%s", step, tostring(s1), tostring(e1)));
-                end, "TrRAt_UI.Region_Area_Rescan");
-
-            end,
-            debug.traceback
+function TrRAt_UI.AreaRescan.Do(step)
+    _execute_in_thread_with_xpcall(
+        "TrRAt_UI.AreaRescan.impl",
+        function()
+            TrRAt_UI.AreaRescan.impl(step);
+        end
     );
-    TrRAt_UI.L.logf("[info] Region_Area_Rescan step=%d success=%s err=%s", step, tostring(success), tostring(err));
+end
+
+-- step in { 30, 20, 15 }
+-- console.toggleVisibility(); require("lua/ui_cmds").AreaRescan.Do(20)
+
+----- Region Rescan -----
+
+TrRAt_UI.RegionRescan = {
+    Events = {},
+};
+
+function TrRAt_UI.RegionRescan.impl(step)
+    local region = Anno.Region_Current();
+    -- TODO: implement
 end
 
 
--- console.toggleVisibility(); require("lua/ui_cmds").Region_Area_Rescan(20)
--- step in { 30, 20, 15 }
+function TrRAt_UI.RegionRescan.Do(step)
+    _execute_in_thread_with_xpcall(
+            "TrRAt_UI.RegionRescan.impl",
+            function()
+                TrRAt_UI.RegionRescan.impl(step);
+            end
+    );
+end
+
+----- Enable -----
+
+TrRAt_UI.Enable = {
+    Events = {},
+}
+
+function TrRAt_UI.Enable.impl()
+    -- TODO: implement
+end
+
+function TrRAt_UI.Enable.Do()
+    _execute_in_thread_with_xpcall(
+            "TrRAt_UI.Enable.impl",
+            function()
+                TrRAt_UI.Enable.impl();
+            end
+    );
+end
 
 return TrRAt_UI;

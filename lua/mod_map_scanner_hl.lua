@@ -20,6 +20,11 @@ local GeneratorProducts = require("lua/generator/products");
 
 local MapScannerHL = {};
 
+function MapScannerHL._Region_AllAreas_ScanImpl()
+    session.setCameraToPreset(11);
+    return map_scanner.Session();
+end
+
 function MapScannerHL.Region_AllAreas_Get(region)
     local ret = cache.Get("map_scanner.Session(P11)", region);
     return map_scanner.SessionAreas(ret);
@@ -28,11 +33,16 @@ end
 function MapScannerHL.Region_AllAreas_ForceScan(region)
     local ret = cache.Set(
             "map_scanner.Session(P11)",
-            function()
-                session.setCameraToPreset(11);
-                return map_scanner.Session()
-            end,
+            MapScannerHL._Region_AllAreas_ScanImpl,
             region
+    );
+    return map_scanner.SessionAreas(ret);
+end
+
+function MapScannerHL.Region_AllAreas_GetOrScan(region)
+    local ret = cache.GetOrSetR(
+            MapScannerHL._Region_AllAreas_ScanImpl,
+            "map_scanner.Session(P11)", region
     );
     return map_scanner.SessionAreas(ret);
 end
