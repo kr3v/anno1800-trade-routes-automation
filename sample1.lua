@@ -662,24 +662,24 @@ end
 -- consider using waitForGameTimeDelta
 
 
---system.start(asyncWorker, "trade-route-async-watcher")
---system.start(heartbeat_loop, "trade-executor-alive-heartbeat")
---
---local tradeRouteLoopInterruptOW = interrupt_on_file("lua/stop-trade-route-loop-ow");
---system.start(function()
---    local success, err = xpcall(function()
---        return tradeExecutor_loop(Anno.Region_OldWorld, tradeRouteLoopInterruptOW);
---    end, debug.traceback);
---    L.logf("Trade executor loop (OW) exited with success=%s, err=%s", tostring(success), tostring(err));
---end, "trade-route-executor-loop-ow");
---
---local tradeRouteLoopInterruptNW = interrupt_on_file("lua/stop-trade-route-loop-nw");
---system.start(function()
---    local success, err = xpcall(function()
---        return tradeExecutor_loop(Anno.Region_NewWorld, tradeRouteLoopInterruptNW);
---    end, debug.traceback);
---    L.logf("Trade executor loop (NW) exited with success=%s, err=%s", tostring(success), tostring(err));
---end, "trade-route-executor-loop-nw");
+system.start(asyncWorker, "trade-route-async-watcher")
+system.start(heartbeat_loop, "trade-executor-alive-heartbeat")
+
+local tradeRouteLoopInterruptOW = interrupt_on_file("lua/stop-trade-route-loop-ow");
+system.start(function()
+    local success, err = xpcall(function()
+        return tradeExecutor_loop(Anno.Region_OldWorld, tradeRouteLoopInterruptOW);
+    end, debug.traceback);
+    L.logf("Trade executor loop (OW) exited with success=%s, err=%s", tostring(success), tostring(err));
+end, "trade-route-executor-loop-ow");
+
+local tradeRouteLoopInterruptNW = interrupt_on_file("lua/stop-trade-route-loop-nw");
+system.start(function()
+    local success, err = xpcall(function()
+        return tradeExecutor_loop(Anno.Region_NewWorld, tradeRouteLoopInterruptNW);
+    end, debug.traceback);
+    L.logf("Trade executor loop (NW) exited with success=%s, err=%s", tostring(success), tostring(err));
+end, "trade-route-executor-loop-nw");
 
 --local success, err = pcall(function()
 --    local __oid = serpLight.get_OID(session.selection[1]);
@@ -705,50 +705,50 @@ end
 --    --inspector.Do(L.logger("lua/obj-inspect-fertilizer.yaml"), objectAccessor.GameObject(__oid));
 --end)
 
-local success, err = xpcall(function()
-    local settingsFileName = ts.GameSetup.SettingsFileName;
-    local profileName = ts.Participants.Current.Profile.CompanyName;
-    L.logf("settingsFileName=%s", tostring(settingsFileName));
-    L.logf("profileName=%s", tostring(profileName));
-
-    local profileNameSafe = profileName:gsub('[^%w%s%.%-%_\\]', '_');
-    L.logf("profileNameSafe=%s", tostring(profileNameSafe));
-
-    local base = settingsFileName:match("^(.*)\\GameSettings\\Setup.xml$");
-    L.logf("base=%s", tostring(base));
-
-    --local
-
-    --1. keep ships info
-    --2. print json with the non-empty request/supply info
-    --4. print generated orders and their execution log
-    --5. maintain everything in one big log (per region)
-
-    -- TODOs:
-    -- maintain separate file with formatted request-supply info (per region)
-    -- maintain separate file with pretty-printed
-    --      remaining-deficit.json
-    --      remaining-surplus.json
-    --      trade-history.json
-    -- gdp global/per city/per region?
-    -- 
-
-    local baseFileName = base .. "\\log\\TrRAt_" .. profileNameSafe .. "_";
-
-    -- $ l
-    -- accounts
-    -- benchmarks
-    -- config
-    -- desync
-    -- feedback
-    -- log
-    -- mods
-    -- photography
-    -- screenshot
-    -- shaders
-    -- stamps
-
-end, debug.traceback);
+--local success, err = xpcall(function()
+--    local settingsFileName = ts.GameSetup.SettingsFileName;
+--    local profileName = ts.Participants.Current.Profile.CompanyName;
+--    L.logf("settingsFileName=%s", tostring(settingsFileName));
+--    L.logf("profileName=%s", tostring(profileName));
+--
+--    local profileNameSafe = profileName:gsub('[^%w%s%.%-%_\\]', '_');
+--    L.logf("profileNameSafe=%s", tostring(profileNameSafe));
+--
+--    local base = settingsFileName:match("^(.*)\\GameSettings\\Setup.xml$");
+--    L.logf("base=%s", tostring(base));
+--
+--    --local
+--
+--    --1. keep ships info
+--    --2. print json with the non-empty request/supply info
+--    --4. print generated orders and their execution log
+--    --5. maintain everything in one big log (per region)
+--
+--    -- TODOs:
+--    -- maintain separate file with formatted request-supply info (per region)
+--    -- maintain separate file with pretty-printed
+--    --      remaining-deficit.json
+--    --      remaining-surplus.json
+--    --      trade-history.json
+--    -- gdp global/per city/per region?
+--    --
+--
+--    local baseFileName = base .. "\\log\\TrRAt_" .. profileNameSafe .. "_";
+--
+--    -- $ l
+--    -- accounts
+--    -- benchmarks
+--    -- config
+--    -- desync
+--    -- feedback
+--    -- log
+--    -- mods
+--    -- photography
+--    -- screenshot
+--    -- shaders
+--    -- stamps
+--
+--end, debug.traceback);
 
 L.logf("PCALL success: %s", tostring(success));
 L.logf("PCALL error: %s", tostring(err));

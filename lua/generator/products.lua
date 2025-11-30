@@ -1,5 +1,6 @@
 local GeneratorProducts = {};
 
+local Anno = require("lua/anno_interface");
 local objectAccessor = require("lua/anno_object_accessor");
 local session = require("lua/anno_session");
 local serpLight = require("lua/serp/lighttools");
@@ -23,16 +24,16 @@ local function readFile(path)
     return content
 end
 
-local function detectProducts(L)
+function GeneratorProducts.detectProducts(L)
     local currentEconomy = objectAccessor.Generic(function()
         return ts.Area.Current.Economy
     end)
     local potentialProducts = json.decode(readFile(textsPath));
     local productsInfo = {}
     local maxCap = currentEconomy.GetStorageCapacity(1010203); -- Soap; using as reference
-    for k, v in pairs(potentialProducts) do
-        local cap = currentEconomy.GetStorageCapacity(tonumber(k));
-        local item = { Guid = tonumber(k), Name = v };
+    for guidS, name in pairs(potentialProducts) do
+        local cap = currentEconomy.GetStorageCapacity(tonumber(guidS));
+        local item = { Guid = tonumber(guidS), Name = name };
         if cap == maxCap then
             table.insert(productsInfo, { Guid = item.Guid, Name = item.Name });
         end
@@ -100,6 +101,47 @@ function GeneratorProducts.discoverResidences(L, productsInfo)
     return residencesInfo;
 end
 
+local function discoverResidence(
+        L,
+        residenceOID,
+        productsInfo
+)
+    local residence = objectAccessor.GameObject(residenceOID);
+    local residenceName = residence.Static.Text;
+    local residenceGUID = residence.Static.Guid;
+    local populationGUID = residence.Residence.PopulationLevel.Guid;
+
+    local ret = {
+        Guid = residenceGUID,
+        Name = residenceName,
+        PopulationGUID = populationGUID,
+        Request = {},
+    };
+
+    L.logf("%s (%s)", residenceName, populationGUID);
+
+    for _, product in pairs(productsInfo) do
+        local productName, productID = product.Name, product.Guid;
+
+        local maxHappiness = residence.Residence.GetMaxHappinessForGood(productID);
+        local maxMoney = residence.Residence.GetMaxMoneyForGood(productID);
+        local maxResearch = residence.Residence.GetMaxResearchForGood(productID);
+        local maxSupply = residence.Residence.GetMaxSupplyForGood(productID);
+
+        local needed = maxHappiness > 0 or maxMoney > 0 or maxResearch > 0 or maxSupply > 0;
+        if needed then
+            L.logf("\t%s (%d)", productName, productID);
+
+            ret.Request[tostring(productID)] = {
+                Name = productName,
+                Guid = productID,
+            };
+        end
+    end
+
+    return ret;
+end
+
 GeneratorProducts.TsVectorType = {
     Guid = "number",
     Icon = "string",
@@ -145,8 +187,8 @@ function GeneratorProducts.discoverFactories()
 end
 
 local function _do(L)
-    local productsInfo = detectProducts(L);
-    local residencesInfo = discoverResidences(L, productsInfo);
+    local productsInfo = GeneratorProducts.detectProducts(L);
+    local residencesInfo = GeneratorProducts.discoverResidences(L, productsInfo);
     local factoriesInfo = GeneratorProducts.discoverFactories();
 
     -- productsInfo: table< { Guid: number, Name: string } >
@@ -177,6 +219,7 @@ function GeneratorProducts.Load(L)
     for _, v in pairs(productsInfo) do
         GeneratorProducts.Products[v.Guid] = v;
     end
+    GeneratorProducts.__products = productsInfo;
 
     local residencesInfoJ = cache.ReadFrom(L, residenceInfoPath);
     local residencesInfo = {};
@@ -211,5 +254,57 @@ function GeneratorProducts.Product(productGuid)
     end
     return GeneratorProducts.Products[productGuid];
 end
+
+---
+
+local function _discoverResidence(
+        L,
+        region,
+        residenceGuid,
+        residenceOid
+)
+    if residenceOid == nil then
+        local curr_region = Anno.Region_Current();
+        if curr_region ~= region then
+            return nil;
+        end
+        local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Residence7);
+        for _, residence in pairs(os) do
+            local oid = serpLight.get_OID(residence);
+            local o = objectAccessor.GameObject(oid);
+            local guid = o.Static.Guid;
+
+            if guid == residenceGuid then
+                residenceOid = oid;
+                break ;
+            end
+        end
+    end
+    if residenceOid == nil then
+        return nil;
+    end
+
+    local res = discoverResidence(
+            L,
+            residenceOid,
+            GeneratorProducts.__products
+    );
+    GeneratorProducts.ResidencesInfo[residenceGuid] = res;
+end
+
+function GeneratorProducts.Residence(L, region, residenceGuid, residenceOid)
+    if type(residenceGuid) == "string" then
+        residenceGuid = tonumber(residenceGuid);
+    end
+
+    local ret = GeneratorProducts.ResidencesInfo[residenceGuid];
+    if ret == nil then
+        _discoverResidence(L, region, residenceGuid, residenceOid);
+    end
+
+    return GeneratorProducts.ResidencesInfo[residenceGuid];
+end
+
+---
 
 return GeneratorProducts

@@ -148,7 +148,7 @@ function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas
                 _request = math.min(_areaCap, 200);
             end
             L.logf("Area %s (id=%d) %s stock=%s (+%s) request=%s", areaData.city_name, areaID, productName, _stock, inFlightStock, _request);
-            _stock = _stock + inFlightStock;
+            _request = _request - inFlightStock;
 
             if _stock >= _request + 50 and _stock >= 50 then
                 if supply[areaID] == nil then

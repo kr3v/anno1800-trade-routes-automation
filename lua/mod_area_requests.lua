@@ -8,7 +8,7 @@ function AreaRequests.Population(L, region)
     local q = Anno.Region_ResidenceGUIDs(region);
     for areaID, residenceGUIDs in pairs(q) do
         for _, guid in pairs(residenceGUIDs) do
-            local residence = GeneratorProducts.ResidencesInfo[tonumber(guid)];
+            local residence = GeneratorProducts.Residence(L, region, tonumber(guid), nil);
             L.logf("residence GUID: %d -> %s", tonumber(guid), tostring(residence));
             if residence == nil or residence.Request == nil then
                 L.logf("Warning: Residence GUID %d not found in GeneratorProducts.ResidencesInfo", tonumber(guid));

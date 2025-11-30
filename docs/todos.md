@@ -3,6 +3,7 @@
 3. make mod installable via mod.io
 4. arctic/enbesa/trelawney support
 5. automate extracting objects request, don't use statically generated ones
+6. figure out how to restart on save reload / new game / etc; what to do on pauses
 
 ---
 
