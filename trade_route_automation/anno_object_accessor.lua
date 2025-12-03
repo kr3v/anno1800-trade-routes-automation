@@ -1,4 +1,4 @@
-local serpLight = require("lua/serp/lighttools");
+local serpLight = require("trade_route_automation/serp/lighttools");
 
 -- This module allows reusing Anno objects without fetching them multiple times to tackle the issue of field caching.
 -- E.g.

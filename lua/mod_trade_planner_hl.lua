@@ -1,3 +1,0 @@
-local TradePlannerHL = {};
-
-return TradePlannerHL;

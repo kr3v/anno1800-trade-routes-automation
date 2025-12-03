@@ -1,4 +1,4 @@
-local default_dst = "lua/modlog.txt";
+local default_dst = "tra-log.txt";
 
 local function _write_to_file(t, dst)
     local file = io.open(dst, "a+")
@@ -11,9 +11,14 @@ end
 
 local logs_removed = {}
 
-local function newLogger(dst)
+local function newLogger(dst, base)
     if dst == nil then
         dst = default_dst
+    end
+    -- if "/" in dst then
+    if string.find(dst, "/") or string.find(dst, "\\") then
+    elseif base then
+        dst = base .. dst
     end
     if not logs_removed[dst] then
         os.remove(dst)
@@ -23,6 +28,7 @@ local function newLogger(dst)
     local l = {};
     l.fields = {};
     l.dst = dst or default_dst;
+    l.__base = base;
 
     local function formatFields()
         local ret = "";
@@ -61,7 +67,7 @@ local function newLogger(dst)
         if fields ~= "" then
             ret = ret .. fields .. " ";
         end
-        ret = ret .. formatField("msg", msg);
+        ret = ret .. msg;
         _write_to_file(ret .. "\n", l.dst)
     end
     l.logf = function(fmt, ...)
@@ -89,7 +95,7 @@ local function newLogger(dst)
             fields_copy[k] = v;
         end
 
-        local ret = newLogger(dst);
+        local ret = newLogger(dst, l.__base);
         ret.fields = fields_copy;
         return ret;
     end

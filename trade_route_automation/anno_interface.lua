@@ -1,14 +1,81 @@
-local serpLight = require("lua/serp/lighttools");
-local objectAccessor = require("lua/anno_object_accessor");
-local cache = require("lua/utils_cache");
+local serpLight = require("trade_route_automation/serp/lighttools");
+local objectAccessor = require("trade_route_automation/anno_object_accessor");
+local cache = require("trade_route_automation/utils_cache");
 
-local Anno = {};
+local Anno = {
+    Internal = {},
+};
 
 ---
 
 function Anno.Camera_MoveTo_Object(oid)
     ts.MetaObjects.CheatLookAtObject(oid);
 end
+
+function Anno.Object_Properties(oid)
+    local props = {};
+    for i, v in pairs(serpLight.PropertiesStringToID) do
+        xpcall(function()
+            local t = session.getObjectByID(oid):getProperty(v);
+            table.insert(props, { name = i, id = v });
+        end, debug.traceback);
+    end
+    return props;
+end
+
+-- Objects[OID] = { GUID = GUID, userdata = userdata, OID = OID, ParticipantID = ParticipantID, SessionGuid = SessionGuid }
+
+---@class SessionObject
+---@field GUID number
+---@field userdata userdata
+---@field OID number
+---@field ParticipantID number
+---@field SessionGuid number
+
+---@return table<number, SessionObject>
+function Anno.Objects_GetAll_ByProperty(property)
+    return serpLight.GetCurrentSessionObjectsFromLocaleByProperty(property);
+end
+
+---@class TsVectorType
+---@field Guid number
+---@field Icon string
+---@field Text string
+---@field Value string
+
+Anno.TsVectorType = {
+    Guid = "number",
+    Icon = "string",
+    Text = "string",
+    Value = "string",
+}
+
+---@return TsVectorType[]
+function Anno.Object_ItemContainer_GetSockets(oid)
+    return serpLight.GetVectorGuidsFromSessionObject('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer Sockets Count]', Anno.TsVectorType);
+end
+
+---@return GUID[]
+function Anno.SocketItemGuidsToInputReplacements(socketItemGUID)
+    local res = {};
+    local i = 0;
+    while true do
+        local r = serpLight.DoForSessionGameObjectRaw('[AssetData([ItemAssetData(' .. tostring(socketItemGUID) .. ') ReplaceInputNewInput(' .. tostring(i) .. ')]) Guid]');
+        local rN = tonumber(r);
+        if rN == nil or rN <= 0 then
+            break ;
+        end
+        table.insert(res, r);
+
+        i = i + 1;
+        if i > 100 then
+            --error("wtf? infinite loop detected in Anno.SocketItemGuidsToInputReplacements for socketItemGUID " .. tostring(socketItemGUID));
+            break ;
+        end
+    end
+    return res;
+end
+
 
 ---
 
@@ -38,7 +105,7 @@ function Anno.Area_GetGoodCapacity(region, areaID, guid)
     local ret = serpLight.DoForSessionGameObjectRaw(cmd);
     local cap = tonumber(ret);
     if cap >= 2147483647 or cap < 0 or cap == nil then
-        return { got = cap, orig = ret, args = {region = region, areaID = areaID, guid = guid} };
+        return { got = cap, orig = ret, args = { region = region, areaID = areaID, guid = guid } };
     end
     return cap;
 end
@@ -214,10 +281,39 @@ local function _AreasToResidenceGuids()
     return ret;
 end
 
-Anno.Internal = Anno.Internal or {}
+---@alias GUID number
+---@alias OID number
+---@alias OID_str string
+
+---@return table<AreaID_str, table<OID_str, GUID[]>>
+local function _BuildingsWithSockets()
+    local ret = {};
+    local os = Anno.Objects_GetAll_ByProperty(serpLight.PropertiesStringToID.Distribution);
+    for oid, _ in pairs(os) do
+        local areaId = serpLight.AreatableToAreaID(objectAccessor.GameObject(oid).Area.ID);
+        local areaIdStr = tostring(areaId);
+        local oidStr = tostring(oid);
+
+        local sockets = Anno.Object_ItemContainer_GetSockets(oid);
+        if #sockets > 0 then
+
+            local socketItemsGuids = {};
+            for _, v in ipairs(sockets) do
+                table.insert(socketItemsGuids, v.Guid);
+            end
+
+            if ret[areaIdStr] == nil then
+                ret[areaIdStr] = {};
+            end
+            ret[areaIdStr][oidStr] = socketItemsGuids;
+        end
+    end
+    return ret;
+end
+
+---
 
 function Anno.Internal._AreasToProductionGuids()
-
     local os = {};
     local factories = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Factory7);
     for _, v in pairs(factories) do
@@ -256,6 +352,8 @@ function Anno.Internal._AreasToProductionGuids()
     return ret;
 end
 
+---
+
 function Anno.Region_AreaID_To_OID(region)
     local currentRegion = Anno.Region_Current();
     if currentRegion ~= region then
@@ -264,7 +362,7 @@ function Anno.Region_AreaID_To_OID(region)
     return cache.GetOrSet("Anno.AreaID_To_ItsOID", _AreaID_To_ItsOID_Build, region);
 end
 
-function Anno.Ships_GetInRegion(region)
+function Anno.Region_Ships_GetAll(region)
     local currentRegion = Anno.Region_Current();
     if currentRegion ~= region then
         return cache.Get("Anno.Ships_GetAll", region);
@@ -288,11 +386,22 @@ function Anno.Region_ProductionGUIDs(region)
     return cache.GetOrSet("Anno.AreasToProductionGuids", Anno.Internal._AreasToProductionGuids, region);
 end
 
+function Anno.Region_BuildingsWithSockets(region)
+    local currentRegion = Anno.Region_Current();
+    if currentRegion ~= region then
+        return cache.Get("Anno.BuildingsWithSockets", region);
+    end
+    return cache.GetOrSet("Anno.BuildingsWithSockets", _BuildingsWithSockets, region);
+end
+
+---
+
 function Anno.Region_IsCached(region)
     return cache.Exists("Anno.AreaID_To_ItsOID", region)
             and cache.Exists("Anno.Ships_GetAll", region)
             and cache.Exists("Anno.AreasToResidenceGuids", region)
-            and cache.Exists("Anno.AreasToProductionGuids", region);
+            and cache.Exists("Anno.AreasToProductionGuids", region)
+            and cache.Exists("Anno.BuildingsWithSockets", region);
 end
 
 function Anno.Region_CanCache(region)
@@ -307,6 +416,7 @@ function Anno.Region_RefreshCache()
     cache.Set("Anno.Ships_GetAll", _Ships_GetAll, currentRegion);
     cache.Set("Anno.AreasToResidenceGuids", _AreasToResidenceGuids, currentRegion);
     cache.Set("Anno.AreasToProductionGuids", Anno.Internal._AreasToProductionGuids, currentRegion);
+    cache.Set("Anno.BuildingsWithSockets", _BuildingsWithSockets, currentRegion);
 end
 
 ---

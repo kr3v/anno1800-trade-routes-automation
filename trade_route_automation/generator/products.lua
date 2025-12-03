@@ -1,20 +1,14 @@
-local GeneratorProducts = {};
+local AnnoInfo = {
+    _Residence = {},
+    _Paths = {},
+};
 
-local Anno = require("lua/anno_interface");
-local objectAccessor = require("lua/anno_object_accessor");
-local session = require("lua/anno_session");
-local serpLight = require("lua/serp/lighttools");
-local json = require("lua/rxi/json");
-local cache = require("lua/utils_cache");
-local utable = require("lua/utils_table");
-
-local base = "lua/generator/";
-
-local textsPath = base .. "texts.json";
-local productInfoPath = base .. "product_info.json";
-local factoriesInfoPath = base .. "factories_info.json";
-local residenceInfoPath = base .. "residence_info.json";
-
+local Anno = require("trade_route_automation/anno_interface");
+local objectAccessor = require("trade_route_automation/anno_object_accessor");
+local serpLight = require("trade_route_automation/serp/lighttools");
+local json = require("trade_route_automation/rxi/json");
+local cache = require("trade_route_automation/utils_cache");
+local utable = require("trade_route_automation/utils_table");
 
 -- Helper function to read file
 local function readFile(path)
@@ -24,11 +18,11 @@ local function readFile(path)
     return content
 end
 
-function GeneratorProducts.detectProducts(L)
+function AnnoInfo.scanProducts(L)
     local currentEconomy = objectAccessor.Generic(function()
         return ts.Area.Current.Economy
     end)
-    local potentialProducts = json.decode(readFile(textsPath));
+    local potentialProducts = json.decode(readFile(AnnoInfo._Paths.textsPath));
     local productsInfo = {}
     local maxCap = currentEconomy.GetStorageCapacity(1010203); -- Soap; using as reference
     for guidS, name in pairs(potentialProducts) do
@@ -44,7 +38,9 @@ function GeneratorProducts.detectProducts(L)
     return productsInfo;
 end
 
-function GeneratorProducts.discoverResidences(L, productsInfo)
+---
+
+function AnnoInfo._Residence.ScanAll(L, productsInfo)
     local discoveredResidences = {};
     local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Residence7);
     for _, residence in pairs(os) do
@@ -101,7 +97,7 @@ function GeneratorProducts.discoverResidences(L, productsInfo)
     return residencesInfo;
 end
 
-local function discoverResidence(
+function AnnoInfo._Residence.Scan(
         L,
         residenceOID,
         productsInfo
@@ -142,16 +138,38 @@ local function discoverResidence(
     return ret;
 end
 
-GeneratorProducts.TsVectorType = {
-    Guid = "number",
-    Icon = "string",
-    Text = "string",
-    Value = "string",
-}
+function AnnoInfo._Residence.FindAndScan(L, region, residenceGuid)
+    local curr_region = Anno.Region_Current();
+    if curr_region ~= region then
+        return nil;
+    end
 
-function GeneratorProducts.discoverFactories()
+    local residenceOid;
+    local os = Anno.Objects_GetAll_ByProperty(serpLight.PropertiesStringToID.Residence7);
+    for oid, _ in pairs(os) do
+        local guid = objectAccessor.GameObject(oid).Static.Guid;
+        if guid == residenceGuid then
+            residenceOid = oid;
+            break ;
+        end
+    end
+
+    if residenceOid == nil then
+        return nil;
+    end
+
+    local res = AnnoInfo._Residence.Scan(L, residenceOid, AnnoInfo.__products);
+    AnnoInfo.ResidencesInfo[residenceGuid] = res;
+    return res;
+end
+
+---
+
+AnnoInfo.TsVectorType = Anno.TsVectorType;
+
+function AnnoInfo.scanCurrentRegionForFactories()
     local function _test(guid)
-        local _consumption = serpLight.GetVectorGuidsFromSessionObject("[FactoryAssetData(" .. tostring(guid) .. ") Consumption Count]", GeneratorProducts.TsVectorType);
+        local _consumption = serpLight.GetVectorGuidsFromSessionObject("[FactoryAssetData(" .. tostring(guid) .. ") Consumption Count]", AnnoInfo.TsVectorType);
         if _consumption == nil or utable.length(_consumption) == 0 then
             return nil;
         end
@@ -168,7 +186,7 @@ function GeneratorProducts.discoverFactories()
         }
     end
 
-    local potentialFactories = json.decode(readFile(textsPath));
+    local potentialFactories = json.decode(readFile(AnnoInfo._Paths.textsPath));
     local factoriesInfo = {}
 
     for k, v in pairs(potentialFactories) do
@@ -186,10 +204,21 @@ function GeneratorProducts.discoverFactories()
     return factoriesInfo;
 end
 
+function AnnoInfo._Paths.Init(base)
+    local textsPath = base .. "texts.json";
+    local productInfoPath = base .. "product_info.json";
+    local factoriesInfoPath = base .. "factories_info.json";
+    local residenceInfoPath = base .. "residence_info.json";
+    AnnoInfo._Paths.textsPath = textsPath;
+    AnnoInfo._Paths.productInfoPath = productInfoPath;
+    AnnoInfo._Paths.factoriesInfoPath = factoriesInfoPath;
+    AnnoInfo._Paths.residenceInfoPath = residenceInfoPath;
+end
+
 local function _do(L)
-    local productsInfo = GeneratorProducts.detectProducts(L);
-    local residencesInfo = GeneratorProducts.discoverResidences(L, productsInfo);
-    local factoriesInfo = GeneratorProducts.discoverFactories();
+    local productsInfo = AnnoInfo.scanProducts(L);
+    local residencesInfo = AnnoInfo._Residence.ScanAll(L, productsInfo);
+    local factoriesInfo = AnnoInfo.scanCurrentRegionForFactories();
 
     -- productsInfo: table< { Guid: number, Name: string } >
     -- residencesInfo: table< residenceGuid: number, { Guid: number, Name: string, PopulationGUID: number, Request: table< productGuid: number, { Name: string, Guid: number } > } >
@@ -197,10 +226,12 @@ local function _do(L)
     return productsInfo, residencesInfo, factoriesInfo;
 end
 
-function GeneratorProducts.Store(L)
+function AnnoInfo.Store(L, base)
+    AnnoInfo._Paths.Init(base);
+
     local productsInfo, residencesInfo, factoriesInfo = _do(L);
-    cache.WriteTo(productInfoPath, productsInfo);
-    cache.WriteTo(factoriesInfoPath, factoriesInfo);
+    cache.WriteTo(AnnoInfo._Paths.productInfoPath, productsInfo);
+    cache.WriteTo(AnnoInfo._Paths.factoriesInfoPath, factoriesInfo);
 
     local residencesInfoJ = {};
     for k, v in pairs(residencesInfo) do
@@ -210,18 +241,20 @@ function GeneratorProducts.Store(L)
         end
     end
 
-    cache.WriteTo(residenceInfoPath, residencesInfoJ);
+    cache.WriteTo(AnnoInfo._Paths.residenceInfoPath, residencesInfoJ);
 end
 
-function GeneratorProducts.Load(L)
-    local productsInfo = cache.ReadFrom(L, productInfoPath);
-    GeneratorProducts.Products = {};
-    for _, v in pairs(productsInfo) do
-        GeneratorProducts.Products[v.Guid] = v;
-    end
-    GeneratorProducts.__products = productsInfo;
+function AnnoInfo.Load(L, base)
+    AnnoInfo._Paths.Init(base);
 
-    local residencesInfoJ = cache.ReadFrom(L, residenceInfoPath);
+    local productsInfo = cache.ReadFrom(L, AnnoInfo._Paths.productInfoPath);
+    AnnoInfo.Products = {};
+    for _, v in pairs(productsInfo) do
+        AnnoInfo.Products[v.Guid] = v;
+    end
+    AnnoInfo.__products = productsInfo;
+
+    local residencesInfoJ = cache.ReadFrom(L, AnnoInfo._Paths.residenceInfoPath);
     local residencesInfo = {};
     for k, v in pairs(residencesInfoJ) do
         residencesInfo[tonumber(k)] = {};
@@ -229,9 +262,9 @@ function GeneratorProducts.Load(L)
             residencesInfo[tonumber(k)][kk] = vv;
         end
     end
-    GeneratorProducts.ResidencesInfo = residencesInfo;
+    AnnoInfo.ResidencesInfo = residencesInfo;
 
-    local factoriesInfoJ = cache.ReadFrom(L, factoriesInfoPath);
+    local factoriesInfoJ = cache.ReadFrom(L, AnnoInfo._Paths.factoriesInfoPath);
     local factoriesInfo = {};
     for _, v in pairs(factoriesInfoJ) do
         local consumption = {};
@@ -245,66 +278,49 @@ function GeneratorProducts.Load(L)
         v.Consumption = consumption;
         factoriesInfo[v.Guid] = v;
     end
-    GeneratorProducts.FactoriesInfo = factoriesInfo;
+    AnnoInfo.FactoriesInfo = factoriesInfo;
 end
 
-function GeneratorProducts.Product(productGuid)
+---
+
+---@class AnnoInfo.ProductInfo
+---@field Guid number
+---@field Name string
+
+---@class AnnoInfo.ResidenceInfo
+---@field Guid number
+---@field Name string
+---@field PopulationGUID number
+---@field Request table<number, AnnoInfo.ProductInfo>
+
+---@class AnnoInfo.FactoryInfo
+---@field Guid number
+---@field Name string
+---@field Consumption table<number, AnnoInfo.ProductInfo>
+
+---@param productGuid number|string
+---@return AnnoInfo.ProductInfo|nil
+function AnnoInfo.Product(productGuid)
     if type(productGuid) == "string" then
         productGuid = tonumber(productGuid);
     end
-    return GeneratorProducts.Products[productGuid];
+    return AnnoInfo.Products[productGuid];
 end
 
----
-
-local function _discoverResidence(
-        L,
-        region,
-        residenceGuid,
-        residenceOid
-)
-    if residenceOid == nil then
-        local curr_region = Anno.Region_Current();
-        if curr_region ~= region then
-            return nil;
-        end
-        local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Residence7);
-        for _, residence in pairs(os) do
-            local oid = serpLight.get_OID(residence);
-            local o = objectAccessor.GameObject(oid);
-            local guid = o.Static.Guid;
-
-            if guid == residenceGuid then
-                residenceOid = oid;
-                break ;
-            end
-        end
-    end
-    if residenceOid == nil then
-        return nil;
-    end
-
-    local res = discoverResidence(
-            L,
-            residenceOid,
-            GeneratorProducts.__products
-    );
-    GeneratorProducts.ResidencesInfo[residenceGuid] = res;
-end
-
-function GeneratorProducts.Residence(L, region, residenceGuid, residenceOid)
+---@param region string
+---@param residenceGuid number|string
+---@return AnnoInfo.ResidenceInfo|nil
+function AnnoInfo.Residence(L, region, residenceGuid)
     if type(residenceGuid) == "string" then
         residenceGuid = tonumber(residenceGuid);
     end
-
-    local ret = GeneratorProducts.ResidencesInfo[residenceGuid];
+    local ret = AnnoInfo.ResidencesInfo[residenceGuid];
     if ret == nil then
-        _discoverResidence(L, region, residenceGuid, residenceOid);
+        AnnoInfo._Residence.FindAndScan(L, region, residenceGuid);
     end
-
-    return GeneratorProducts.ResidencesInfo[residenceGuid];
+    return AnnoInfo.ResidencesInfo[residenceGuid];
 end
 
 ---
 
-return GeneratorProducts
+return AnnoInfo

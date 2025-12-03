@@ -1,6 +1,6 @@
-require("lua/serp/bint");
+require("trade_route_automation/serp/bint");
 
-local g_LTL_Serp = {};
+local serpLight = {};
 
 -- Anno 1800 uses a sligly custom version of Lua 5.3
 
@@ -380,11 +380,11 @@ end
 local function myeval(str, as_table_pointer)
     local last_key
     if as_table_pointer then
-        local name_parts = g_LTL_Serp.mysplit(str, ".")
+        local name_parts = serpLight.mysplit(str, ".")
         last_key = table.remove(name_parts) -- remove the last part of it to get a pointer
         str = table.concat(name_parts, ".")
     end
-    local status, ret = xpcall(load("return " .. str), g_LTL_Serp.log_error)
+    local status, ret = xpcall(load("return " .. str), serpLight.log_error)
     if status == false then
         -- err
         ret = str -- then maybe its meant to be a string
@@ -421,7 +421,7 @@ end
 -- sort the table by key and then return the key,value pair at postion i (starting with 1)
 local function GetPairAtIndSortedKeys(t, i, f)
     local _ = 1
-    for k, v in g_LTL_Serp.pairsByKeys(t, f) do
+    for k, v in serpLight.pairsByKeys(t, f) do
         if _ == i then
             return k, v
         end
@@ -489,7 +489,7 @@ local function _ValueToString(_value)
         end
     else
         --failsafe
-        g_LTL_Serp.modlog("unsupported value type for ValueToString: " .. tostring(type(_value)) .. " " .. tostring(_value), ModID)
+        serpLight.modlog("unsupported value type for ValueToString: " .. tostring(type(_value)) .. " " .. tostring(_value), ModID)
         return 'nil'
     end
 end
@@ -500,7 +500,7 @@ local function _IndexToString(_index)
         return "[\'" .. _index .. "\']"
     else
         --failsafe
-        g_LTL_Serp.modlog("unsupported index type for IndexToString: " .. tostring(type(_index)) .. " " .. tostring(_index), ModID)
+        serpLight.modlog("unsupported index type for IndexToString: " .. tostring(type(_index)) .. " " .. tostring(_index), ModID)
         return 'nil'
     end
 end
@@ -531,10 +531,10 @@ end
 
 local function HexToTable(_string)
     local str = _HexToString(_string)
-    local status, _ioTable = xpcall(load("return " .. str, nil, "bt", _ioTable), g_LTL_Serp.log_error)
+    local status, _ioTable = xpcall(load("return " .. str, nil, "bt", _ioTable), serpLight.log_error)
     if status == false then
         -- err , eg a string, can happen if the name of an helper did not change to a string-table but kept being a normal name string.. (so find out why the name change did not work)
-        g_LTL_Serp.modlog("ERROR in HexToTable, str is not table : " .. tostring(str), ModID)
+        serpLight.modlog("ERROR in HexToTable, str is not table : " .. tostring(str), ModID)
         _ioTable = nil -- may cause more errors
     end
     return _ioTable
@@ -595,7 +595,7 @@ end
 local function log_error(err)
     local traceback = debug.traceback ~= nil and debug.traceback() or "nil"
     local fullerr = tostring(err) .. ", traceback:\n" .. traceback
-    g_LTL_Serp.modlog("ERROR : " .. fullerr, ModID)
+    serpLight.modlog("ERROR : " .. fullerr, ModID)
     return fullerr
 end
 
@@ -606,21 +606,21 @@ local function start_thread(threadname, _ModID, fn, ...)
     _ModID = _ModID or ""
     if string.find(threadname, "_random_") then
         -- if you added this string into your thread name
-        threadname = g_LTL_Serp.myreplace(threadname, "_random_", tostring(math.random())) -- making sure all threads are unique and not replaced
+        threadname = serpLight.myreplace(threadname, "_random_", tostring(math.random())) -- making sure all threads are unique and not replaced
     end
     local final_threadname = tostring(_ModID) .. ": " .. tostring(threadname)
     if system.internal.coroutines[final_threadname] ~= nil then
         -- no need to check status, because done threads are already set nil again
-        g_LTL_Serp.modlog("WARNING start_thread: A thread with the name " .. tostring(final_threadname) .. " is currently running. Are you sure you want to overwrite it? Choose a unique threadname if you dont want this (you can include _random_ in the threadname to add random number or include _nodouble_ to not overwrite a previous thread and so nothing)", _ModID)
+        serpLight.modlog("WARNING start_thread: A thread with the name " .. tostring(final_threadname) .. " is currently running. Are you sure you want to overwrite it? Choose a unique threadname if you dont want this (you can include _random_ in the threadname to add random number or include _nodouble_ to not overwrite a previous thread and so nothing)", _ModID)
         if string.find(threadname, "_nodouble_") then
             -- if we dont want to overwrite previous thread
             return false
         end
     end
     return system.start(function()
-        local status, err = xpcall(fn, g_LTL_Serp.log_error, table.unpack(args))
+        local status, err = xpcall(fn, serpLight.log_error, table.unpack(args))
         if status == false then
-            g_LTL_Serp.modlog("ERROR in thread '" .. tostring(final_threadname) .. "': " .. tostring(err), _ModID)
+            serpLight.modlog("ERROR in thread '" .. tostring(final_threadname) .. "': " .. tostring(err), _ModID)
             error(err)
         end
     end, final_threadname)
@@ -653,7 +653,7 @@ local function StopAllThreads()
             if coroutine.status(system.internal.coroutines[name]) == "suspended" then
                 -- seems to be ok to still close them, but just in case log it
                 print("stopthreads, stopping thread although its still busy: " .. tostring(name), ModID)
-                g_LTL_Serp.modlog("stopthreads, stopping thread although its still busy: " .. tostring(name), ModID)
+                serpLight.modlog("stopthreads, stopping thread although its still busy: " .. tostring(name), ModID)
             end
             system.internal.coroutines[name] = nil
         end
@@ -674,7 +674,7 @@ end
 
 -- eg. path="GUID" or "Attacker.DPS" or "Area.Economy.GetStorageAmount(1010017)"
 local function ToTextembed(path)
-    local path_parts = g_LTL_Serp.mysplit(path, ".")
+    local path_parts = serpLight.mysplit(path, ".")
     local path_textemb = ""
     for _, path_part in ipairs(path_parts) do
         if string.sub(path_part, 1, 3) == "Get" or string.sub(path_part, 1, 3) == "Set" then
@@ -686,7 +686,7 @@ local function ToTextembed(path)
 end
 
 local function SplitNumberFromName(name)
-    local name_parts = g_LTL_Serp.mysplit(name, "_") -- eg. "The Shipname_2300" or simply "0.5"
+    local name_parts = serpLight.mysplit(name, "_") -- eg. "The Shipname_2300" or simply "0.5"
     local namevalue, restname = nil, ""
     for _, part in ipairs(name_parts) do
         local asnumber = tonumber(part)
@@ -702,7 +702,7 @@ end
 
 local maxdisplayedlength = 16 -- this is the max for Anno1800
 local function GetNameInvisible(name)
-    local splits = g_LTL_Serp.mysplit(name, "‎")
+    local splits = serpLight.mysplit(name, "‎")
     local result = {}
     for _, v in ipairs(splits) do
         if v ~= "" then
@@ -715,7 +715,7 @@ end
 local function AddToNameInvisible(origname, addstring, onlifnotaddedyet)
     local new_name = origname
     if not onlifnotaddedyet or not string.find(origname, addstring) then
-        local invis, name = g_LTL_Serp.GetNameInvisible(origname)
+        local invis, name = serpLight.GetNameInvisible(origname)
         if invis == nil or invis == "" then
             new_name = name
             for i = name:len(), maxdisplayedlength - 1, 2 do
@@ -735,7 +735,7 @@ end
 -- plays one of the sounds on the sounds list. key is the sound GUID and value is a weight:
 -- sounds = {[Sound1GUID]=10,[Sound2GUID]=20}
 local function play_random_sound(sounds)
-    local picks = g_LTL_Serp.weighted_random_choices(sounds, 1)
+    local picks = serpLight.weighted_random_choices(sounds, 1)
     local pick = next(picks)
     if pick ~= nil then
         game.playSound(pick) -- macht kein desync und wird scheinbar nur für den peer abgespielt der den lua cde ausführt. alternative: game.GUIManager.playAudioText(GUID) (nicht getestet im MP)
@@ -813,13 +813,13 @@ end
 local function OIDtableToOID(OIDtable)
     local AreaID, ObjectID, EditorFlag, EditorChunkID
     if type(OIDtable) == "table" then
-        ObjectID = g_LTL_Serp.to_bint(OIDtable["ObjectID"])
-        EditorFlag = g_LTL_Serp.to_bint(OIDtable["EditorFlag"] or 0)
-        EditorChunkID = g_LTL_Serp.to_bint(OIDtable["EditorChunkID"] or 0)
+        ObjectID = serpLight.to_bint(OIDtable["ObjectID"])
+        EditorFlag = serpLight.to_bint(OIDtable["EditorFlag"] or 0)
+        EditorChunkID = serpLight.to_bint(OIDtable["EditorChunkID"] or 0)
         if type(OIDtable["AreaID"]) == "table" then
-            AreaID = g_LTL_Serp.to_bint(AreatableToAreaID(OIDtable["AreaID"]))
+            AreaID = serpLight.to_bint(AreatableToAreaID(OIDtable["AreaID"]))
         elseif type(OIDtable["AreaID"]) == "number" then
-            AreaID = g_LTL_Serp.to_bint(OIDtable["AreaID"])
+            AreaID = serpLight.to_bint(OIDtable["AreaID"])
         end
     end
     -- local OID = ((AreaID << 32) + (ObjectID) + (EditorFlag << 63) + (EditorChunkID << 50))
@@ -846,14 +846,14 @@ end
 -- provide OID as string, if it is too high as integer!
 local function OIDToOIDtable(OID)
     if type(OID) ~= "table" then
-        OID = g_LTL_Serp.to_bint(OID)
+        OID = serpLight.to_bint(OID)
         -- local ObjectID = (OID & 0xFFFFFFFF)
         -- local AreaID = ((OID) >> 32)
         local ObjectID = tonumber((OID >> 0) & 0xFFFFFFFF)
         local AreaID = tonumber((OID >> 32) & 0xFFFF)
         local EditorChunkID = tonumber((OID >> 50) & 0xFF)
         local EditorFlag = tonumber((OID >> 63) & 0xF)
-        local Areatable = g_LTL_Serp.AreaIDToAreatable(AreaID)
+        local Areatable = serpLight.AreaIDToAreatable(AreaID)
         return { ObjectID = ObjectID, AreaID = Areatable, EditorFlag = EditorFlag, EditorChunkID = EditorChunkID } -- named AreaID although its a table, because this is what the game expects as OIDtable format
     end
 end
@@ -868,7 +868,7 @@ local function get_OID(userdata, to_type)
     if Namestring ~= nil and type(Namestring) == "string" then
         oid = string.match(Namestring, "oid (.*)")
         if oid ~= nil and type(oid) == "string" then
-            oid = g_LTL_Serp.my_to_type(oid, to_type)
+            oid = serpLight.my_to_type(oid, to_type)
         end
     end
     return oid
@@ -922,18 +922,18 @@ local function t_FnViaTextEmbed(PID)
             ts.Participants.GetParticipant(121).Profile.SetCompanyName(oldname1) -- name it back to original
             if string.find(TaskString, "usetextembed") then
                 local textembed_result = ts.Participants.GetParticipant(122).Profile.CompanyName
-                TaskString = g_LTL_Serp.myreplace(TaskString, "usetextembed", textembed_result)
+                TaskString = serpLight.myreplace(TaskString, "usetextembed", textembed_result)
                 ts.Participants.GetParticipant(122).Profile.SetCompanyName(oldname2) -- name it back to original
             end
-            local tasksplit = g_LTL_Serp.mysplit(TaskString, "|")
+            local tasksplit = serpLight.mysplit(TaskString, "|")
             local funcname = table.remove(tasksplit, 1)
-            local func = g_LTL_Serp.myeval(funcname)
+            local func = serpLight.myeval(funcname)
             for i = 1, #tasksplit do
                 local value = tasksplit[i]
-                tasksplit[i] = g_LTL_Serp.myeval(tasksplit[i])
+                tasksplit[i] = serpLight.myeval(tasksplit[i])
             end
             -- call the func within a new thread, to not longer block this function
-            g_LTL_Serp.start_thread("t_FnViaTextEmbed_random_ call " .. tostring(funcname), ModID, function(func, funcname, tasksplit, TaskString, ModID)
+            serpLight.start_thread("t_FnViaTextEmbed_random_ call " .. tostring(funcname), ModID, function(func, funcname, tasksplit, TaskString, ModID)
                 local notstop = 0
                 while func == nil do
                     -- in case this is executed with AlwaysTrue Trigger or so, give it a second to init all lua scripts
@@ -943,21 +943,21 @@ local function t_FnViaTextEmbed(PID)
                         --2seconds
                         break
                     end
-                    func = g_LTL_Serp.myeval(funcname)
+                    func = serpLight.myeval(funcname)
                 end
                 local success, err
                 if func == nil then
                     success, err = false, "t_FnViaTextEmbed: func does not exist (nil)" -- its a bit more clear than "attempt to call a nil value"
                 else
-                    success, err = xpcall(func, g_LTL_Serp.log_error, table.unpack(tasksplit))
+                    success, err = xpcall(func, serpLight.log_error, table.unpack(tasksplit))
                 end
                 if success == false then
-                    g_LTL_Serp.modlog("ERROR t_FnViaTextEmbed while trying to execute TaskString: " .. tostring(TaskString) .. " , error: " .. tostring(err), ModID)
+                    serpLight.modlog("ERROR t_FnViaTextEmbed while trying to execute TaskString: " .. tostring(TaskString) .. " , error: " .. tostring(err), ModID)
                 end
             end, func, funcname, tasksplit, TaskString, ModID)
         end
     end
-    g_LTL_Serp.start_thread("t_FnViaTextEmbed release it again", ModID, function()
+    serpLight.start_thread("t_FnViaTextEmbed release it again", ModID, function()
         coroutine.yield() -- one yield to make sure t_FnViaTextEmbed was ended meanwhile
         ts.Unlock.SetUnlockNet(1500005600)
     end)
@@ -972,6 +972,7 @@ local function DoForSessionGameObjectRaw (cmd)
     lock = 1
     local ret = nil
     local success, err = xpcall(function()
+        print(cmd)
         game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(cmd) .. " )]")
         ret = ts.Participants.GetParticipant(120).Profile.CompanyName;
         local old = ts.GetAssetData(100939).Text
@@ -1014,7 +1015,7 @@ local function DoForSessionGameObject(ts_embed_string, doreturnstring, keepasstr
             ret = nil -- ALSO happens for 0 Pointers. For invalid objects ts.GetGameObject(OID).GUID will be 0. But SessionGameObject does not return 0 here, but sth invalid.
         end
         if not keepasstring and ret ~= nil then
-            ret = g_LTL_Serp.myeval(returnstring)
+            ret = serpLight.myeval(returnstring)
             if ret == nil then
                 -- failed to eval, eg. meant to be a string
                 ret = returnstring
@@ -1031,14 +1032,14 @@ end
 -- we can only access AreaFromID from the current active session of the local player
 -- set FertilitiesOrLodesString to "Fertilities" or "Lodes" (ores), depending of what you want to get returned
 local function GetFertilitiesOrLodesFromArea_CurrentSession(AreaID, FertilitiesOrLodesString)
-    local count = g_LTL_Serp.DoForSessionGameObject("[Area AreaFromID(" .. tostring(AreaID) .. ") " .. tostring(FertilitiesOrLodesString) .. " Count]", true)
+    local count = serpLight.DoForSessionGameObject("[Area AreaFromID(" .. tostring(AreaID) .. ") " .. tostring(FertilitiesOrLodesString) .. " Count]", true)
     local results = {}
     if count ~= nil and count ~= "nil" then
         count = tonumber(count)
         if count ~= nil and count > 0 then
             local GUID
             for i = 0, count - 1 do
-                GUID = g_LTL_Serp.DoForSessionGameObject("[Area AreaFromID(" .. tostring(AreaID) .. ") " .. tostring(FertilitiesOrLodesString) .. " At(" .. tostring(i) .. ") Guid]", true)
+                GUID = serpLight.DoForSessionGameObject("[Area AreaFromID(" .. tostring(AreaID) .. ") " .. tostring(FertilitiesOrLodesString) .. " At(" .. tostring(i) .. ") Guid]", true)
                 if GUID ~= nil and GUID ~= "nil" then
                     results[tonumber(GUID)] = true -- use it as key, so you can easily check for a specific fertility without looping over the list
                 end
@@ -1058,7 +1059,7 @@ end
 local function GetVectorGuidsFromSessionObject(ts_embed_string, InfoToInclude)
     InfoToInclude = InfoToInclude or { Guid = "string", Value = "number" } -- eg for Costs you want eg "ProductGuid" and "Amount". Or only Guid for Sockets (has no Value)
     local ts_embed_string_guid, ts_embed_string_value
-    local count = g_LTL_Serp.DoForSessionGameObject(ts_embed_string, true)
+    local count = serpLight.DoForSessionGameObject(ts_embed_string, true)
     local results = {}
     if count ~= nil and count ~= "nil" then
         count = tonumber(count)
@@ -1068,11 +1069,11 @@ local function GetVectorGuidsFromSessionObject(ts_embed_string, InfoToInclude)
                 results[i] = {}
                 for info, typ in pairs(InfoToInclude) do
                     local cmd = string.gsub(ts_embed_string, "Count", "At(" .. tostring(i) .. ") " .. info);
-                    results[i][info] = g_LTL_Serp.my_to_type(g_LTL_Serp.DoForSessionGameObject(cmd, true, true), typ)
+                    results[i][info] = serpLight.my_to_type(serpLight.DoForSessionGameObject(cmd, true, true), typ)
                 end
             end
         else
-            g_LTL_Serp.modlog("GetVectorGuidsFromSessionObject: count is " .. tostring(count) .. " for " .. tostring(ts_embed_string), ModID)
+            serpLight.modlog("GetVectorGuidsFromSessionObject: count is " .. tostring(count) .. " for " .. tostring(ts_embed_string), ModID)
         end
     end
     return results
@@ -1085,14 +1086,14 @@ end
 -- buildings (hängt vom GUIType ab): 116 Bauernhaus, 103 Marktplatz, 102 Kontor/Lagerhaus,97 handelskammer UI, 113 Kirche, 120 Werft, 192/193 oder 194 ist Movie beenden
 -- RefOid = 0 for whole menus , for ships/buildings: g_LTL_Serp.get_OID(session.getSelectedFactory())
 local function GetCoopPeersAtMarker(UIState, RefOid)
-    local count = g_LTL_Serp.DoForSessionGameObject("[Online GetCoopPeersAtMarker(" .. tostring(UIState) .. "," .. tostring(RefOid) .. ") Count]", true)
+    local count = serpLight.DoForSessionGameObject("[Online GetCoopPeersAtMarker(" .. tostring(UIState) .. "," .. tostring(RefOid) .. ") Count]", true)
     local peerints = {}
     if count ~= nil and count ~= "nil" then
         count = tonumber(count)
         if count ~= nil and count > 0 then
             local peerint
             for i = 0, count - 1 do
-                peerint = g_LTL_Serp.DoForSessionGameObject("[Online GetCoopPeersAtMarker(" .. tostring(UIState) .. "," .. tostring(RefOid) .. ") At(" .. tostring(i) .. ")]", true)
+                peerint = serpLight.DoForSessionGameObject("[Online GetCoopPeersAtMarker(" .. tostring(UIState) .. "," .. tostring(RefOid) .. ") At(" .. tostring(i) .. ")]", true)
                 if peerint ~= nil and peerint ~= "nil" then
                     peerints[tonumber(peerint)] = true -- use it as key, so you can easily check for a specific without looping over the list
                 end
@@ -1109,9 +1110,9 @@ local function GetEffectivities(GUID)
     local Effectivities = {}
     if ts.ToolOneHelper.GetHasEffectivitiy(GUID) then
         local EffectivityPercentages
-        local EffectivityTargetGroups = g_LTL_Serp.GetVectorGuidsFromSessionObject("[ToolOneHelper EffectivityTargetGroups(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
+        local EffectivityTargetGroups = serpLight.GetVectorGuidsFromSessionObject("[ToolOneHelper EffectivityTargetGroups(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
         if next(EffectivityTargetGroups) then
-            EffectivityPercentages = g_LTL_Serp.GetVectorGuidsFromSessionObject("[ToolOneHelper EffectivityPercentages(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
+            EffectivityPercentages = serpLight.GetVectorGuidsFromSessionObject("[ToolOneHelper EffectivityPercentages(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
         end
         for k, info in pairs(EffectivityTargetGroups) do
             Effectivities[EffectivityTargetGroups[k]] = EffectivityPercentages[k]
@@ -1122,7 +1123,7 @@ end
 
 -- add GUIDs as ItemEffectTarget to an asset to be able to loop over them in lua, since looping over AssetPools in lua is not possible
 local function GetItemOrBuffEffectTargets(GUID)
-    local _ItemOrBuffEffectTargets = g_LTL_Serp.GetVectorGuidsFromSessionObject("[ToolOneHelper ItemOrBuffEffectTargets(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
+    local _ItemOrBuffEffectTargets = serpLight.GetVectorGuidsFromSessionObject("[ToolOneHelper ItemOrBuffEffectTargets(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
     local ItemOrBuffEffectTargets = {}
     for _, PGinfo in pairs(_ItemOrBuffEffectTargets) do
         local Product = PGinfo[""] -- ItemOrBuffEffectTargets directly returns a list of integers, so we used empty string as InfoToInclude
@@ -1133,7 +1134,7 @@ end
 -- also as AssetPool alternative for lua, here you can combine Ingredient and Amount for 2 values which are ment to belong together
 -- Beware: Amount can be at max 100.000, so not be used for GUIDs!
 local function GetAssetCosts(GUID)
-    local _Costs = g_LTL_Serp.GetVectorGuidsFromSessionObject("[ToolOneHelper BuildCost(" .. tostring(GUID) .. ") Costs Count]", { ProductGUID = "integer", Amount = "integer" })
+    local _Costs = serpLight.GetVectorGuidsFromSessionObject("[ToolOneHelper BuildCost(" .. tostring(GUID) .. ") Costs Count]", { ProductGUID = "integer", Amount = "integer" })
     local Costs = {}
     for _, info in pairs(_Costs) do
         local Product = info["ProductGUID"]
@@ -1158,10 +1159,10 @@ local function GetGameObjectPath(OID, path)
             end
         else
             -- string or bint. we can only return strings, not any tabeles/gameobjects this way
-            local path_textemb = g_LTL_Serp.ToTextembed(path)
+            local path_textemb = serpLight.ToTextembed(path)
             -- g_LTL_Serp.modlog("GetGameObjectPath : [MetaObjects SessionGameObject("..tostring(OID)..")"..path_textemb.."]",ModID)
-            ret = g_LTL_Serp.DoForSessionGameObject("[MetaObjects SessionGameObject(" .. tostring(OID) .. ")" .. path_textemb .. "]", true)
-            local status, err = xpcall(g_LTL_Serp.myeval, g_LTL_Serp.log_error, ret) -- to make "1" 1 or "true" true
+            ret = serpLight.DoForSessionGameObject("[MetaObjects SessionGameObject(" .. tostring(OID) .. ")" .. path_textemb .. "]", true)
+            local status, err = xpcall(serpLight.myeval, serpLight.log_error, ret) -- to make "1" 1 or "true" true
             if status == true then
                 -- otherwise we keep it as string (eg. "Feld Besteller" Name causes an error with myeval)
                 ret = err
@@ -1194,7 +1195,7 @@ local function GetActiveQuestInstances(DescriptionTextGUID, firstfound, startfro
     maxemptycount = maxemptycount or 20
     while true do
         if logloop then
-            g_LTL_Serp.modlog("Quest ID " .. tostring(ID) .. ", active: " .. tostring(ts.Quests.GetQuest(ID).IsActive) .. ", HasEnded: " .. tostring(ts.Quests.GetQuest(ID).HasEnded) .. ", StoryText: " .. tostring(ts.Quests.GetQuest(ID).QuestStoryText) .. ", DescriptionText: " .. tostring(ts.Quests.GetQuest(ID).QuestDescriptionText) .. ", TimeLeft: " .. tostring(ts.Quests.GetQuest(ID).TimeLeft) .. ", StateReachable: " .. tostring(ts.Quests.GetQuest(ID).StateReachable), ModID)
+            serpLight.modlog("Quest ID " .. tostring(ID) .. ", active: " .. tostring(ts.Quests.GetQuest(ID).IsActive) .. ", HasEnded: " .. tostring(ts.Quests.GetQuest(ID).HasEnded) .. ", StoryText: " .. tostring(ts.Quests.GetQuest(ID).QuestStoryText) .. ", DescriptionText: " .. tostring(ts.Quests.GetQuest(ID).QuestDescriptionText) .. ", TimeLeft: " .. tostring(ts.Quests.GetQuest(ID).TimeLeft) .. ", StateReachable: " .. tostring(ts.Quests.GetQuest(ID).StateReachable), ModID)
         end
         local IsActive = ts.Quests.GetQuest(ID).IsActive
         local HasEnded = ts.Quests.GetQuest(ID).HasEnded
@@ -1253,7 +1254,7 @@ local function GetCurrentSessionObjectsFromLocaleByProperty(Property)
     if type(Property) == "number" then
         PropertyID = Property
     elseif type(Property) == "string" then
-        PropertyID = g_LTL_Serp.PropertiesStringToID[Property]
+        PropertyID = serpLight.PropertiesStringToID[Property]
     end
     local GUID, OID
     local Objects = {}
@@ -1263,9 +1264,9 @@ local function GetCurrentSessionObjectsFromLocaleByProperty(Property)
         local userdatas = session.getObjectGroupByProperty(PropertyID) -- game.MetaGameManager finds the same like session...
         if type(userdatas) == "table" and #userdatas > 0 then
             for k, userdata in ipairs(userdatas) do
-                if userdata ~= nil and g_LTL_Serp.IsUserdataValid(userdata) then
+                if userdata ~= nil and serpLight.IsUserdataValid(userdata) then
                     -- is never nil, but nullpointer if not assigned. but here it should always be assigned
-                    OID = g_LTL_Serp.get_OID(userdata)
+                    OID = serpLight.get_OID(userdata)
                     GUID = ts.Objects.GetObject(OID).GUID
                     if GUID ~= 0 then
                         -- is not the case here, but just to be save
@@ -1292,10 +1293,10 @@ end
 local function DestroyGUIDByLocal(PID, GUID, Property)
     if PID == ts.Participants.GetGetCurrentParticipantID() then
         -- functions called via ActionExecuteScript need this check
-        g_LTL_Serp.modlog("DestroyGUIDByLocal: GUID " .. tostring(GUID) .. " called", ModID)
-        g_LTL_Serp.start_thread("DestroyGUIDByLocal_random_", ModID, function()
+        serpLight.modlog("DestroyGUIDByLocal: GUID " .. tostring(GUID) .. " called", ModID)
+        serpLight.start_thread("DestroyGUIDByLocal_random_", ModID, function()
             local Property = Property or "ShipMaintenance" -- best for finding ships
-            local objects = g_LTL_Serp.GetCurrentSessionObjectsFromLocaleByProperty(Property)
+            local objects = serpLight.GetCurrentSessionObjectsFromLocaleByProperty(Property)
             local victims = {}
             for OID, objectinfo in pairs(objects) do
                 if objectinfo.GUID == GUID then
@@ -1317,15 +1318,15 @@ local function DestroyGUIDByLocal(PID, GUID, Property)
                         end
                     end
                     if notstop > 100 then
-                        g_LTL_Serp.modlog("DestroyGUIDByLocal: GUID " .. tostring(GUID) .. " did not change owner within 10 seconds.. abort", ModID)
+                        serpLight.modlog("DestroyGUIDByLocal: GUID " .. tostring(GUID) .. " did not change owner within 10 seconds.. abort", ModID)
                     else
                         coroutine.yield() -- just to be sure owner change was completely done
                         ts.GetGameObject(OID).Attackable.SetAddDamagePercent(100, PID)
-                        g_LTL_Serp.modlog("DestroyGUIDByLocal: GUID " .. tostring(GUID) .. " success, should be destroyed now", ModID)
+                        serpLight.modlog("DestroyGUIDByLocal: GUID " .. tostring(GUID) .. " success, should be destroyed now", ModID)
                     end
                 end
             else
-                g_LTL_Serp.modlog("DestroyGUIDByLocal: did not find GUID " .. tostring(GUID) .. " owned by local player in current session (normal in coop, but at least one from the coop team should find it, unless you called this fn with an GUID you did not spawn just to save scripts)", ModID)
+                serpLight.modlog("DestroyGUIDByLocal: did not find GUID " .. tostring(GUID) .. " owned by local player in current session (normal in coop, but at least one from the coop team should find it, unless you called this fn with an GUID you did not spawn just to save scripts)", ModID)
             end
         end)
     end
@@ -1339,9 +1340,9 @@ local EventOnObjectDeletionConfirmed = {}
 local function _OnObjectDeletionConfirmed(GUID)
     for modname, fn in pairs(EventOnObjectDeletionConfirmed) do
         if type(fn) == "function" then
-            local status, err = xpcall(fn, g_LTL_Serp.log_error, GUID)
+            local status, err = xpcall(fn, serpLight.log_error, GUID)
             if status == false then
-                g_LTL_Serp.modlog("ERROR in _OnObjectDeletionConfirmed for mod '" .. tostring(modname) .. "': " .. tostring(err), ModID)
+                serpLight.modlog("ERROR in _OnObjectDeletionConfirmed for mod '" .. tostring(modname) .. "': " .. tostring(err), ModID)
             end
         end
     end
@@ -1354,7 +1355,7 @@ end
 -- only lasts until you select something else
 local function ChangeGUIStateIf(PID, allowedOwner, allowedselectedGUIDs, GUIState)
     if PID == nil or PID == ts.Participants.GetGetCurrentParticipantID() then
-        if (allowedOwner == nil or ts.Selection.Object.GUID.Owner == allowedOwner) and (allowedselectedGUIDs == nil or g_LTL_Serp.table_contains_value(allowedselectedGUIDs, ts.Selection.Object.GUID)) then
+        if (allowedOwner == nil or ts.Selection.Object.GUID.Owner == allowedOwner) and (allowedselectedGUIDs == nil or serpLight.table_contains_value(allowedselectedGUIDs, ts.Selection.Object.GUID)) then
             ts.Interface.ToggleStateVisibility(GUIState)
         end
     end
@@ -1390,45 +1391,936 @@ local function IsUserdataValid(userdata, OID)
     -- return userdata
 end
 
-local PropertiesStringToID = { AudioTextPool = 0, DevTestProp = 1, Position = 2, Standard = 3, Text = 4, TextPool = 5, ObjectFilter = 6, ObjectiveScaling = 7, ObjectList = 8, ObjectTargetFilter = 9, ParticipantRelation = 10, SessionFilter = 11, SpawnArea = 12, TradingStation = 13, ConditionObjectAnywhere = 14, ConditionObjectClientQuestObject = 15, ConditionObjectiveSignsAndFeedback = 16, ConditionObjectPlayerKontor = 17, ConditionObjectPrebuiltObject = 18, ConditionObjectSpawnedObject = 19, ConditionObjectStarterObject = 20,
-                               ConditionObjectUseDefaultSettings = 21, ConditionScanner = 22, ConditionActiveRegion = 23, ConditionActiveSession = 24, ConditionAlwaysFalse = 25, ConditionAlwaysTrue = 26, ConditionAreaClaimed = 27, ConditionAttractiveness = 28, ConditionBuildingsInBlueprintmode = 29, ConditionBurningObject = 30, ConditionBusActivationNeedSaturation = 31, ConditionCameraMovement = 32, ConditionCorporationDifficulty = 33, ConditionDecision = 34, ConditionDecisionOption = 35, ConditionDiplomaticState = 36, ConditionDiplomaticStateChanged = 37,
-                               ConditionEvaluateTextSource = 38, ConditionEvent = 39, ConditionExpeditionFinished = 40, ConditionExportGoodsLeveled = 41, ConditionFactoryProductivity = 42, ConditionFestival = 43, ConditionFiniteResource = 44, ConditionFirstTimeEventHappened = 45, ConditionGameEnded = 46, ConditionGamePadAction = 47, ConditionGoodsInRange = 48, ConditionGUIEvent = 49, ConditionHaciendaDecreesActive = 50, ConditionHaciendaModuleCount = 51, ConditionHappinessMood = 52, ConditionInPalaceRange = 53, ConditionInStorage = 54, ConditionIrrigatedModules = 55,
-                               ConditionIrrigationCapacityExceeded = 56, ConditionIsBuffed = 57, ConditionIsCampaign = 58, ConditionIsCraftingInProgress = 59, ConditionIsCreativeMode = 60, ConditionIsDiscovered = 61, ConditionIsDLCActive = 62, ConditionIsDocklandsExportPyramidFull = 63, ConditionIsGamepadMode = 64, ConditionIsIndustrialized = 65, ConditionIslandsDiscovered = 66, ConditionIslandsWithFertility = 67, ConditionIsMultiplayer = 68, ConditionIsParticipantInGame = 69, ConditionIsPaused = 70, ConditionIsTutorial = 71, ConditionItemActionCompleted = 72,
-                               ConditionItemUsed = 73, ConditionMetagameLoaded = 74, ConditionModuleBuildingEfficiency = 75, ConditionModuleCount = 76, ConditionMonoCulture = 77, ConditionMonumentEventsActive = 78, ConditionMonumentProgress = 79, ConditionMutualAreaInSubconditions = 80, ConditionNewspaperPossible = 81, ConditionNewspaperPublished = 82, ConditionObjectPosition = 83, ConditionObjectSelected = 84, ConditionObjHPCheck = 85, ConditionOverlapsAABB = 86, ConditionPalaceItemEquipBonusActive = 87, ConditionPalaceUnlocks = 88, ConditionPhotographObject = 89,
-                               ConditionPlayerCounter = 90, ConditionProductCapacityReached = 91, ConditionProductivity = 92, ConditionQuestPoolQuestRunning = 93, ConditionQuestState = 94, ConditionRecipeResearchCompleted = 95, ConditionReminderMessage = 96, ConditionReputation = 97, ConditionResearchPointLimitReached = 98, ConditionResidentsInBuilding = 99, ConditionSeason = 100, ConditionSelectionHappinessDebuffActive = 101, ConditionSessionLoading = 102, ConditionShipsInRange = 103, ConditionShipsOwnedInSession = 104, ConditionShipyardState = 105, ConditionStaticResult = 106,
-                               ConditionTextPopupClosed = 107, ConditionTextPopupPagesViewed = 108, ConditionThreshold = 109, ConditionTimePassed = 110, ConditionTimer = 111, ConditionTradeRouteCount = 112, ConditionTutorialInteraction = 113, ConditionUnlocked = 114, ConditionUnlockList = 115, Condition = 116, ConditionPropsExecutionPlaceSettings = 117, ConditionPropsNegatable = 118, ConditionPropsSessionSettings = 119, PreConditionList = 120, Trigger = 121, TriggerSequence = 122, TriggerSetup = 123, TriggerProgress = 124, ConditionMoveVehicle = 125, ConditionQuestBringVehicleToObject = 126,
-                               ConditionQuestBusActivationNeedSaturation = 127, ConditionQuestCameraMovement = 128, ConditionQuestDecision = 129, ConditionQuestDelivery = 130, ConditionQuestDestroy = 131, ConditionQuestDivingBell = 132, ConditionQuestEscort = 133, ConditionQuestExpedition = 134, ConditionQuestFactoryProductivity = 135, ConditionQuestFakeObjective = 136, ConditionQuestFollowShip = 137, ConditionQuestGamePadAction = 138, ConditionQuestHitMovingTarget = 139, ConditionQuestIslandsWithFertility = 140, ConditionQuestItemUsed = 141, ConditionQuestModuleBuildingEfficiency = 142,
-                               ConditionQuestMonumentDestroyed = 143, ConditionQuestPhotography = 144, ConditionQuestPickup = 145, ConditionQuestPicturePuzzle = 146, ConditionQuestRecipeResearchCompleted = 147, ConditionQuestResolveConfirmation = 148, ConditionQuestSelectObject = 149, ConditionQuestSellObjectToParticipant = 150, ConditionQuestSmuggler = 151, ConditionQuestStatusQuo = 152, ConditionQuestSubQuest = 153, ConditionQuestSustain = 154, ConditionQuestTutorial = 155, ConditionQuestUseItemInArea = 156, ConditionStarterObject = 157, ConditionQuestAirdrop = 158, ConditionQuestObjective = 159,
-                               ActionAddGoodsToItemContainer = 160, ActionAddReputation = 161, ActionAddResource = 162, ActionApplyMemorization = 163, ActionBankrupt = 164, ActionBindItemToQuest = 165, ActionBuff = 166, ActionBuildObject = 167, ActionChangeIncident = 168, ActionChangeParticipant = 169, ActionChangeSkin = 170, ActionDelayedActions = 171, ActionDeleteItem = 172, ActionDeleteObjects = 173, ActionDeleteStreets = 174, ActionDiscoverIsland = 175, ActionDiscoverParticipant = 176, ActionEmptyFiniteResource = 177, ActionEnableQuest = 178, ActionEnableTicks = 179, ActionEndQuest = 180, ActionEnterSession = 181,
-                               ActionExecuteActionByChance = 182, ActionExecuteDiplomaticAction = 183, ActionExecuteScript = 184, ActionFinishMemorization = 185, ActionForceDiplomaticRelation = 186, ActionForceNewspaper = 187, ActionHostileTakeover = 188, ActionLoadSession = 189, ActionLockAsset = 190, ActionLoseGame = 191, ActionMenuVisibility = 192, ActionModifyVariable = 193, ActionMoveObject = 194, ActionMoveRiverLevel = 195, ActionNotification = 196, ActionPauseBuilding = 197, ActionPlayCameraSequence = 198, ActionPlayMovie = 199, ActionPlaySound = 200, ActionQueueNewspaperArticle = 201, ActionRegisterTrigger = 202,
-                               ActionRemoveFertility = 203, ActionRemoveTrees = 204, ActionReplaceItem = 205, ActionResetBasin = 206, ActionResetTrigger = 207, ActionSetAudioState = 208, ActionSetCamera = 209, ActionSetIslandName = 210, ActionSetIslandReservation = 211, ActionSetObjectGUID = 212, ActionSetObjectHitpoints = 213, ActionSetObjectPosition = 214, ActionSetObjectVariation = 215, ActionSetObjectVisibility = 216, ActionSetObjectVisualDamage = 217, ActionSetQuestPoolEnablement = 218, ActionSetSelection = 219, ActionSetWeather = 220, ActionSpawnObjects = 221, ActionSpeechBubble = 222, ActionStartFestival = 223,
-                               ActionStartIncident = 224, ActionStartObjectSequence = 225, ActionStartQuest = 226, ActionStartTreasureMapQuest = 227, ActionStopIncident = 228, ActionStopObjectMovement = 229, ActionTimerAddTime = 230, ActionTimerPause = 231, ActionTriggerMinimapPing = 232, ActionTriggerPopup = 233, ActionTriggerTextBook = 234, ActionTriggerTextPopup = 235, ActionUnloadSession = 236, ActionUnlockAsset = 237, ActionUnlockIrrigationTypeForIsland = 238, ActionWinGame = 239, ActionSendUbisoftEvent = 240, ActionOverwriteSeason = 241, ActionSetNewSeasonPool = 242, ActionMoveCameraSequence = 243, Action = 244,
-                               ActionLink = 245, ActionList = 246, OptionAudioSlider = 247, OptionCombobox = 248, OptionGrid = 249, OptionSeparator = 250, OptionSlider = 251, OptionToggle = 252, OptionHeadline = 253, OptionGamepadButtonMapping = 254, Matcher = 255, MatcherCriterion = 256, MatcherCriterionAnd = 257, MatcherCriterionDiplomacyState = 258, MatcherCriterionDropTarget = 259, MatcherCriterionGuardable = 260, MatcherCriterionGUID = 261, MatcherCriterionHappinessMood = 262, MatcherCriterionInteractable = 263, MatcherCriterionIsland = 264, MatcherCriterionMoveable = 265, MatcherCriterionObjectState = 266,
-                               MatcherCriterionObjectType = 267, MatcherCriterionOr = 268, MatcherCriterionOwner = 269, MatcherCriterionProperty = 270, CorporationScalingValue = 271, CustomizableButtonConfig = 272, EmptyAutoCreateValue = 273, Blocking = 274, Bridge = 275, Building = 276, BuildingModule = 277, BuildingUnique = 278, BusActivation = 279, BusStop = 280, Constructable = 281, Culture = 282, DistributionCenter = 283, Dockland = 284, FloorStackOwner = 285, Hacienda = 286, InfluenceSource = 287, ItemCrafterBuilding = 288, LoadingPier = 289, MetaItemStorageAccess = 290, ModuleOwner = 291, Monument = 292, Ornament = 293,
-                               PalaceMonumentTracker = 294, RepairCrane = 295, Shipyard = 296, Slot = 297, StreetActivation = 298, ThirdPartyObject = 299, Upgradable = 300, VisitorHarbor = 301, WorkforceConnector = 302, AnimalBase = 303, AnimalFlock = 304, FishShoal = 305, Herd = 306, ChannelTarget = 307, DivingBellObject = 308, FollowSpline = 309, QuestObject = 310, QuestTracker = 311, Scanner = 312, VisibilityRange = 313, AssetPool = 314, Attackable = 315, Attacker = 316, Bombarder = 317, CampaignBehaviour = 318, Collectable = 319, Collector = 320, CommandQueue = 321, Craftable = 322, DayNightReaction = 323, DelayedConstruction = 324, DivingBell = 325,
-                               Draggable = 326, Drifting = 327, Dying = 328, EcoSystemProvider = 329, Exploder = 330, FeedbackController = 331, IceFloe = 332, IceFloeDestroyer = 333, Infolayer = 334, InfotipObject = 335, ItemReplacer = 336, Lifetime = 337, Mesh = 338, MetaGameObjectReference = 339, MetaPersistent = 340, MinimapToken = 341, MinimapTokenReplacement = 342, MinimapTokenSettings = 343, Nameable = 344, Object = 345, Painter = 346, Pausable = 347, PositionMarker = 348, Projectile = 349, ProjectileIncident = 350, Prop = 351, RandomDummySpawner = 352, RandomMapObject = 353, Rentable = 354, ResearchCenter = 355, Seamine = 356, Selection = 357,
-                               Sellable = 358, ShipIncident = 359, ShipMaintenance = 360, Skin = 361, Stance = 362, Street = 363, TradeRouteVehicle = 364, Trailer = 365, Tree = 366, Walking = 367, MusicInfluencer = 368, Notes = 369, CriticalError = 370, DynamicVariation = 371, NonCriticalError = 372, Target = 373, TargetGroup = 374, ValueAssetMap = 375, VariableValue = 376, AmbientArea = 377, BezierPath = 378, Coastline = 379, CommentBox = 380, DistributionCenterMarker = 381, FogBank = 382, IslandUndiscover = 383, Lake = 384, MusicArea = 385, River = 386, WorkAreaPath = 387, FeedbackBuildingGroup = 388, FeedbackParametersGlobal = 389, FeedbackSessionDescription = 390,
-                               FeedbackSessionDescriptionOverwritable = 391, TrafficFeedbackClass = 392, TrafficFeedbackUnit = 393, AnimalParametersGlobal = 394, AnimalSessionDescription = 395, RiverFeature = 396, ActiveTradeFeature = 397, AttractivenessFeature = 398, BlacklistFeature = 399, BuildModeFeature = 400, ConstructionAIFeature = 401, CoopFeature = 402, DayNightFeature = 403, DiscoveryFeature = 404, EconomyStatisticFeature = 405, EcoSystemFeature = 406, ElectricityFeature = 407, FirstPersonFeature = 408, GameSpeedFeature = 409, GameUpdateFeature = 410, HappinessFeature = 411, HarborPropFeature = 412, HardFarmsFeature = 413, HeatFeature = 414,
-                               HighscoreFeature = 415, HostileTakeoverFeature = 416, InfluenceFeature = 417, IrrigationConfig = 418, ItemTransferFeature = 419, KontorFeature = 420, MilitaryFeature = 421, MovementFeature = 422, ParticipantRepresentationFeature = 423, PassiveTradeFeature = 424, PlayerCounterConfig = 425, RailwayFeature = 426, RealWindFeature = 427, ResearchFeature = 428, RiverSlotFeature = 429, RuinNotificationFeature = 430, SelectionFeature = 431, SessionTransferFeature = 432, SettlementRights = 433, SkinDescriptionFeature = 434, StreetFeature = 435, StreetOverlayFeature = 436, TourismFeature = 437, TrackingFeature = 438, TradeContractFeature = 439,
-                               TradeRouteFeature = 440, WeatherFeature = 441, WinLoseFeature = 442, WorkforceTransferFeature = 443, WorldMarketFeature = 444, ScenarioItemTradeFeature = 445, FlotsamFeature = 446, PlaystationActivitiesFeature = 447, SeasonFeature = 448, Season = 449, SeasonPool = 450, FertilitySet = 451, MapGeneratorInput = 452, MapTemplate = 453, MineSlotResourceSet = 454, RandomIsland = 455, ResourceSetCondition = 456, CharacterInteractionConfig = 457, DiplomacyConfig = 458, CityAttractivenessNewsTracker = 459, DiplomacyNewsTracker = 460, HostileTakeoverNewsTracker = 461, IncidentNewsTracker = 462, IncomeBalanceNewsTracker = 463,
-                               IslandSettledNewsTracker = 464, MilitaryNewsTracker = 465, MonumentNewsTracker = 466, NeedsSatisfactionNews = 467, NeedsSatisfactionNewsTracker = 468, NewsTrackerBase = 469, ObjectBuildNewsTracker = 470, OverallSatisfactionNewsTracker = 471, QuestNewsTracker = 472, ShipBuiltNewsTracker = 473, UnlockNewsTracker = 474, WorkforceNewsTracker = 475, WorkforceSliderNewsTracker = 476, NewsArticleList = 477, NewspaperArticle = 478, NewspaperBalancing = 479, NewspaperImage = 480, NewspaperSpecialEditionArticle = 481, OnlineMarketBalancing = 482, OnlineMarketVisual = 483, FirstPartyConfig = 484, OnlineConfig = 485, PlatformServicesConfig = 486,
-                               Available = 487, Computer = 488, DifficultySetup = 489, GameSetup = 490, Human = 491, Map = 492, RandomMap = 493, BannerConfig = 494, CampaignSetupUnlocks = 495, Chat = 496, Quickmatch = 497, MultiplayerConfig = 498, Godlike = 499, ResearchSubcategory = 500, BuildingBaseTiles = 501, BuildPermit = 502, BuildPermitGroup = 503, CameraSettings = 504, ColorConfig = 505, Cost = 506, DifficultySettings = 507, GlobalConfig = 508, GoodValueBalancing = 509, GUIConfig = 510, InputConfig = 511, ItemInfotipTextFeature = 512, Locked = 513, ObjectPool = 514, ProgressBalancing = 515, ProgressLevel = 516, QuestConfig = 517, RewardConfig = 518, CreativeModeBalancing = 519,
-                               AttractivenessNotification = 520, AudioNotification = 521, BaseNotification = 522, CampaignNotification = 523, CharacterNotification = 524, MainNotification = 525, NotificationSubtitle = 526, OnScreenNotification = 527, PalaceNotification = 528, SideNotification = 529, Notification = 530, NotificationConfiguration = 531, IncidentBuffConfig = 532, IncidentOverlayConfig = 533, MaintenanceBarConfig = 534, ObjectMenuBlueprintScene = 535, ObjectmenuCityInstitutionScene = 536, ObjectmenuCommuterHarbourScene = 537, ObjectMenuGuildHouseScene = 538, ObjectmenuHeader = 539, ObjectmenuKontorScene = 540, ObjectmenuPalace = 541,
-                               ObjectmenuPierScene = 542, ObjectmenuProductionScene = 543, ObjectmenuResearchCentreScene = 544, ObjectMenuResidenceHappinessSceneConfig = 545, ObjectmenuResidenceScene = 546, ObjectMenuScenarioRuinScene = 547, ObjectmenuShipScene = 548, ObjectMenuShipYardScene = 549, ObjectmenuVisitorHarborScene = 550, DropGoodPopup = 551, ObjectMenuCoalOilHarbour = 552, ConstructionMenu = 553, ShipListConfig = 554, ItemCategory = 555, ItemFilter = 556, ItemKeywords = 557, ItemSearchConfig = 558, KeywordFilter = 559, ProductFilter = 560, ProductList = 561, ScenarioGameOverScene = 562, ScenarioLoadingScene = 563, RightClickMenu = 564,
-                               ActiveTradeScene = 565, AttractivenessPopup = 566, CharacterNotificationScene = 567, ChatNotificationScene = 568, ConstructionRadialScene = 569, CraftingPopup = 570, CreateGameScene = 571, CreditsScene = 572, CursorScene = 573, DecisionQuestNarrativeBook = 574, DLCPromotionScene = 575, DifficultySettingsScene = 576, DiplomacyScene = 577, DocklandsScene = 578, ExpeditionOverviewScene = 579, IconInfolayerScene = 580, InfluencePopup = 581, IslandBarPollutionScene = 582, IslandBarScene = 583, IslandStorage = 584, ItemFiltersScene = 585, LoadingScene = 586, MinimapScene = 587, MonumentScene = 588, MPLobbyScene = 589, MPQuickMatchLobbyScene = 590,
-                               NavigationMenuScene = 591, NewspaperScene = 592, OnlineMarketScene = 593, OnScreenNotificationScene = 594, OptionsScene = 595, PauseMenuScene = 596, ProfileSelectionScene = 597, QuestBookScene = 598, QuestTrackerScene = 599, RecipeBuildingScene = 600, ResearchCentreScene = 601, ResourceBarScene = 602, SessionScene = 603, SessionTradeRouteOverviewScene = 604, SessionTradeRoutesScene = 605, SessionTradeTransfer = 606, ShipMenuRadial = 607, SideNotificationsArchive = 608, SideNotificationScene = 609, StatisticMenu = 610, StrategicMapScene = 611, TreasureMapScene = 612, WorkforceMenu = 613, OnScreenIconScene = 614, ItemTransferScene = 615,
-                               RubberDotsIcon = 616, ScenarioWorkshopScene = 617, MonumentEventScene = 618, HostileTakeoverScene = 619, ScreenCaptureScene = 620, CustomizeModeScene = 621, TitleScene = 622, DesyncScene = 623, FilteredSelectionPopup = 624, GenericPopup = 625, NegotiationPopup = 626, TextPopup = 627, TextPopupLayoutData = 628, ModPopup = 629, SettingsMenu = 630, StaticHelpConfig = 631, StaticHelpTopic = 632, TutorialUiElement = 633, TutorialUiBalancing = 634, ConstructionCategory = 635, FontRendering = 636, GamepadCursor = 637, InfolayerConfig = 638, InfoLayerIcon = 639, InfoTip = 640, InfoTipBalancing = 641, InteractionFeedback = 642, MainMenuNavigationConfig = 643,
-                               MouseCursor = 644, NewspaperEffectIcon = 645, PassiveTradeWindow = 646, ProductionChain = 647, ShipList = 648, Startup = 649, WorldMapCardConfig = 650, WorldMapConfig = 651, AmbientMoodProvider = 652, Audio = 653, AudioLink = 654, AudioText = 655, GameParameter = 656, GlobalSoundEventConfig = 657, MetaSoundConfig = 658, MusicSoundConfig = 659, RequiredSoundBanks = 660, RFX = 661, RFXList = 662, SessionSoundConfig = 663, SoundBank = 664, SoundEmitter = 665, SoundEmitterCommandBarks = 666, StateChoice = 667, StateGroup = 668, SwitchChoice = 669, SwitchGroup = 670, UISoundConfig = 671, WorldMapDynamicSoundEmitter = 672, WorldMapSound = 673, WwiseStandard = 674,
-                               WwiseTrigger = 675, Expedition = 676, ExpeditionAttribute = 677, ExpeditionDecision = 678, ExpeditionEvent = 679, ExpeditionEventPool = 680, ExpeditionFeature = 681, ExpeditionMapOption = 682, ExpeditionOption = 683, ExpeditionSlot = 684, ExpeditionThreat = 685, ExpeditionTrade = 686, QPCDMultiplerHappiness = 687, QPCDMultiplierBase = 688, DecisionQuestFixer = 689, Objectives = 690, PlayerCounterContextPool = 691, Quest = 692, QuestDynamicPriority = 693, QuestLine = 694, QuestMain = 695, QuestOptional = 696, QuestPool = 697, RegionRewardPool = 698, ResourceRewardPool = 699, Reward = 700, RewardPool = 701, Island = 702, Region = 703, Session = 704,
-                               TransitionConfig = 705, WorldMap = 706, Video = 707, VideoSubtitle = 708, CorporationProfile = 709, PlayerLogo = 710, Portrait = 711, ConstructionAI = 712, EventTrader = 713, ItemCrafter = 714, MilitaryAI = 715, Pirate = 716, ThirdParty = 717, Trader = 718, BuyShares = 719, Diplomacy = 720, ExpeditionUser = 721, Highscore = 722, Interaction = 723, ItemTransferHandler = 724, KontorOwner = 725, MetaBuffHandler = 726, MetaBuildPermits = 727, MetaInfluence = 728, ParticipantMessageObject = 729, ParticipantMessages = 730, Profile = 731, ProfileCounter = 732, UniqueBuildingHandler = 733, CraftableItem = 734, EffectContainer = 735, EffectForward = 736, Item = 737,
-                               ItemAction = 738, ItemConfig = 739, ItemContainer = 740, ItemEffect = 741, ItemEffectTargetPool = 742, ItemReplacementPool = 743, ItemSocketSet = 744, ItemStartExpedition = 745, ItemWithUI = 746, SpecialAction = 747, VisualEffectWhenActive = 748, CameraSequence = 749, Achievement = 750, AchievementBalancing = 751, AchievementReward = 752, UplayAction = 753, UbisoftChallenge = 754, DlcController = 755, UplayProduct = 756, UplayProductPromotion = 757, UplayReward = 758, MapGenerator = 759, JiraManager = 760, Recipe = 761, RecipeBuilding = 762, RecipeList = 763, BombardmentAmmo = 764, BuffFactory = 765, Distribution = 766, EconomyFeature7 = 767,
-                               Electrifiable = 768, Factory7 = 769, FactoryBase = 770, Fertility = 771, FreeAreaProductivity = 772, Heated = 773, HeatProvider = 774, Industrializable = 775, IrrigationSource = 776, ItemTransfer = 777, LogisticNode = 778, Maintenance = 779, Market = 780, ModuleIrrigation = 781, MonoCulture = 782, Motorizable = 783, Palace = 784, PalaceMinistry = 785, PopulationGroup7 = 786, PopulationLevel7 = 787, Postbox = 788, Powerplant = 789, Product = 790, ProductStorageList = 791, PublicService = 792, Residence7 = 793, StorageBase = 794, TrainStation = 795, Transporter7 = 796, Warehouse = 797, Watered = 798, GeneralIncidentConfiguration = 799, Incident = 800,
-                               IncidentArcticIllness = 801, IncidentCommunication = 802, IncidentEffectConfiguration = 803, IncidentExplosion = 804, IncidentFestival = 805, IncidentFire = 806, IncidentIllness = 807, IncidentInfectable = 808, IncidentInfluencer = 809, IncidentResolver = 810, IncidentResolverUnit = 811, IncidentResolverUpkeep = 812, IncidentRiot = 813, AttackableUpgrade = 814, AttackerUpgrade = 815, Buff = 816, BuildingUpgrade = 817, CultureSet = 818, CultureUpgrade = 819, DistributionUpgrade = 820, DivingBellUpgrade = 821, EcoSystemProviderUpgrade = 822, EcoSystemUpgrade = 823, FactoryUpgrade = 824, HeaterUpgrade = 825, IncidentInfectableUpgrade = 826,
-                               IncidentInfluencerUpgrade = 827, IndustrializableUpgrade = 828, InfluenceSourceUpgrade = 829, IrrigationUpgrade = 830, ItemContainerUpgrade = 831, KontorUpgrade = 832, ModuleOwnerUpgrade = 833, MonumentUpgrade = 834, NewspaperUpgrade = 835, PassiveTradeGoodGenUpgrade = 836, PierUpgrade = 837, PopulationUpgrade = 838, PowerplantUpgrade = 839, ProjectileUpgrade = 840, RepairCraneUpgrade = 841, ResidenceUpgrade = 842, ResourceUpgrade = 843, ShipyardUpgrade = 844, TradeShipUpgrade = 845, UpgradeList = 846, VehicleUpgrade = 847, VisitorHarborUpgrade = 848, VisitorUpgrade = 849, WarehouseUpgrade = 850, TextSourceFormatting = 851, RatingAdjacentBlocks = 852,
-                               RatingBlockRegularity = 853, RatingBuildableWithinRadius = 854, RatingCityBlockOverride = 855, RatingCompactness = 856, RatingConnectorDistanceToPipe = 857, RatingDistance = 858, RatingFragmentation = 859, RatingFreeformInnerRatio = 860, RatingFreeStanding = 861, RatingHarborConnected = 862, RatingHarborDefense = 863, RatingHarborOffice = 864, RatingHindersBlockExpansions = 865, RatingInsideTiles = 866, RatingNearestBuilding = 867, RatingNeighborTiles = 868, RatingNotIrrigatedTiles = 869, RatingOverwrittenBlocks = 870, RatingProductionChainProximity = 871, RatingProvideBoosterCoverage = 872, RatingProvideLogisticCoverage = 873,
-                               RatingProvidePublicCoverage = 874, RatingPublicCoverage = 875, RatingPublicOverlap = 876, RatingStreetPointsToWarehouse = 877, RatingSubRect = 878, GlobalConstructionAIBalancing = 879, PlacementScore = 880, OnlineEvent = 881, MonumentEvent = 882, MonumentEventCategory = 883, Test234 = 884, Test345 = 885, Test456 = 886, TestVisibility = 887, TestVisibilityACA = 888, AttractivenessConsoleScene = 889, NewspaperConsoleScene = 890, SessionTradeRouteConsoleScene = 891, StrategicMapConsoleScene = 892, SystemPopupConsoleScene = 893, MonumentConsoleScene = 894, RuinedStateBalancing = 895, TransferGoodsConsoleScene = 896, IslandDetailConsoleScene = 897,
-                               GamepadButtonPromptScene = 898, WorkforceConsoleScene = 899, CulturalBuildingPopupConsoleScene = 900, ObjectMenuShipYardConsoleScene = 901, ConsoleOptionScene = 902, AdvancedDifficultiesConsoleScene = 903, MPLobbyConsoleScene = 904, DLCOverviewConsoleScene = 905, DLCPromotionPopupConsoleScene = 906, ResidenceUpgradeFeature = 907, BuildModeBalancing = 908, ErrorMessageBalancing = 909, SelectionsBalancing = 910, TargetBalancing = 911, GamepadWorldmapConfig = 912, VirtualKeyboardBalancing = 913, PlatformBalancing = 914, ButtonPromptAppearanceConfig = 915, GamepadButtonMapping = 916, GamepadConfig = 917, GamepadVibrationEffect = 918,
-                               ScenarioBalancing = 919, ScenarioMetaInfo = 920, ScenarioMetaInfoInternal = 921, ScenarioSelectionMarker = 922, ScenarioCurrencyFixer = 923, ScenarioWorkshopItem = 924, ScenarioWorkshopPackage = 925 }
+serpLight.PropertiesStringToID = {
+    AudioTextPool = 0,
+    DevTestProp = 1,
+    Position = 2,
+    Standard = 3,
+    Text = 4,
+    TextPool = 5,
+    ObjectFilter = 6,
+    ObjectiveScaling = 7,
+    ObjectList = 8,
+    ObjectTargetFilter = 9,
+    ParticipantRelation = 10,
+    SessionFilter = 11,
+    SpawnArea = 12,
+    TradingStation = 13,
+    ConditionObjectAnywhere = 14,
+    ConditionObjectClientQuestObject = 15,
+    ConditionObjectiveSignsAndFeedback = 16,
+    ConditionObjectPlayerKontor = 17,
+    ConditionObjectPrebuiltObject = 18,
+    ConditionObjectSpawnedObject = 19,
+    ConditionObjectStarterObject = 20,
+    ConditionObjectUseDefaultSettings = 21,
+    ConditionScanner = 22,
+    ConditionActiveRegion = 23,
+    ConditionActiveSession = 24,
+    ConditionAlwaysFalse = 25,
+    ConditionAlwaysTrue = 26,
+    ConditionAreaClaimed = 27,
+    ConditionAttractiveness = 28,
+    ConditionBuildingsInBlueprintmode = 29,
+    ConditionBurningObject = 30,
+    ConditionBusActivationNeedSaturation = 31,
+    ConditionCameraMovement = 32,
+    ConditionCorporationDifficulty = 33,
+    ConditionDecision = 34,
+    ConditionDecisionOption = 35,
+    ConditionDiplomaticState = 36,
+    ConditionDiplomaticStateChanged = 37,
+    ConditionEvaluateTextSource = 38,
+    ConditionEvent = 39,
+    ConditionExpeditionFinished = 40,
+    ConditionExportGoodsLeveled = 41,
+    ConditionFactoryProductivity = 42,
+    ConditionFestival = 43,
+    ConditionFiniteResource = 44,
+    ConditionFirstTimeEventHappened = 45,
+    ConditionGameEnded = 46,
+    ConditionGamePadAction = 47,
+    ConditionGoodsInRange = 48,
+    ConditionGUIEvent = 49,
+    ConditionHaciendaDecreesActive = 50,
+    ConditionHaciendaModuleCount = 51,
+    ConditionHappinessMood = 52,
+    ConditionInPalaceRange = 53,
+    ConditionInStorage = 54,
+    ConditionIrrigatedModules = 55,
+    ConditionIrrigationCapacityExceeded = 56,
+    ConditionIsBuffed = 57,
+    ConditionIsCampaign = 58,
+    ConditionIsCraftingInProgress = 59,
+    ConditionIsCreativeMode = 60,
+    ConditionIsDiscovered = 61,
+    ConditionIsDLCActive = 62,
+    ConditionIsDocklandsExportPyramidFull = 63,
+    ConditionIsGamepadMode = 64,
+    ConditionIsIndustrialized = 65,
+    ConditionIslandsDiscovered = 66,
+    ConditionIslandsWithFertility = 67,
+    ConditionIsMultiplayer = 68,
+    ConditionIsParticipantInGame = 69,
+    ConditionIsPaused = 70,
+    ConditionIsTutorial = 71,
+    ConditionItemActionCompleted = 72,
+    ConditionItemUsed = 73,
+    ConditionMetagameLoaded = 74,
+    ConditionModuleBuildingEfficiency = 75,
+    ConditionModuleCount = 76,
+    ConditionMonoCulture = 77,
+    ConditionMonumentEventsActive = 78,
+    ConditionMonumentProgress = 79,
+    ConditionMutualAreaInSubconditions = 80,
+    ConditionNewspaperPossible = 81,
+    ConditionNewspaperPublished = 82,
+    ConditionObjectPosition = 83,
+    ConditionObjectSelected = 84,
+    ConditionObjHPCheck = 85,
+    ConditionOverlapsAABB = 86,
+    ConditionPalaceItemEquipBonusActive = 87,
+    ConditionPalaceUnlocks = 88,
+    ConditionPhotographObject = 89,
+    ConditionPlayerCounter = 90,
+    ConditionProductCapacityReached = 91,
+    ConditionProductivity = 92,
+    ConditionQuestPoolQuestRunning = 93,
+    ConditionQuestState = 94,
+    ConditionRecipeResearchCompleted = 95,
+    ConditionReminderMessage = 96,
+    ConditionReputation = 97,
+    ConditionResearchPointLimitReached = 98,
+    ConditionResidentsInBuilding = 99,
+    ConditionSeason = 100,
+    ConditionSelectionHappinessDebuffActive = 101,
+    ConditionSessionLoading = 102,
+    ConditionShipsInRange = 103,
+    ConditionShipsOwnedInSession = 104,
+    ConditionShipyardState = 105,
+    ConditionStaticResult = 106,
+    ConditionTextPopupClosed = 107,
+    ConditionTextPopupPagesViewed = 108,
+    ConditionThreshold = 109,
+    ConditionTimePassed = 110,
+    ConditionTimer = 111,
+    ConditionTradeRouteCount = 112,
+    ConditionTutorialInteraction = 113,
+    ConditionUnlocked = 114,
+    ConditionUnlockList = 115,
+    Condition = 116,
+    ConditionPropsExecutionPlaceSettings = 117,
+    ConditionPropsNegatable = 118,
+    ConditionPropsSessionSettings = 119,
+    PreConditionList = 120,
+    Trigger = 121,
+    TriggerSequence = 122,
+    TriggerSetup = 123,
+    TriggerProgress = 124,
+    ConditionMoveVehicle = 125,
+    ConditionQuestBringVehicleToObject = 126,
+    ConditionQuestBusActivationNeedSaturation = 127,
+    ConditionQuestCameraMovement = 128,
+    ConditionQuestDecision = 129,
+    ConditionQuestDelivery = 130,
+    ConditionQuestDestroy = 131,
+    ConditionQuestDivingBell = 132,
+    ConditionQuestEscort = 133,
+    ConditionQuestExpedition = 134,
+    ConditionQuestFactoryProductivity = 135,
+    ConditionQuestFakeObjective = 136,
+    ConditionQuestFollowShip = 137,
+    ConditionQuestGamePadAction = 138,
+    ConditionQuestHitMovingTarget = 139,
+    ConditionQuestIslandsWithFertility = 140,
+    ConditionQuestItemUsed = 141,
+    ConditionQuestModuleBuildingEfficiency = 142,
+    ConditionQuestMonumentDestroyed = 143,
+    ConditionQuestPhotography = 144,
+    ConditionQuestPickup = 145,
+    ConditionQuestPicturePuzzle = 146,
+    ConditionQuestRecipeResearchCompleted = 147,
+    ConditionQuestResolveConfirmation = 148,
+    ConditionQuestSelectObject = 149,
+    ConditionQuestSellObjectToParticipant = 150,
+    ConditionQuestSmuggler = 151,
+    ConditionQuestStatusQuo = 152,
+    ConditionQuestSubQuest = 153,
+    ConditionQuestSustain = 154,
+    ConditionQuestTutorial = 155,
+    ConditionQuestUseItemInArea = 156,
+    ConditionStarterObject = 157,
+    ConditionQuestAirdrop = 158,
+    ConditionQuestObjective = 159,
+    ActionAddGoodsToItemContainer = 160,
+    ActionAddReputation = 161,
+    ActionAddResource = 162,
+    ActionApplyMemorization = 163,
+    ActionBankrupt = 164,
+    ActionBindItemToQuest = 165,
+    ActionBuff = 166,
+    ActionBuildObject = 167,
+    ActionChangeIncident = 168,
+    ActionChangeParticipant = 169,
+    ActionChangeSkin = 170,
+    ActionDelayedActions = 171,
+    ActionDeleteItem = 172,
+    ActionDeleteObjects = 173,
+    ActionDeleteStreets = 174,
+    ActionDiscoverIsland = 175,
+    ActionDiscoverParticipant = 176,
+    ActionEmptyFiniteResource = 177,
+    ActionEnableQuest = 178,
+    ActionEnableTicks = 179,
+    ActionEndQuest = 180,
+    ActionEnterSession = 181,
+    ActionExecuteActionByChance = 182,
+    ActionExecuteDiplomaticAction = 183,
+    ActionExecuteScript = 184,
+    ActionFinishMemorization = 185,
+    ActionForceDiplomaticRelation = 186,
+    ActionForceNewspaper = 187,
+    ActionHostileTakeover = 188,
+    ActionLoadSession = 189,
+    ActionLockAsset = 190,
+    ActionLoseGame = 191,
+    ActionMenuVisibility = 192,
+    ActionModifyVariable = 193,
+    ActionMoveObject = 194,
+    ActionMoveRiverLevel = 195,
+    ActionNotification = 196,
+    ActionPauseBuilding = 197,
+    ActionPlayCameraSequence = 198,
+    ActionPlayMovie = 199,
+    ActionPlaySound = 200,
+    ActionQueueNewspaperArticle = 201,
+    ActionRegisterTrigger = 202,
+    ActionRemoveFertility = 203,
+    ActionRemoveTrees = 204,
+    ActionReplaceItem = 205,
+    ActionResetBasin = 206,
+    ActionResetTrigger = 207,
+    ActionSetAudioState = 208,
+    ActionSetCamera = 209,
+    ActionSetIslandName = 210,
+    ActionSetIslandReservation = 211,
+    ActionSetObjectGUID = 212,
+    ActionSetObjectHitpoints = 213,
+    ActionSetObjectPosition = 214,
+    ActionSetObjectVariation = 215,
+    ActionSetObjectVisibility = 216,
+    ActionSetObjectVisualDamage = 217,
+    ActionSetQuestPoolEnablement = 218,
+    ActionSetSelection = 219,
+    ActionSetWeather = 220,
+    ActionSpawnObjects = 221,
+    ActionSpeechBubble = 222,
+    ActionStartFestival = 223,
+    ActionStartIncident = 224,
+    ActionStartObjectSequence = 225,
+    ActionStartQuest = 226,
+    ActionStartTreasureMapQuest = 227,
+    ActionStopIncident = 228,
+    ActionStopObjectMovement = 229,
+    ActionTimerAddTime = 230,
+    ActionTimerPause = 231,
+    ActionTriggerMinimapPing = 232,
+    ActionTriggerPopup = 233,
+    ActionTriggerTextBook = 234,
+    ActionTriggerTextPopup = 235,
+    ActionUnloadSession = 236,
+    ActionUnlockAsset = 237,
+    ActionUnlockIrrigationTypeForIsland = 238,
+    ActionWinGame = 239,
+    ActionSendUbisoftEvent = 240,
+    ActionOverwriteSeason = 241,
+    ActionSetNewSeasonPool = 242,
+    ActionMoveCameraSequence = 243,
+    Action = 244,
+    ActionLink = 245,
+    ActionList = 246,
+    OptionAudioSlider = 247,
+    OptionCombobox = 248,
+    OptionGrid = 249,
+    OptionSeparator = 250,
+    OptionSlider = 251,
+    OptionToggle = 252,
+    OptionHeadline = 253,
+    OptionGamepadButtonMapping = 254,
+    Matcher = 255,
+    MatcherCriterion = 256,
+    MatcherCriterionAnd = 257,
+    MatcherCriterionDiplomacyState = 258,
+    MatcherCriterionDropTarget = 259,
+    MatcherCriterionGuardable = 260,
+    MatcherCriterionGUID = 261,
+    MatcherCriterionHappinessMood = 262,
+    MatcherCriterionInteractable = 263,
+    MatcherCriterionIsland = 264,
+    MatcherCriterionMoveable = 265,
+    MatcherCriterionObjectState = 266,
+    MatcherCriterionObjectType = 267,
+    MatcherCriterionOr = 268,
+    MatcherCriterionOwner = 269,
+    MatcherCriterionProperty = 270,
+    CorporationScalingValue = 271,
+    CustomizableButtonConfig = 272,
+    EmptyAutoCreateValue = 273,
+    Blocking = 274,
+    Bridge = 275,
+    Building = 276,
+    BuildingModule = 277,
+    BuildingUnique = 278,
+    BusActivation = 279,
+    BusStop = 280,
+    Constructable = 281,
+    Culture = 282,
+    DistributionCenter = 283,
+    Dockland = 284,
+    FloorStackOwner = 285,
+    Hacienda = 286,
+    InfluenceSource = 287,
+    ItemCrafterBuilding = 288,
+    LoadingPier = 289,
+    MetaItemStorageAccess = 290,
+    ModuleOwner = 291,
+    Monument = 292,
+    Ornament = 293,
+    PalaceMonumentTracker = 294,
+    RepairCrane = 295,
+    Shipyard = 296,
+    Slot = 297,
+    StreetActivation = 298,
+    ThirdPartyObject = 299,
+    Upgradable = 300,
+    VisitorHarbor = 301,
+    WorkforceConnector = 302,
+    AnimalBase = 303,
+    AnimalFlock = 304,
+    FishShoal = 305,
+    Herd = 306,
+    ChannelTarget = 307,
+    DivingBellObject = 308,
+    FollowSpline = 309,
+    QuestObject = 310,
+    QuestTracker = 311,
+    Scanner = 312,
+    VisibilityRange = 313,
+    AssetPool = 314,
+    Attackable = 315,
+    Attacker = 316,
+    Bombarder = 317,
+    CampaignBehaviour = 318,
+    Collectable = 319,
+    Collector = 320,
+    CommandQueue = 321,
+    Craftable = 322,
+    DayNightReaction = 323,
+    DelayedConstruction = 324,
+    DivingBell = 325,
+    Draggable = 326,
+    Drifting = 327,
+    Dying = 328,
+    EcoSystemProvider = 329,
+    Exploder = 330,
+    FeedbackController = 331,
+    IceFloe = 332,
+    IceFloeDestroyer = 333,
+    Infolayer = 334,
+    InfotipObject = 335,
+    ItemReplacer = 336,
+    Lifetime = 337,
+    Mesh = 338,
+    MetaGameObjectReference = 339,
+    MetaPersistent = 340,
+    MinimapToken = 341,
+    MinimapTokenReplacement = 342,
+    MinimapTokenSettings = 343,
+    Nameable = 344,
+    Object = 345,
+    Painter = 346,
+    Pausable = 347,
+    PositionMarker = 348,
+    Projectile = 349,
+    ProjectileIncident = 350,
+    Prop = 351,
+    RandomDummySpawner = 352,
+    RandomMapObject = 353,
+    Rentable = 354,
+    ResearchCenter = 355,
+    Seamine = 356,
+    Selection = 357,
+    Sellable = 358,
+    ShipIncident = 359,
+    ShipMaintenance = 360,
+    Skin = 361,
+    Stance = 362,
+    Street = 363,
+    TradeRouteVehicle = 364,
+    Trailer = 365,
+    Tree = 366,
+    Walking = 367,
+    MusicInfluencer = 368,
+    Notes = 369,
+    CriticalError = 370,
+    DynamicVariation = 371,
+    NonCriticalError = 372,
+    Target = 373,
+    TargetGroup = 374,
+    ValueAssetMap = 375,
+    VariableValue = 376,
+    AmbientArea = 377,
+    BezierPath = 378,
+    Coastline = 379,
+    CommentBox = 380,
+    DistributionCenterMarker = 381,
+    FogBank = 382,
+    IslandUndiscover = 383,
+    Lake = 384,
+    MusicArea = 385,
+    River = 386,
+    WorkAreaPath = 387,
+    FeedbackBuildingGroup = 388,
+    FeedbackParametersGlobal = 389,
+    FeedbackSessionDescription = 390,
+    FeedbackSessionDescriptionOverwritable = 391,
+    TrafficFeedbackClass = 392,
+    TrafficFeedbackUnit = 393,
+    AnimalParametersGlobal = 394,
+    AnimalSessionDescription = 395,
+    RiverFeature = 396,
+    ActiveTradeFeature = 397,
+    AttractivenessFeature = 398,
+    BlacklistFeature = 399,
+    BuildModeFeature = 400,
+    ConstructionAIFeature = 401,
+    CoopFeature = 402,
+    DayNightFeature = 403,
+    DiscoveryFeature = 404,
+    EconomyStatisticFeature = 405,
+    EcoSystemFeature = 406,
+    ElectricityFeature = 407,
+    FirstPersonFeature = 408,
+    GameSpeedFeature = 409,
+    GameUpdateFeature = 410,
+    HappinessFeature = 411,
+    HarborPropFeature = 412,
+    HardFarmsFeature = 413,
+    HeatFeature = 414,
+    HighscoreFeature = 415,
+    HostileTakeoverFeature = 416,
+    InfluenceFeature = 417,
+    IrrigationConfig = 418,
+    ItemTransferFeature = 419,
+    KontorFeature = 420,
+    MilitaryFeature = 421,
+    MovementFeature = 422,
+    ParticipantRepresentationFeature = 423,
+    PassiveTradeFeature = 424,
+    PlayerCounterConfig = 425,
+    RailwayFeature = 426,
+    RealWindFeature = 427,
+    ResearchFeature = 428,
+    RiverSlotFeature = 429,
+    RuinNotificationFeature = 430,
+    SelectionFeature = 431,
+    SessionTransferFeature = 432,
+    SettlementRights = 433,
+    SkinDescriptionFeature = 434,
+    StreetFeature = 435,
+    StreetOverlayFeature = 436,
+    TourismFeature = 437,
+    TrackingFeature = 438,
+    TradeContractFeature = 439,
+    TradeRouteFeature = 440,
+    WeatherFeature = 441,
+    WinLoseFeature = 442,
+    WorkforceTransferFeature = 443,
+    WorldMarketFeature = 444,
+    ScenarioItemTradeFeature = 445,
+    FlotsamFeature = 446,
+    PlaystationActivitiesFeature = 447,
+    SeasonFeature = 448,
+    Season = 449,
+    SeasonPool = 450,
+    FertilitySet = 451,
+    MapGeneratorInput = 452,
+    MapTemplate = 453,
+    MineSlotResourceSet = 454,
+    RandomIsland = 455,
+    ResourceSetCondition = 456,
+    CharacterInteractionConfig = 457,
+    DiplomacyConfig = 458,
+    CityAttractivenessNewsTracker = 459,
+    DiplomacyNewsTracker = 460,
+    HostileTakeoverNewsTracker = 461,
+    IncidentNewsTracker = 462,
+    IncomeBalanceNewsTracker = 463,
+    IslandSettledNewsTracker = 464,
+    MilitaryNewsTracker = 465,
+    MonumentNewsTracker = 466,
+    NeedsSatisfactionNews = 467,
+    NeedsSatisfactionNewsTracker = 468,
+    NewsTrackerBase = 469,
+    ObjectBuildNewsTracker = 470,
+    OverallSatisfactionNewsTracker = 471,
+    QuestNewsTracker = 472,
+    ShipBuiltNewsTracker = 473,
+    UnlockNewsTracker = 474,
+    WorkforceNewsTracker = 475,
+    WorkforceSliderNewsTracker = 476,
+    NewsArticleList = 477,
+    NewspaperArticle = 478,
+    NewspaperBalancing = 479,
+    NewspaperImage = 480,
+    NewspaperSpecialEditionArticle = 481,
+    OnlineMarketBalancing = 482,
+    OnlineMarketVisual = 483,
+    FirstPartyConfig = 484,
+    OnlineConfig = 485,
+    PlatformServicesConfig = 486,
+    Available = 487,
+    Computer = 488,
+    DifficultySetup = 489,
+    GameSetup = 490,
+    Human = 491,
+    Map = 492,
+    RandomMap = 493,
+    BannerConfig = 494,
+    CampaignSetupUnlocks = 495,
+    Chat = 496,
+    Quickmatch = 497,
+    MultiplayerConfig = 498,
+    Godlike = 499,
+    ResearchSubcategory = 500,
+    BuildingBaseTiles = 501,
+    BuildPermit = 502,
+    BuildPermitGroup = 503,
+    CameraSettings = 504,
+    ColorConfig = 505,
+    Cost = 506,
+    DifficultySettings = 507,
+    GlobalConfig = 508,
+    GoodValueBalancing = 509,
+    GUIConfig = 510,
+    InputConfig = 511,
+    ItemInfotipTextFeature = 512,
+    Locked = 513,
+    ObjectPool = 514,
+    ProgressBalancing = 515,
+    ProgressLevel = 516,
+    QuestConfig = 517,
+    RewardConfig = 518,
+    CreativeModeBalancing = 519,
+    AttractivenessNotification = 520,
+    AudioNotification = 521,
+    BaseNotification = 522,
+    CampaignNotification = 523,
+    CharacterNotification = 524,
+    MainNotification = 525,
+    NotificationSubtitle = 526,
+    OnScreenNotification = 527,
+    PalaceNotification = 528,
+    SideNotification = 529,
+    Notification = 530,
+    NotificationConfiguration = 531,
+    IncidentBuffConfig = 532,
+    IncidentOverlayConfig = 533,
+    MaintenanceBarConfig = 534,
+    ObjectMenuBlueprintScene = 535,
+    ObjectmenuCityInstitutionScene = 536,
+    ObjectmenuCommuterHarbourScene = 537,
+    ObjectMenuGuildHouseScene = 538,
+    ObjectmenuHeader = 539,
+    ObjectmenuKontorScene = 540,
+    ObjectmenuPalace = 541,
+    ObjectmenuPierScene = 542,
+    ObjectmenuProductionScene = 543,
+    ObjectmenuResearchCentreScene = 544,
+    ObjectMenuResidenceHappinessSceneConfig = 545,
+    ObjectmenuResidenceScene = 546,
+    ObjectMenuScenarioRuinScene = 547,
+    ObjectmenuShipScene = 548,
+    ObjectMenuShipYardScene = 549,
+    ObjectmenuVisitorHarborScene = 550,
+    DropGoodPopup = 551,
+    ObjectMenuCoalOilHarbour = 552,
+    ConstructionMenu = 553,
+    ShipListConfig = 554,
+    ItemCategory = 555,
+    ItemFilter = 556,
+    ItemKeywords = 557,
+    ItemSearchConfig = 558,
+    KeywordFilter = 559,
+    ProductFilter = 560,
+    ProductList = 561,
+    ScenarioGameOverScene = 562,
+    ScenarioLoadingScene = 563,
+    RightClickMenu = 564,
+    ActiveTradeScene = 565,
+    AttractivenessPopup = 566,
+    CharacterNotificationScene = 567,
+    ChatNotificationScene = 568,
+    ConstructionRadialScene = 569,
+    CraftingPopup = 570,
+    CreateGameScene = 571,
+    CreditsScene = 572,
+    CursorScene = 573,
+    DecisionQuestNarrativeBook = 574,
+    DLCPromotionScene = 575,
+    DifficultySettingsScene = 576,
+    DiplomacyScene = 577,
+    DocklandsScene = 578,
+    ExpeditionOverviewScene = 579,
+    IconInfolayerScene = 580,
+    InfluencePopup = 581,
+    IslandBarPollutionScene = 582,
+    IslandBarScene = 583,
+    IslandStorage = 584,
+    ItemFiltersScene = 585,
+    LoadingScene = 586,
+    MinimapScene = 587,
+    MonumentScene = 588,
+    MPLobbyScene = 589,
+    MPQuickMatchLobbyScene = 590,
+    NavigationMenuScene = 591,
+    NewspaperScene = 592,
+    OnlineMarketScene = 593,
+    OnScreenNotificationScene = 594,
+    OptionsScene = 595,
+    PauseMenuScene = 596,
+    ProfileSelectionScene = 597,
+    QuestBookScene = 598,
+    QuestTrackerScene = 599,
+    RecipeBuildingScene = 600,
+    ResearchCentreScene = 601,
+    ResourceBarScene = 602,
+    SessionScene = 603,
+    SessionTradeRouteOverviewScene = 604,
+    SessionTradeRoutesScene = 605,
+    SessionTradeTransfer = 606,
+    ShipMenuRadial = 607,
+    SideNotificationsArchive = 608,
+    SideNotificationScene = 609,
+    StatisticMenu = 610,
+    StrategicMapScene = 611,
+    TreasureMapScene = 612,
+    WorkforceMenu = 613,
+    OnScreenIconScene = 614,
+    ItemTransferScene = 615,
+    RubberDotsIcon = 616,
+    ScenarioWorkshopScene = 617,
+    MonumentEventScene = 618,
+    HostileTakeoverScene = 619,
+    ScreenCaptureScene = 620,
+    CustomizeModeScene = 621,
+    TitleScene = 622,
+    DesyncScene = 623,
+    FilteredSelectionPopup = 624,
+    GenericPopup = 625,
+    NegotiationPopup = 626,
+    TextPopup = 627,
+    TextPopupLayoutData = 628,
+    ModPopup = 629,
+    SettingsMenu = 630,
+    StaticHelpConfig = 631,
+    StaticHelpTopic = 632,
+    TutorialUiElement = 633,
+    TutorialUiBalancing = 634,
+    ConstructionCategory = 635,
+    FontRendering = 636,
+    GamepadCursor = 637,
+    InfolayerConfig = 638,
+    InfoLayerIcon = 639,
+    InfoTip = 640,
+    InfoTipBalancing = 641,
+    InteractionFeedback = 642,
+    MainMenuNavigationConfig = 643,
+    MouseCursor = 644,
+    NewspaperEffectIcon = 645,
+    PassiveTradeWindow = 646,
+    ProductionChain = 647,
+    ShipList = 648,
+    Startup = 649,
+    WorldMapCardConfig = 650,
+    WorldMapConfig = 651,
+    AmbientMoodProvider = 652,
+    Audio = 653,
+    AudioLink = 654,
+    AudioText = 655,
+    GameParameter = 656,
+    GlobalSoundEventConfig = 657,
+    MetaSoundConfig = 658,
+    MusicSoundConfig = 659,
+    RequiredSoundBanks = 660,
+    RFX = 661,
+    RFXList = 662,
+    SessionSoundConfig = 663,
+    SoundBank = 664,
+    SoundEmitter = 665,
+    SoundEmitterCommandBarks = 666,
+    StateChoice = 667,
+    StateGroup = 668,
+    SwitchChoice = 669,
+    SwitchGroup = 670,
+    UISoundConfig = 671,
+    WorldMapDynamicSoundEmitter = 672,
+    WorldMapSound = 673,
+    WwiseStandard = 674,
+    WwiseTrigger = 675,
+    Expedition = 676,
+    ExpeditionAttribute = 677,
+    ExpeditionDecision = 678,
+    ExpeditionEvent = 679,
+    ExpeditionEventPool = 680,
+    ExpeditionFeature = 681,
+    ExpeditionMapOption = 682,
+    ExpeditionOption = 683,
+    ExpeditionSlot = 684,
+    ExpeditionThreat = 685,
+    ExpeditionTrade = 686,
+    QPCDMultiplerHappiness = 687,
+    QPCDMultiplierBase = 688,
+    DecisionQuestFixer = 689,
+    Objectives = 690,
+    PlayerCounterContextPool = 691,
+    Quest = 692,
+    QuestDynamicPriority = 693,
+    QuestLine = 694,
+    QuestMain = 695,
+    QuestOptional = 696,
+    QuestPool = 697,
+    RegionRewardPool = 698,
+    ResourceRewardPool = 699,
+    Reward = 700,
+    RewardPool = 701,
+    Island = 702,
+    Region = 703,
+    Session = 704,
+    TransitionConfig = 705,
+    WorldMap = 706,
+    Video = 707,
+    VideoSubtitle = 708,
+    CorporationProfile = 709,
+    PlayerLogo = 710,
+    Portrait = 711,
+    ConstructionAI = 712,
+    EventTrader = 713,
+    ItemCrafter = 714,
+    MilitaryAI = 715,
+    Pirate = 716,
+    ThirdParty = 717,
+    Trader = 718,
+    BuyShares = 719,
+    Diplomacy = 720,
+    ExpeditionUser = 721,
+    Highscore = 722,
+    Interaction = 723,
+    ItemTransferHandler = 724,
+    KontorOwner = 725,
+    MetaBuffHandler = 726,
+    MetaBuildPermits = 727,
+    MetaInfluence = 728,
+    ParticipantMessageObject = 729,
+    ParticipantMessages = 730,
+    Profile = 731,
+    ProfileCounter = 732,
+    UniqueBuildingHandler = 733,
+    CraftableItem = 734,
+    EffectContainer = 735,
+    EffectForward = 736,
+    Item = 737,
+    ItemAction = 738,
+    ItemConfig = 739,
+    ItemContainer = 740,
+    ItemEffect = 741,
+    ItemEffectTargetPool = 742,
+    ItemReplacementPool = 743,
+    ItemSocketSet = 744,
+    ItemStartExpedition = 745,
+    ItemWithUI = 746,
+    SpecialAction = 747,
+    VisualEffectWhenActive = 748,
+    CameraSequence = 749,
+    Achievement = 750,
+    AchievementBalancing = 751,
+    AchievementReward = 752,
+    UplayAction = 753,
+    UbisoftChallenge = 754,
+    DlcController = 755,
+    UplayProduct = 756,
+    UplayProductPromotion = 757,
+    UplayReward = 758,
+    MapGenerator = 759,
+    JiraManager = 760,
+    Recipe = 761,
+    RecipeBuilding = 762,
+    RecipeList = 763,
+    BombardmentAmmo = 764,
+    BuffFactory = 765,
+    Distribution = 766,
+    EconomyFeature7 = 767,
+    Electrifiable = 768,
+    Factory7 = 769,
+    FactoryBase = 770,
+    Fertility = 771,
+    FreeAreaProductivity = 772,
+    Heated = 773,
+    HeatProvider = 774,
+    Industrializable = 775,
+    IrrigationSource = 776,
+    ItemTransfer = 777,
+    LogisticNode = 778,
+    Maintenance = 779,
+    Market = 780,
+    ModuleIrrigation = 781,
+    MonoCulture = 782,
+    Motorizable = 783,
+    Palace = 784,
+    PalaceMinistry = 785,
+    PopulationGroup7 = 786,
+    PopulationLevel7 = 787,
+    Postbox = 788,
+    Powerplant = 789,
+    Product = 790,
+    ProductStorageList = 791,
+    PublicService = 792,
+    Residence7 = 793,
+    StorageBase = 794,
+    TrainStation = 795,
+    Transporter7 = 796,
+    Warehouse = 797,
+    Watered = 798,
+    GeneralIncidentConfiguration = 799,
+    Incident = 800,
+    IncidentArcticIllness = 801,
+    IncidentCommunication = 802,
+    IncidentEffectConfiguration = 803,
+    IncidentExplosion = 804,
+    IncidentFestival = 805,
+    IncidentFire = 806,
+    IncidentIllness = 807,
+    IncidentInfectable = 808,
+    IncidentInfluencer = 809,
+    IncidentResolver = 810,
+    IncidentResolverUnit = 811,
+    IncidentResolverUpkeep = 812,
+    IncidentRiot = 813,
+    AttackableUpgrade = 814,
+    AttackerUpgrade = 815,
+    Buff = 816,
+    BuildingUpgrade = 817,
+    CultureSet = 818,
+    CultureUpgrade = 819,
+    DistributionUpgrade = 820,
+    DivingBellUpgrade = 821,
+    EcoSystemProviderUpgrade = 822,
+    EcoSystemUpgrade = 823,
+    FactoryUpgrade = 824,
+    HeaterUpgrade = 825,
+    IncidentInfectableUpgrade = 826,
+    IncidentInfluencerUpgrade = 827,
+    IndustrializableUpgrade = 828,
+    InfluenceSourceUpgrade = 829,
+    IrrigationUpgrade = 830,
+    ItemContainerUpgrade = 831,
+    KontorUpgrade = 832,
+    ModuleOwnerUpgrade = 833,
+    MonumentUpgrade = 834,
+    NewspaperUpgrade = 835,
+    PassiveTradeGoodGenUpgrade = 836,
+    PierUpgrade = 837,
+    PopulationUpgrade = 838,
+    PowerplantUpgrade = 839,
+    ProjectileUpgrade = 840,
+    RepairCraneUpgrade = 841,
+    ResidenceUpgrade = 842,
+    ResourceUpgrade = 843,
+    ShipyardUpgrade = 844,
+    TradeShipUpgrade = 845,
+    UpgradeList = 846,
+    VehicleUpgrade = 847,
+    VisitorHarborUpgrade = 848,
+    VisitorUpgrade = 849,
+    WarehouseUpgrade = 850,
+    TextSourceFormatting = 851,
+    RatingAdjacentBlocks = 852,
+    RatingBlockRegularity = 853,
+    RatingBuildableWithinRadius = 854,
+    RatingCityBlockOverride = 855,
+    RatingCompactness = 856,
+    RatingConnectorDistanceToPipe = 857,
+    RatingDistance = 858,
+    RatingFragmentation = 859,
+    RatingFreeformInnerRatio = 860,
+    RatingFreeStanding = 861,
+    RatingHarborConnected = 862,
+    RatingHarborDefense = 863,
+    RatingHarborOffice = 864,
+    RatingHindersBlockExpansions = 865,
+    RatingInsideTiles = 866,
+    RatingNearestBuilding = 867,
+    RatingNeighborTiles = 868,
+    RatingNotIrrigatedTiles = 869,
+    RatingOverwrittenBlocks = 870,
+    RatingProductionChainProximity = 871,
+    RatingProvideBoosterCoverage = 872,
+    RatingProvideLogisticCoverage = 873,
+    RatingProvidePublicCoverage = 874,
+    RatingPublicCoverage = 875,
+    RatingPublicOverlap = 876,
+    RatingStreetPointsToWarehouse = 877,
+    RatingSubRect = 878,
+    GlobalConstructionAIBalancing = 879,
+    PlacementScore = 880,
+    OnlineEvent = 881,
+    MonumentEvent = 882,
+    MonumentEventCategory = 883,
+    Test234 = 884,
+    Test345 = 885,
+    Test456 = 886,
+    TestVisibility = 887,
+    TestVisibilityACA = 888,
+    AttractivenessConsoleScene = 889,
+    NewspaperConsoleScene = 890,
+    SessionTradeRouteConsoleScene = 891,
+    StrategicMapConsoleScene = 892,
+    SystemPopupConsoleScene = 893,
+    MonumentConsoleScene = 894,
+    RuinedStateBalancing = 895,
+    TransferGoodsConsoleScene = 896,
+    IslandDetailConsoleScene = 897,
+    GamepadButtonPromptScene = 898,
+    WorkforceConsoleScene = 899,
+    CulturalBuildingPopupConsoleScene = 900,
+    ObjectMenuShipYardConsoleScene = 901,
+    ConsoleOptionScene = 902,
+    AdvancedDifficultiesConsoleScene = 903,
+    MPLobbyConsoleScene = 904,
+    DLCOverviewConsoleScene = 905,
+    DLCPromotionPopupConsoleScene = 906,
+    ResidenceUpgradeFeature = 907,
+    BuildModeBalancing = 908,
+    ErrorMessageBalancing = 909,
+    SelectionsBalancing = 910,
+    TargetBalancing = 911,
+    GamepadWorldmapConfig = 912,
+    VirtualKeyboardBalancing = 913,
+    PlatformBalancing = 914,
+    ButtonPromptAppearanceConfig = 915,
+    GamepadButtonMapping = 916,
+    GamepadConfig = 917,
+    GamepadVibrationEffect = 918,
+    ScenarioBalancing = 919,
+    ScenarioMetaInfo = 920,
+    ScenarioMetaInfoInternal = 921,
+    ScenarioSelectionMarker = 922,
+    ScenarioCurrencyFixer = 923,
+    ScenarioWorkshopItem = 924,
+    ScenarioWorkshopPackage = 925
+};
+
+local PropertiesStringToID = serpLight.PropertiesStringToID;
 
 -- How to check for properties of your found objects:
 
@@ -1459,7 +2351,7 @@ local function HasProperty(userdata, Property, OID)
     if type(Property) == "number" then
         PropertyID = Property
     elseif type(Property) == "string" then
-        PropertyID = g_LTL_Serp.PropertiesStringToID[Property]
+        PropertyID = serpLight.PropertiesStringToID[Property]
     end
     if PropertyID ~= nil then
         if userdata == nil and OID ~= nil then
@@ -1506,54 +2398,54 @@ end
 -- So these are no guarantee! just very likely!
 -- providing userdata to the following functions is optional
 local function HasWalking(OID, userdata)
-    local hasproperty = g_LTL_Serp.HasProperty(userdata, "Walking", OID)
+    local hasproperty = serpLight.HasProperty(userdata, "Walking", OID)
     if hasproperty then
         return true
     elseif hasproperty == nil then
         -- then try the less secure way via GetGameObject, which also works if object is in another session
-        return g_LTL_Serp.GetGameObjectPath(OID, "Walking.BaseSpeedWithUpgrades") ~= 0
+        return serpLight.GetGameObjectPath(OID, "Walking.BaseSpeedWithUpgrades") ~= 0
     end
 end
 local function HasCommandQueue(OID, userdata)
-    local hasproperty = g_LTL_Serp.HasProperty(userdata, "CommandQueue", OID)
+    local hasproperty = serpLight.HasProperty(userdata, "CommandQueue", OID)
     if hasproperty then
         return true
     elseif hasproperty == nil then
         -- then try the less secure way via GetGameObject, which also works if object is in another session
-        return g_LTL_Serp.GetGameObjectPath(OID, "CommandQueue.UI_IsNonMoving") or g_LTL_Serp.GetGameObjectPath(OID, "CommandQueue.UI_IsMoving") -- scheint immer eins von beiden wahr zu sein, auch zb auf patroullie/traderoute
+        return serpLight.GetGameObjectPath(OID, "CommandQueue.UI_IsNonMoving") or serpLight.GetGameObjectPath(OID, "CommandQueue.UI_IsMoving") -- scheint immer eins von beiden wahr zu sein, auch zb auf patroullie/traderoute
     end
 end
 local function HasAttacker(OID, userdata)
-    local hasproperty = g_LTL_Serp.HasProperty(userdata, "Attacker", OID)
+    local hasproperty = serpLight.HasProperty(userdata, "Attacker", OID)
     if hasproperty then
         return true
     elseif hasproperty == nil then
         -- then try the less secure way via GetGameObject, which also works if object is in another session
-        return g_LTL_Serp.GetGameObjectPath(OID, "Attacker.DPS") ~= 0
+        return serpLight.GetGameObjectPath(OID, "Attacker.DPS") ~= 0
     end
 end
 local function HasAttackable(OID, userdata)
     -- we can not check if and by what it can be attacked though
-    local hasproperty = g_LTL_Serp.HasProperty(userdata, "Attackable", OID)
+    local hasproperty = serpLight.HasProperty(userdata, "Attackable", OID)
     if hasproperty then
         return true
     elseif hasproperty == nil then
         -- then try the less secure way via GetGameObject, which also works if object is in another session
-        return g_LTL_Serp.GetGameObjectPath(OID, "Attackable.MaxHitPoints") ~= 0
+        return serpLight.GetGameObjectPath(OID, "Attackable.MaxHitPoints") ~= 0
     end
 end
 local function HasBombarder(OID, userdata)
     -- most likely also means it is an airship
-    local hasproperty = g_LTL_Serp.HasProperty(userdata, "Bombarder", OID)
+    local hasproperty = serpLight.HasProperty(userdata, "Bombarder", OID)
     if hasproperty then
         return true
     elseif hasproperty == nil then
         -- then try the less secure way via GetGameObject, which also works if object is in another session
-        return g_LTL_Serp.GetGameObjectPath(OID, "Bombarder.ShaftCount") ~= 0
+        return serpLight.GetGameObjectPath(OID, "Bombarder.ShaftCount") ~= 0
     end
 end
 local function NeedsBuildPermit(OID, GUID)
-    GUID = GUID or OID ~= nil and g_LTL_Serp.GetGameObjectPath(OID, "GUID")
+    GUID = GUID or OID ~= nil and serpLight.GetGameObjectPath(OID, "GUID")
     return ts.BuildPermits.GetNeedsBuildPermit(GUID)
 end
 
@@ -1563,7 +2455,7 @@ end
 
 local function AffectedByStatusEffect(OID, StatusEffectGUID)
     -- eg StatusEffect dealt by projectiles. this way you can easily filter for objects hit with your custom projectile
-    return g_LTL_Serp.GetGameObjectPath(OID, "Attackable.GetIsPartOfActiveStatusEffectChain(" .. tostring(StatusEffectGUID) .. ")") -- unfortunately does not work with buffs provided in a different way
+    return serpLight.GetGameObjectPath(OID, "Attackable.GetIsPartOfActiveStatusEffectChain(" .. tostring(StatusEffectGUID) .. ")") -- unfortunately does not work with buffs provided in a different way
 end
 -- for Productivity Buffs for Factory/Monument see GetVectorGuidsFromSessionObject ProductivityUpgradeList
 -- And you can check ItemContainer for "GetItemAlreadyEquipped" to check if a ship/guildhouse has an item euqipped
@@ -1589,7 +2481,7 @@ local function GetModloaderlog()
         _File:close()
         return _content
     else
-        g_LTL_Serp.modlog("GetModloaderlog: failed to load mod-loader.log (not at the default path)", ModID)
+        serpLight.modlog("GetModloaderlog: failed to load mod-loader.log (not at the default path)", ModID)
     end
     return {}
 end
@@ -1609,7 +2501,7 @@ local function GetActiveMods()
     -- return ModNames
 
     local ModIDs = {}
-    local modloaderlines = g_LTL_Serp.GetModloaderlog()
+    local modloaderlines = serpLight.GetModloaderlog()
     local latestmodloadingline = 0
     for i, line in ipairs(modloaderlines) do
         if string.find(line, " %[info%] Load mods") then
@@ -1632,7 +2524,18 @@ end
 -- ##################################################################################################################
 
 
-g_LTL_Serp = {
+
+serpLight.t_FnViaTextEmbed = t_FnViaTextEmbed
+serpLight.DoForSessionGameObject = DoForSessionGameObject
+serpLight.DoForSessionGameObjectRaw = DoForSessionGameObjectRaw
+serpLight.GetVectorGuidsFromSessionObject = GetVectorGuidsFromSessionObject
+serpLight.AreatableToAreaID = AreatableToAreaID
+serpLight.AreaIDToAreatable = AreaIDToAreatable
+serpLight.OIDtableToOID = OIDtableToOID
+serpLight.OIDToOIDtable = OIDToOIDtable
+serpLight.get_OID = get_OID
+
+local z = {
     -- general lua helpers
     replace_chars_for_Name = replace_chars_for_Name,
     TableToFormattedString = TableToFormattedString,
@@ -1666,7 +2569,7 @@ g_LTL_Serp = {
     log_error = log_error,
     start_thread = start_thread,
     waitForTimeDelta = waitForTimeDelta,
-    CallGlobalFnBlocked = CallGlobalFnBlocked,
+    --CallGlobalFnBlocked = CallGlobalFnBlocked,
     StopAllThreads = StopAllThreads,
     WasNewGameJustStarted = WasNewGameJustStarted,
     IsHuman = IsHuman,
@@ -1675,13 +2578,6 @@ g_LTL_Serp = {
     AddToNameInvisible = AddToNameInvisible,
     GetNameInvisible = GetNameInvisible,
     play_random_sound = play_random_sound,
-
-    -- ID Converter
-    AreatableToAreaID = AreatableToAreaID,
-    AreaIDToAreatable = AreaIDToAreatable,
-    OIDtableToOID = OIDtableToOID,
-    OIDToOIDtable = OIDToOIDtable,
-    get_OID = get_OID,
 
     -- Some constants
     PIDs = {
@@ -1737,11 +2633,7 @@ g_LTL_Serp = {
     UITypeState = { Statistics = 176, Shipyard = 120 },
 
     -- Trickster Anno Helpers
-    t_FnViaTextEmbed = t_FnViaTextEmbed,
-    DoForSessionGameObject = DoForSessionGameObject,
-    DoForSessionGameObjectRaw = DoForSessionGameObjectRaw,
     GetFertilitiesOrLodesFromArea_CurrentSession = GetFertilitiesOrLodesFromArea_CurrentSession,
-    GetVectorGuidsFromSessionObject = GetVectorGuidsFromSessionObject,
     GetCoopPeersAtMarker = GetCoopPeersAtMarker,
     GetEffectivities = GetEffectivities,
     GetItemOrBuffEffectTargets = GetItemOrBuffEffectTargets,
@@ -1757,7 +2649,6 @@ g_LTL_Serp = {
     -- CheckObjectHelpers
     IsUserdataValid = IsUserdataValid,
     HasProperty = HasProperty,
-    PropertiesStringToID = PropertiesStringToID,
     HasWalking = HasWalking,
     HasCommandQueue = HasCommandQueue,
     HasAttacker = HasAttacker,
@@ -1768,8 +2659,11 @@ g_LTL_Serp = {
 
     GetModloaderlog = GetModloaderlog,
     GetActiveMods = GetActiveMods,
-
 }
+for k, v in pairs(z) do
+    serpLight[k] = v
+end
+
 -- ######
 -- Very helpful vanilla commands:
 
@@ -1780,4 +2674,4 @@ g_LTL_Serp = {
 -- Trigger Conditions. This can also circumvent the issue that ProfileCounter can not handle Pools. If you know what pool you want to track,
 -- you can make a Trigger for it and can this way get the current amount via lua
 
-return g_LTL_Serp
+return serpLight

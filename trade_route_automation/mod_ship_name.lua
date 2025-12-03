@@ -1,8 +1,8 @@
---local Anno = require("lua/anno_interface");
---local async = require("lua/utils_async");
---local shipCmd = require("lua/mod_ship_cmd");
---local objectAccessor = require("lua/anno_object_accessor");
---local logger = require("lua/utils_logger");
+--local Anno = require("trade_route_automation/anno_interface");
+--local async = require("trade_route_automation/utils_async");
+--local shipCmd = require("trade_route_automation/mod_ship_cmd");
+--local objectAccessor = require("trade_route_automation/anno_object_accessor");
+--local logger = require("trade_route_automation/utils_logger");
 --
 --
 --local function Ship_Name_StoreCmdInfo(oid, dst)

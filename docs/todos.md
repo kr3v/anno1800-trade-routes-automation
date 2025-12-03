@@ -5,6 +5,33 @@
 5. automate extracting objects request, don't use statically generated ones
 6. figure out how to restart on save reload / new game / etc; what to do on pauses
 
+```azure
+--    --local
+--
+--    --1. keep ships info
+--    --2. print json with the non-empty request/supply info
+--    --4. print generated orders and their execution log
+--    --5. maintain everything in one big log (per region)
+--
+--    -- TODOs:
+--    -- maintain separate file with formatted request-supply info (per region)
+--    -- maintain separate file with pretty-printed
+--    --      remaining-deficit.json
+--    --      remaining-surplus.json
+--    --      trade-history.json
+--    -- gdp global/per city/per region?
+--
+
+
+-- TODO: public interface
+-- 1. rescan objects in current session -> just do it once a minute / on first load
+-- 2. find player areas in current region -> just look at loading piers from `AreaID_To_ItsOID`
+-- 3. detailed scan of current player area
+--
+-- consider using waitForGameTimeDelta
+
+```
+
 ---
 
 ```lua
@@ -32,6 +59,22 @@
 
 ^^^ use the above for trade union buffs (e.g. additional inputs)
 
+
+```
+local function AffectedByStatusEffect(OID, StatusEffectGUID)
+-- eg StatusEffect dealt by projectiles. this way you can easily filter for objects hit with your custom projectile
+return g_LTL_Serp.GetGameObjectPath(OID, "Attackable.GetIsPartOfActiveStatusEffectChain(" .. tostring(StatusEffectGUID) .. ")") -- unfortunately does not work with buffs provided in a different way
+end
+
+-- for Productivity Buffs for Factory/Monument see GetVectorGuidsFromSessionObject ProductivityUpgradeList
+-- And you can check ItemContainer for "GetItemAlreadyEquipped" to check if a ship/guildhouse has an item euqipped
+-- I fear checking other buffs is not possible in lua...
+
+-- ts_embed_string: "[MetaObjects SessionGameObject("..tostring(OID)..") ItemContainer Sockets Count]"  == Sockets content
+-- ts_embed_string: "[MetaObjects SessionGameObject("..tostring(OID)..") Factory ProductivityUpgradeList Count]"  == Buffs on Objects with Factory (or also Monument) property
+-- it really ONLY returns Buffs which provide ProductivityUpgrade buff ... (mit ts.GetItemAssetData(BuffGUID) kommen wir an infos zu buffs/items, aber nicht ob etwas davon betroffen ist)
+-- you use "Count" in your ts_embed_string. the function will also automatically call At() for it (to get the actual content)
+```
 
 ----
 
@@ -651,4 +694,13 @@
 
 try above to maintain contracts import goods
 
+
+---
+
+
+```lua
+    local _Costs = g_LTL_Serp.GetVectorGuidsFromSessionObject("[ToolOneHelper BuildCost(" .. tostring(GUID) .. ") Costs Count]", { ProductGUID = "integer", Amount = "integer" })
+```
+
+consider using the above to detect water objects in the scanner
 

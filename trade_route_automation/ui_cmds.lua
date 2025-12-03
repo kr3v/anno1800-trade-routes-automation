@@ -1,21 +1,10 @@
-local Anno = require("lua/anno_interface");
-local inspector = require("lua/anno_object_inspector");
-local objectAccessor = require("lua/anno_object_accessor");
-local session = require("lua/anno_session");
+local Anno = require("trade_route_automation/anno_interface");
 
-local serpLight = require("lua/serp/lighttools");
-local json = require("lua/rxi/json");
-local cache = require("lua/utils_cache");
-local base64 = require("lua/iskolbin/base64");
-local async = require("lua/utils_async");
-local utable = require("lua/utils_table");
+local serpLight = require("trade_route_automation/serp/lighttools");
+local cache = require("trade_route_automation/utils_cache");
 
-local AreasRequest = require("lua/mod_area_requests");
-local TradePlannerLL = require("lua/mod_trade_planner_ll");
-local map_scanner = require("lua/mod_map_scanner");
-local mapScannerHL = require("lua/mod_map_scanner_hl");
-local shipCmd = require("lua/mod_ship_cmd");
-local TradeExecutor = require("lua/mod_trade_executor");
+local MapScannerLL = require("trade_route_automation/mod_map_scanner");
+local MapScannerHL = require("trade_route_automation/mod_map_scanner_hl");
 
 local TrRAt_UI = {
     L = nil,
@@ -48,7 +37,7 @@ function TrRAt_UI.AreaRescan.impl(step)
     local areaID = serpLight.AreatableToAreaID(ts.Area.Current.ID);
     local areaName = Anno.Area_CityName(region, areaID);
 
-    local areas = mapScannerHL.Region_AllAreas_Get(region);
+    local areas = MapScannerHL.Region_AllAreas_Get(region);
     if areas == nil then
         return nil;
     end
@@ -60,7 +49,7 @@ function TrRAt_UI.AreaRescan.impl(step)
     local grid = areas[areaID];
     local lx, ly = grid.min_x, grid.min_y;
     local hx, hy = grid.max_x, grid.max_y;
-    local scan = map_scanner.Area(TrRAt_UI.L, lx, ly, hx, hy, step);
+    local scan = MapScannerLL.Area_WaterPoints(TrRAt_UI.L, lx, ly, hx, hy, step);
 
     cache.Set(
             "areaScanner_dfs",
@@ -93,7 +82,7 @@ function TrRAt_UI.AreaRescan.Do(step)
 end
 
 -- step in { 30, 20, 15 }
--- console.toggleVisibility(); require("lua/ui_cmds").AreaRescan.Do(20)
+-- console.toggleVisibility(); require("trade_route_automation/ui_cmds").AreaRescan.Do(20)
 
 ----- Region Rescan -----
 
@@ -101,9 +90,16 @@ TrRAt_UI.RegionRescan = {
     Events = {},
 };
 
-function TrRAt_UI.RegionRescan.impl(step)
+function TrRAt_UI.RegionRescan.impl()
     local region = Anno.Region_Current();
     -- TODO: implement
+
+    MapScannerHL.Region_AllAreas_ForceScan(region);
+
+    -- Trigger events
+    for _, callback in ipairs(TrRAt_UI.RegionRescan.Events) do
+        callback(region);
+    end
 end
 
 

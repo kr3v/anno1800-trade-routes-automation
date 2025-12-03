@@ -3,61 +3,53 @@ include Makefile.vars
 TRA_DIR ?= trade-route-automation
 REGIONS ?= OW NW ER AR CT
 
+BASE ?= $(INSTALL_BASEDIR_E)
+
 install: install/mkdir
-	cp ./sample1.lua "$(INSTALL_BASEDIR)/trade-automation/execute.lua"
-	cp -r lua/* "$(INSTALL_BASEDIR)"
+	cp ./sample1.lua "$(INSTALL_BASEDIR_E)/trade-automation/execute.lua"
+	cp ./trade_route_automation/_executor.lua "$(INSTALL_BASEDIR_E)"
+	cp -r trade_route_automation/* "$(INSTALL_BASEDIR)"
 
 install/mkdir:
 	mkdir -p "$(INSTALL_BASEDIR)"
-	mkdir -p "$(INSTALL_BASEDIR)/$(TRA_DIR)"
-	for region in $(REGIONS); do \
-		mkdir -p "$(INSTALL_BASEDIR)/$(TRA_DIR)/$$region"; \
-		mkdir -p "$(INSTALL_BASEDIR)/$(TRA_DIR)/$$region/trades"; \
-	done
 
 stop:
-	touch ./anno-1800/stop-trade-route-async-watcher
-	touch ./anno-1800/stop-trade-route-loop-ow
-	touch ./anno-1800/stop-trade-route-loop-nw
-	touch ./anno-1800/stop-trade-executor-heartbeat
+	touch "$(BASE)/stop-trade-route-async-watcher"
+	touch "$(BASE)/stop-trade-route-loop-ow"
+	touch "$(BASE)/stop-trade-route-loop-nw"
+	touch "$(BASE)/stop-trade-executor-heartbeat"
+	touch "$(BASE)/stop-trade-routes-automation-owner"
 
 interrupt: stop
 
 clean/interrupt:
-	rm -f ./anno-1800/stop-trade-route-async-watcher || true
-	rm -f ./anno-1800/stop-trade-route-loop-ow || true
-	rm -f ./anno-1800/stop-trade-route-loop-nw || true
-	rm -f ./anno-1800/stop-trade-executor-heartbeat || true
+	rm -f "$(BASE)/stop-trade-route-async-watcher" || true
+	rm -f "$(BASE)/stop-trade-route-loop-ow" || true
+	rm -f "$(BASE)/stop-trade-route-loop-nw" || true
+	rm -f "$(BASE)/stop-trade-executor-heartbeat" || true
 
 clean/logs:
-	@rm ./anno-1800/modlog.txt || true
-	@rm ./anno-1800/trade-route-automation/trade-executor-history.json
-
-clean/logs/trade:
-	-@rm ./anno-1800/trade-route-automation/$(REGION)/*.json
-	-@rm ./anno-1800/trade-route-automation/$(REGION)/*.log
-	-@rm ./anno-1800/trade-route-automation/$(REGION)/*.hub
-	-@rm ./anno-1800/trade-route-automation/$(REGION)/trades/*.log
+	-@rm "$(LOGS_DIR)"/"$(LOGS_MARKER)"*.json
+	-@rm "$(LOGS_DIR)"/"$(LOGS_MARKER)"*.log
+	-@rm "$(LOGS_DIR)"/"$(LOGS_MARKER)"*.hub
+	-@rm "$(LOGS_DIR)"/"$(LOGS_MARKER)"*.tsv
 
 clean:
 	-make clean/interrupt
 	-make clean/logs
-	-for region in $(REGIONS); do \
-		make clean/logs/trade REGION="$$region"; \
-	done
 
 ###
 
 run-clean: clean mouse/middle install
 	sleep 1
-	cat ./anno-1800/modlog.txt
+	cat $(BASE)/modlog.txt
 
 run: mouse/middle install
 	sleep 1
 	@echo ""
 	@echo "########"
 	@echo ""
-	cat ./anno-1800/modlog.txt
+	cat $(BASE)/modlog.txt
 
 ###
 
@@ -66,12 +58,12 @@ mouse/middle:
 	mkdir anno-1800/cache || true
 
 area-visualizations:
-	@for f in $(wildcard ./anno-1800/area*.tsv); do \
+	@for f in $(wildcard $(BASE)/area*.tsv); do \
 		python3 ./utils/area-visualizer.py "$$f" "$$f.png"; \
 	done
-	for f in $(ls ./anno-1800/area*.tsv); do \
+	for f in $(ls $(BASE)/area*.tsv); do \
 		python3 ./utils/area-visualizer.py "$f" "$f.png"; \
 	done
 
 texts-to-yaml:
-	python3 ./utils/texts-to-guid.py ./lua/texts.json /data/games/steam/steamapps/common/Anno\ 1800/maindata/data*.rda.unpack/data/config/gui/texts_english.xml
+	python3 ./utils/texts-to-guid.py ./trade_route_automation/texts.json /data/games/steam/steamapps/common/Anno\ 1800/maindata/data*.rda.unpack/data/config/gui/texts_english.xml

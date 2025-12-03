@@ -1,10 +1,13 @@
-local json = require("lua/rxi/json");
-local base64 = require("lua/iskolbin/base64");
+local json = require("trade_route_automation/rxi/json");
+local base64 = require("trade_route_automation/iskolbin/base64");
 
-local baseDir = "lua/cache";
+local cache = {
+    baseDir = nil
+};
 
+---@param str string
 local function makeFilenameSafe(str)
-    return str:gsub("%+", "-"):gsub("/", "_")
+    return str:gsub("[^a-zA-Z0-9%[%]%/]", ""):gsub('["%[%]%/]', "_")
 end
 
 local function fileExists(path)
@@ -27,6 +30,8 @@ local function readFile(path)
 end
 
 local function writeFile(path, content)
+    print(path);
+
     -- Ensure directory exists
     local f = io.open(path, "w")
     if not f then
@@ -38,15 +43,15 @@ end
 
 local function cacheFilePath(funcName, args)
     local keyData = {
-        func = funcName,
+        Func = funcName,
         args = args
     }
     local keyJson = json.encode(keyData)
 
     -- Base64 encode and make filesystem-safe
-    local keyEncoded = base64.encode(keyJson)
-    local filename = makeFilenameSafe(keyEncoded) .. ".json"
-    local filepath = baseDir .. "/" .. filename
+    --local keyEncoded = base64.encode(keyJson)
+    local filename = makeFilenameSafe(keyJson) .. ".json"
+    local filepath = cache.baseDir .. "_" .. filename
     return filepath
 end
 
@@ -88,7 +93,7 @@ local function set(funcName, func, ...)
     return getOrSet(func, funcName, ...)
 end
 
-return {
+cache = {
     GetOrSetR = function(func, funcName, ...)
         return getOrSet(func, funcName, ...)
     end,
@@ -125,3 +130,4 @@ return {
         return result
     end
 }
+return cache

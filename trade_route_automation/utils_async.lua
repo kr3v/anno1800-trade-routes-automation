@@ -2,7 +2,7 @@
     Async - Coroutine-based async/await system for Lua
 
     Usage:
-        local async = require("lua/async")
+        local async = require("trade_route_automation/async")
 
         -- Spawn an async task
         async.spawn(function()

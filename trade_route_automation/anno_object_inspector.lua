@@ -238,9 +238,13 @@ return {
         L.disableDate = false
     end,
     DoF = function(L, obj, title)
+        L.disableDate = true
         inspectL(L, obj, title or "object", true)
+        L.disableDate = false
     end,
     DoFL = function(L, obj, title)
+        L.disableDate = true
         inspectL(L, obj, title or "object", true)
+        L.disableDate = false
     end,
 }

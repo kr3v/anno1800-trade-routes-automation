@@ -1,7 +1,7 @@
-local serpLight = require("lua/serp/lighttools");
-local objectAccessor = require("lua/anno_object_accessor");
+local serpLight = require("trade_route_automation/serp/lighttools");
+local objectAccessor = require("trade_route_automation/anno_object_accessor");
 
-local Anno = require("lua/anno_interface");
+local Anno = require("trade_route_automation/anno_interface");
 
 local function MoveCameraTo(x, y)
     ts.SessionCamera.ToWorldPos(x, y);
@@ -131,22 +131,8 @@ local preset = "P11";
 
 --session.setCameraToPreset(preset);
 
-cityNameToShortName = {
-    c1 = '1',
-    c2 = '2',
-    c3 = '3',
-    c4 = '4',
-    c5 = '5',
-    c6 = '6',
-};
-shortNameToCityName = {
-    ['1'] = 'c1',
-    ['2'] = 'c2',
-    ['3'] = 'c3',
-    ['4'] = 'c4',
-    ['5'] = 'c5',
-    ['6'] = 'c6',
-};
+local cityNameToShortName = {};
+local shortNameToCityName = {};
 
 local function getCityShortName(cityName)
     local sn = cityNameToShortName[cityName];
@@ -466,13 +452,13 @@ local function visualizationTsvs(L, areas)
         end
 
         local scan = cache.getOrSet(function(a, b, c, d, e)
-            return map_scanner.Area(L, a, b, c, d, e);
+            return map_scanner.Area_WaterPoints(L, a, b, c, d, e);
         end, "areaScanner_dfs", grid.min_x, grid.min_y, grid.max_x, grid.max_y, 20);
         L.logf("area returned %d scanned objects", #scan);
 
         local cityName = area.CityName:gsub("%s+", "_");
 
-        local lq = L.logger("lua/area_scan_" .. cityName .. ".tsv");
+        local lq = L.logger("area_scan_" .. cityName .. ".tsv");
         for k, v in pairs(scan) do
             local x, y = map_scanner.UnpackCoordinates(k);
             lq.logf("%d,%d,%s", x, y, map_scanner.Coordinate_ToLetter(v));
@@ -485,10 +471,9 @@ end
 ---
 
 return {
-    Session = sessionScanner,
-    Area = areaScanner_dfs,
-
-    SessionAreas = sessionScanner_areaGrids,
+    Session_Areas_Grid = sessionScanner,
+    Area_WaterPoints = areaScanner_dfs,
+    Session_Areas_Rectangles = sessionScanner_areaGrids,
 
     Coordinate_Land = LAND,
     Coordinate_Water = WATER,

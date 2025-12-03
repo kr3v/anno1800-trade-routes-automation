@@ -3,7 +3,7 @@
         <Item>
             <KeyTypes>Ctrl;Shift;P</KeyTypes>
             <Text>1475000001</Text>
-            <Command>require("lua/ui_cmds").AreaRescan.Do(20)</Command>
+            <Command>require("trade_route_automation/ui_cmds").AreaRescan.Do(20)</Command>
             <Active>Session;WorldMap;Menu;Pause;Popup</Active>
             <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
             <AudioEvent>200634</AudioEvent>
@@ -16,7 +16,7 @@
         <Item>
             <KeyTypes>Ctrl;Shift;O</KeyTypes>
             <Text>1475000002</Text>
-            <Command>require("lua/ui_cmds").RegionRescan.Do(20)</Command>
+            <Command>require("trade_route_automation/ui_cmds").RegionRescan.Do(20)</Command>
             <Active>Session;WorldMap;Menu;Pause;Popup</Active>
             <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
             <AudioEvent>200634</AudioEvent>
@@ -29,7 +29,7 @@
         <Item>
             <KeyTypes>Ctrl;Shift;I</KeyTypes>
             <Text>1475000003</Text>
-            <Command>require("lua/ui_cmds").Enable.Do()</Command>
+            <Command>require("trade_route_automation/ui_cmds").Enable.Do()</Command>
             <Active>Session;WorldMap;Menu;Pause;Popup</Active>
             <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
             <AudioEvent>200634</AudioEvent>

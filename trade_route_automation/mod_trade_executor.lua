@@ -7,12 +7,12 @@
 
 local TradeExecutor = {}
 
-local Anno = require("lua/anno_interface");
-local async = require("lua/utils_async");
-local shipCmd = require("lua/mod_ship_cmd");
-local objectAccessor = require("lua/anno_object_accessor");
-local logger = require("lua/utils_logger");
-local GeneratorProducts = require("lua/generator/products");
+local Anno = require("trade_route_automation/anno_interface");
+local async = require("trade_route_automation/utils_async");
+local shipCmd = require("trade_route_automation/mod_ship_cmd");
+local objectAccessor = require("trade_route_automation/anno_object_accessor");
+local logger = require("trade_route_automation/utils_logger");
+local AnnoInfo = require("trade_route_automation/generator/products");
 
 ---
 
@@ -242,7 +242,7 @@ function TradeExecutor._ExecuteTradeOrderWithShip(L, region, ship_oid, cmd)
     local area_src_n = Anno.Area_CityName(region, order_key.AreaID_from);
     local area_dst_n = Anno.Area_CityName(region, order_key.AreaID_to);
     local ship_name = Anno.Ship_Name_Get(ship_oid);
-    local good_name = GeneratorProducts.Product(order_key.GoodID).Name;
+    local good_name = AnnoInfo.Product(order_key.GoodID).Name;
 
     local end_at = os.date("%Y-%m-%dT%H:%M:%SZ");
 

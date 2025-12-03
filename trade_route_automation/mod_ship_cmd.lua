@@ -1,5 +1,5 @@
-local Anno = require("lua/anno_interface");
-local async = require("lua/utils_async");
+local Anno = require("trade_route_automation/anno_interface");
+local async = require("trade_route_automation/utils_async");
 
 local ShipCmd = {};
 
