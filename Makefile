@@ -65,3 +65,13 @@ area-visualizations:
 
 texts-to-yaml:
 	python3 ./utils/texts-to-guid.py ./trade_route_automation/texts.json /data/games/steam/steamapps/common/Anno\ 1800/maindata/data*.rda.unpack/data/config/gui/texts_english.xml
+
+###
+
+SRC=mods/dev
+TARGET=dist/TradeRoutesAutomation_DEV_$(shell git describe --tags).zip
+
+release: install
+	mkdir -p ./dist
+	rm -f $(TARGET) || true
+	pushd $(SRC) && zip -r ../../$(TARGET) .

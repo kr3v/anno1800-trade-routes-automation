@@ -1,9 +1,6 @@
-1. trade union buffs (e.g. additional inputs)
-2. use contract imports as 'request' from islands
-3. make mod installable via mod.io
-4. arctic/enbesa/trelawney support
-5. automate extracting objects request, don't use statically generated ones
-6. figure out how to restart on save reload / new game / etc; what to do on pauses
+1. use contract imports as 'request' from islands
+2. arctic/enbesa/trelawney support
+3. automate extracting objects request, don't use statically generated ones
 
 ```azure
 --    --local

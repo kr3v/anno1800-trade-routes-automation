@@ -6,73 +6,71 @@ but implemented in game's Lua.
 The mod manages a set of ships to transfer goods between islands inside a region, based on islands' goods stock and
 requests.
 
-The main goals is to eliminate the manual management of trade routes. It is tedious and boring.
+The mod currently handles trades INSIDE a single region. Cross-region trades are not handled.
+
+TL;DR:
+
+1. Mod is difficult to install, but it works on my machine atm.
+2. As a user, you just need to install, start the mod, wait for its 'scan' to complete, and assign ships to a fake trade
+   route like 'TRA_OW' for Old World region automation.
+   The mod will automatically manage those ships AND detect what goods what islands need
+   (residences/factories, even construction goods).
 
 Check [Before/after mod when no in-region trade routes exist (except oil and mail)](#beforeafter-mod-when-no-in-region-trade-routes-exist-except-oil-and-mail)
 for an example.
 
-Notes:
-1. The mod currently handles trades INSIDE a single region. Cross-region trades are not handled. It does handle Old and New World regions separately.
-2. Mod works only in single player. Mod may misbehave on non-Normal difficulties (it relies a bit on game prices, I never tested on other difficulties).
+One of the main goals was to eliminate the manual management of trade routes. Which is tedious and boring for me,
+especially if I want to move some production from one island to another.
 
 ## Installation
 
-1. Install mod (https://github.com/kr3v/anno1800-trade-routes-automation/releases).
-2. Set game speed to "Fast" during region and island scans.
-   - "Fastest" breaks the scanning process.
-3. Execute "Trade Route Automation: rescan current region" hotkey. Default: Shift+Alt+O.
-4. For each _your_ island:
-   1. Switch camera to middle of island. Move mouse cursor to middle of your screen.
-   2. Execute "Trade Route Automation: rescan current island" hotkey. Default: Shift+Alt+P.
-   3. Switch to next island and repeat.
-5. Create a fake trade route named `TRA_${REGION_NAME}` (e.g., `TRA_OW` for Old World, `TRA_NW` for New World).
-   - beware: other regions are not enabled atm.
-6. Assign ships to that trade route. Please rename ships to short names (1-2 letters). See [Ship assignment](#ship-assignment).
+This part is not automated and is not up to Anno 1800 mod standards yet.
 
-Notes:
-1. If you capture a new island (or a new player island appears), you need to rescan that island manually.
-   The mod does not automatically detect new islands.
-2. You can assign new ships to the trade route at any time.
-3. You don't need to rescan islands or region when you reload the game after scanning.
+Good luck :kekw:
 
-BEWARE: mod expects to be installed at `C:/users/<user>/Documents/Anno 1800/mods/TradeRoutesAutomation_DEV`.
-mod.io does not work for me. I am not sure how it installs mods.
+In theory:
 
-Mod logs are at `C:/users/<user>/Documents/Anno 1800/mods/TradeRoutesAutomation_DEV/logs/TrRAt_*`.
-E.g.:
-```azure
-$ ls C:/users/DBAYNAK/Documents/Anno\ 1800/mods/TradeRoutesAutomation_DEV/logs/
-Anno1800_LOGFILE_...-PC_2025-12-05-20-09-41.log
-mod-loader.log
-TrRAt_Cache_Frances_Farthorp__FuncAnnoAreaIDToItsOIDargs_OW_.json
-TrRAt_Cache_Frances_Farthorp__FuncAnnoAreasToProductionGuidsargs_OW_.json
-TrRAt_Cache_Frances_Farthorp__FuncAnnoAreasToResidenceGuidsargs_OW_.json
-TrRAt_Cache_Frances_Farthorp__FuncAnnoBuildingsWithSocketsargs_OW_.json
-TrRAt_Cache_Frances_Farthorp__FuncAnnoShipsGetAllargs_OW_.json
-TrRAt_Cache_Frances_Farthorp__FuncareaScannerdfsargs_OW870620_.json
-TrRAt_Cache_Frances_Farthorp__FuncareaScannerdfsargs_OW915420_.json
-TrRAt_Cache_Frances_Farthorp__FuncareaScannerdfsargs_OW960220_.json
-TrRAt_Cache_Frances_Farthorp__FuncareaScannerdfsargs_OWSassenberg20_.json
-TrRAt_Cache_Frances_Farthorp__FuncareaScannerdfsargs_OWSiphington20_.json
-TrRAt_Cache_Frances_Farthorp__FuncareaScannerdfsargs_OWStockfisk20_.json
-TrRAt_Cache_Frances_Farthorp__FuncmapscannerSessionP11args_OW_.json
-TrRAt_Frances_Farthorp_area_scan_Sassenberg.tsv
-TrRAt_Frances_Farthorp_area_scan_Siphington.tsv
-TrRAt_Frances_Farthorp_area_scan_Stockfisk.tsv
-TrRAt_Frances_Farthorp_base.log
-TrRAt_Frances_Farthorp_force-unload-ships.log
-TrRAt_Frances_Farthorp_OW_remaining-deficit.json
-TrRAt_Frances_Farthorp_OW_remaining-surplus.json
-TrRAt_Frances_Farthorp_trade-execute-iteration.log
-TrRAt_Frances_Farthorp_trade-execute-iteration.log.hub
-TrRAt_Frances_Farthorp_trade-executor-history.json
-TrRAt_Frances_Farthorp_trades.log
+1. Install https://mod.io/g/anno-1800/m/console.
+2. Execute the following:
+
+```shell
+make install "INSTALL_BASEDIR=<path to Anno 1800 directory (NOT MODS, NOT SAVEGAMES, real game dir)>/lua"
 ```
 
-If you have problems, please check the logs and open an issue if needed (with attached logs).
+3. Start the game with the console mod enabled.
+4. Set game speed to either "Slow Down" or "Regular" _on first mod run_.
+   - It appears that "Fast" speed sometimes works.
+   - But the "Fastest" speed definitely breaks the scanning process.
+5. Open the console (Shift+F1 by default) and execute:
+
+```lua
+dofile("lua/_executor.lua"); console.toggleVisibility()
+```
+6. The mod should start working for this game session in the current region.
+7. Wait for the current region to be fully scanned (for the camera to stop moving). Once done, the mod will start
+   managing ships in the current region.
+8. Switch to other regions and wait for them to be scanned as well (just visit them in the game, the mod will start
+   working automatically).
+9. Once all regions are scanned, you can set game speed back to the preferred one.
+10. Check [Ship assignment](#ship-assignment) section below to assign ships to the mod.
+
+If you restart the game, you have to re-execute step 5. But the mod will remember all islands and ship assignments from
+previous runs.
+As long as it is the same game session (same save game), you do not need to rescan islands (*).
+
+BEWARE: the camera will start moving on its own. This is the mod scanning islands in the region.
+The scanning process is relatively slow (it will take several minutes per region).
+After the scanning is done, the camera will stop moving and the mod will start managing ships in the current region.
+
+NOTE: copy-pasting commands to console WORKS, as long as you remove `□` characters that appear when copying.
 
 NOTE: if scanning misbehaves, consider checking if that island was properly scanned.
 Check [readme.md](docs/images/area-visualzer/readme.md).
+
+(*) - NOTE: the mod does not support multiple save games. The island scanning data is global, not per save game.
+If you start a new save game, delete `<path to Anno 1800 directory>/lua/trade-routes-automation/cache/regions/`.
+
+It will force a full rescan.
 
 ### Ship assignment
 
@@ -134,8 +132,8 @@ dung/fertilizer.
 ## List of "low-level" features
 
 - scanning
-    - scan current region to detect all islands,
-    - scan all detected islands to detect players' islands with approximate coast locations,
+    - scan current region to detect all islands (*),
+    - scan all detected islands to detect players' islands with approximate coast locations (*),
     - scan all players' ships and detect ships assigned to this mod (through a specific trade route name),
 - trading
     - given a ship, a source and destination island, and a specific good, the mod can:
@@ -145,7 +143,17 @@ dung/fertilizer.
         - unload the good at the destination island (fully)
     - detect all islands' goods stock, requests, and total capacity,
         - requests are also automated, the mod checks island's buildings/residences and their consumptions (**),
-        - new inputs from trade unions are detected, both old and new input goods are requested though,
 
-(**) - factories consumption info is hardcoded per building type. If a mod changes that, this mod will not be aware of it.
-   But, the detection is automated. So it is a matter of changing the existing code a bit, not a big effort.
+Notes:
+(*) - the scanning process is quite slow (it automatically moves camera around to find islands).
+It takes me 7 minutes for the Old World region where I have 9 islands (incl. big ones).
+This process result is _cached_ on disk, but not YET associated with a specific game or save.
+
+(**) - there are two known problems so far:
+
+1. Residences and factories consumption info is hardcoded per building type. If a mod changes that, this mod will not be
+   aware of it.
+   But, the detection is automated. The current implementation could be extended to dynamically scan all buildings'
+   consumption.
+   Plus, not all residences were scanned yet, so some goods requests may be incomplete.
+2. Trade unions and harbormasters items that change consumption items are not handled yet.
