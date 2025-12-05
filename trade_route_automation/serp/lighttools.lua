@@ -972,7 +972,6 @@ local function DoForSessionGameObjectRaw (cmd)
     lock = 1
     local ret = nil
     local success, err = xpcall(function()
-        print(cmd)
         game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(cmd) .. " )]")
         ret = ts.Participants.GetParticipant(120).Profile.CompanyName;
         local old = ts.GetAssetData(100939).Text

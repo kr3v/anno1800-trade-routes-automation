@@ -83,6 +83,7 @@ end
 
 -- step in { 30, 20, 15 }
 -- console.toggleVisibility(); require("trade_route_automation/ui_cmds").AreaRescan.Do(20)
+-- console.toggleVisibility(); require("trade_route_automation/ui_cmds").RegionRescan.Do(20)
 
 ----- Region Rescan -----
 

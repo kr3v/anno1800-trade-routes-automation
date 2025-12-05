@@ -156,6 +156,35 @@ function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas
             L.logf("Area %s (id=%d) %s stock=%s (+%s) request=%s", areaData.city_name, areaID, productName, _stock, inFlightStock, _request);
             _request = _request - inFlightStock;
 
+            if _areaCap == 75 then
+                -- small area
+                if _stock > 0 and _request == 0 then
+                    -- do nothing? we will transfer at least 50
+                elseif _stock == 0 and _request > 0 then
+                    -- do nothing? let it get as much as it can
+                elseif _stock > 0 and _request > 0 then
+                    _request = 10; -- let it transfer at 60 before cap is hit
+                end
+            elseif _areaCap == 125 then
+                -- medium area
+                if _stock > 0 and _request == 0 then
+                    -- do nothing? we will transfer at least 50
+                elseif _stock == 0 and _request > 0 then
+                    -- do nothing? let it get as much as it can
+                elseif _stock > 0 and _request > 0 then
+                    _request = 25; -- let it transfer at 75 before cap is hit
+                end
+            elseif _areaCap == 175 then
+                -- large area
+                if _stock > 0 and _request == 0 then
+                    -- do nothing? we will transfer at least 50
+                elseif _stock == 0 and _request > 0 then
+                    -- do nothing? let it get as much as it can
+                elseif _stock > 0 and _request > 0 then
+                    _request = 50; -- let it transfer at 90 before cap is hit
+                end
+            end
+
             if _stock >= _request + 50 and _stock >= 50 then
                 if supply[areaID] == nil then
                     supply[areaID] = {};
@@ -193,7 +222,7 @@ function TradePlannerLL.SupplyRequest_BuildHubs(L, region, _stockFromInFlight, a
         end
     end
     if hub == nil then
-        L.logf("No hub area found in region %d", region);
+        L.logf("No hub area found in region %s", region);
         return nil;
     end
 
@@ -212,7 +241,7 @@ function TradePlannerLL.SupplyRequest_BuildHubs(L, region, _stockFromInFlight, a
         for productID in pairs(allProducts) do
             local product = AnnoInfo.Product(productID);
             if product == nil then
-                L.logf("Warning: Product ID %d not found in AnnoInfo", productID);
+                L.logf("Warning: Product ID %s not found in AnnoInfo", productID);
                 goto continue;
             end
             local productName = product.Name;
@@ -234,7 +263,7 @@ function TradePlannerLL.SupplyRequest_BuildHubs(L, region, _stockFromInFlight, a
                 goto continue;
             end
 
-            L.logf("Area %s (id=%d) %s stock=%s (+%s) request=%s", areaData.city_name, areaID, productName, _stock, inFlightStock, _request);
+            L.logf("Area %s (id=%s) %s stock=%s (+%s) request=%s", areaData.city_name, areaID, productName, _stock, inFlightStock, _request);
             _stock = _stock + inFlightStock;
 
             if _stock >= _request * 2 and _stock >= 50 then

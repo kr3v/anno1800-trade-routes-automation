@@ -1,7 +1,7 @@
 <ModOps>
     <ModOp Type="add" GUID='2001271' Path="/Values/GUIConfig/KeyBindings">
         <Item>
-            <KeyTypes>Ctrl;Shift;P</KeyTypes>
+            <KeyTypes>Shift;Alt;P</KeyTypes>
             <Text>1475000001</Text>
             <Command>require("trade_route_automation/ui_cmds").AreaRescan.Do(20)</Command>
             <Active>Session;WorldMap;Menu;Pause;Popup</Active>
@@ -14,7 +14,7 @@
     </ModOp>
     <ModOp Type="add" GUID='2001271' Path="/Values/GUIConfig/KeyBindings">
         <Item>
-            <KeyTypes>Ctrl;Shift;O</KeyTypes>
+            <KeyTypes>Shift;Alt;O</KeyTypes>
             <Text>1475000002</Text>
             <Command>require("trade_route_automation/ui_cmds").RegionRescan.Do(20)</Command>
             <Active>Session;WorldMap;Menu;Pause;Popup</Active>
@@ -27,9 +27,9 @@
     </ModOp>
     <ModOp Type="add" GUID='2001271' Path="/Values/GUIConfig/KeyBindings">
         <Item>
-            <KeyTypes>Ctrl;Shift;I</KeyTypes>
+            <KeyTypes>Shift;Alt;I</KeyTypes>
             <Text>1475000003</Text>
-            <Command>require("trade_route_automation/ui_cmds").Enable.Do()</Command>
+            <Command>_G["trade_route_automation_enabled"] = true</Command>
             <Active>Session;WorldMap;Menu;Pause;Popup</Active>
             <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
             <AudioEvent>200634</AudioEvent>
@@ -37,5 +37,73 @@
             <HideInOptionMenu>0</HideInOptionMenu>
             <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
         </Item>
+    </ModOp>
+    <ModOp Type="add" GUID='2001271' Path="/Values/GUIConfig/KeyBindings">
+        <Item>
+            <KeyTypes>Shift;Alt;U</KeyTypes>
+            <Text>1475000004</Text>
+            <Command>_G["trade_route_automation_enabled"] = false</Command>
+            <Active>Session;WorldMap;Menu;Pause;Popup</Active>
+            <AvailableOnPlatforms>PC;Xbox;PS;Stadia</AvailableOnPlatforms>
+            <AudioEvent>200634</AudioEvent>
+            <Configurable>1</Configurable>
+            <HideInOptionMenu>0</HideInOptionMenu>
+            <AllowMultipleShortcuts>1</AllowMultipleShortcuts>
+        </Item>
+    </ModOp>
+    <ModOp Type="addNextSibling" GUID="130248">
+        <Asset>
+            <Template>Trigger</Template>
+            <Values>
+                <Standard>
+                    <GUID>1475000005</GUID>
+                    <Name>Register lua script on SessionEnter</Name>
+                </Standard>
+                <Trigger>
+                    <TriggerCondition>
+                        <Template>ConditionEvent</Template>
+                        <Values>
+                            <Condition/>
+                            <ConditionEvent>
+                                <ConditionEvent>SessionEnter</ConditionEvent>
+                                <ContextAssetInfolayer>0</ContextAssetInfolayer>
+                            </ConditionEvent>
+                            <ConditionPropsNegatable/>
+                        </Values>
+                    </TriggerCondition>
+                    <TriggerActions>
+                        <Item>
+                            <TriggerAction>
+                                <Template>ActionExecuteScript</Template>
+                                <Values>
+                                    <Action/>
+                                    <ActionExecuteScript>
+                                        <ScriptFileName>data/trade_route_automation/_main.lua</ScriptFileName>
+                                    </ActionExecuteScript>
+                                </Values>
+                            </TriggerAction>
+                        </Item>
+                    </TriggerActions>
+                    <ResetTrigger>
+                        <Template>AutoCreateTrigger</Template>
+                        <Values>
+                            <Trigger>
+                                <TriggerCondition>
+                                    <Template>ConditionAlwaysTrue</Template>
+                                    <Values>
+                                        <Condition/>
+                                        <ConditionAlwaysTrue/>
+                                    </Values>
+                                </TriggerCondition>
+                            </Trigger>
+                        </Values>
+                    </ResetTrigger>
+                </Trigger>
+                <TriggerSetup>
+                    <AutoRegisterTrigger>1</AutoRegisterTrigger>
+                    <UsedBySecondParties>0</UsedBySecondParties>
+                </TriggerSetup>
+            </Values>
+        </Asset>
     </ModOp>
 </ModOps>

@@ -237,6 +237,10 @@ local function tradeExecutor_iteration(L, areas, region)
                 TradePlannerLL.Ships_StockInFlight(L, region, shipsMoving),
                 areas
         );
+        if srt == nil then
+            L.log("No supply request table generated for hub run, exiting iteration.");
+            goto done;
+        end
         local rq = TradePlannerLL.SupplyRequest_ToOrders(L, srt, areas);
         local acs = TradePlannerLL.SupplyRequestOrders_ToShipCommands(L, shipsAvailable, rq);
         local tasks = TradePlannerLL.SupplyRequestShipCommands_Execute(
@@ -245,7 +249,7 @@ local function tradeExecutor_iteration(L, areas, region)
         )
         L.logf("Spawned %d async tasks for trade route execution (hub run).", #tasks);
     end
-
+    :: done ::
     L.logf("end at %s time", os.date("%Y-%m-%d %H:%M:%S"));
 end
 

@@ -6,9 +6,8 @@ REGIONS ?= OW NW ER AR CT
 BASE ?= $(INSTALL_BASEDIR_E)
 
 install: install/mkdir
-	cp ./sample1.lua "$(INSTALL_BASEDIR_E)/trade-automation/execute.lua"
-	cp ./trade_route_automation/_executor.lua "$(INSTALL_BASEDIR_E)"
-	cp -r trade_route_automation/* "$(INSTALL_BASEDIR)"
+	cp -r trade_route_automation/* mods/dev/data/trade_route_automation
+	cp -r mods/dev/* "$(INSTALL_BASEDIR)"
 
 install/mkdir:
 	mkdir -p "$(INSTALL_BASEDIR)"
@@ -29,7 +28,6 @@ clean/interrupt:
 	rm -f "$(BASE)/stop-trade-executor-heartbeat" || true
 
 clean/logs:
-	-@rm "$(LOGS_DIR)"/"$(LOGS_MARKER)"*.json
 	-@rm "$(LOGS_DIR)"/"$(LOGS_MARKER)"*.log
 	-@rm "$(LOGS_DIR)"/"$(LOGS_MARKER)"*.hub
 	-@rm "$(LOGS_DIR)"/"$(LOGS_MARKER)"*.tsv
