@@ -217,9 +217,9 @@ local function theTradeRouteAutomation()
             return not b;
         end
 
-        local anyThreadFailed;
+        local interruptAll;
         local function interruptOnFail()
-            return anyThreadFailed ~= nil;
+            return interruptAll ~= nil;
         end
 
         local enabledInterrupt = function()
@@ -263,20 +263,25 @@ local function theTradeRouteAutomation()
 
         while true do
             if interruptF() then
-                anyThreadFailed = true;
+                interruptAll = true;
                 L.log("Received external interrupt signal, stopping trade route automation.");
                 return ;
             end
             if profileNameInterrupt() then
                 L.log("Profile name changed, restarting trade route automation.");
-                anyThreadFailed = true;
+                interruptAll = true;
+                goto reset;
+            end
+            if enabledInterrupt() then
+                L.log("Trade route automation is disabled, stopping.");
+                interruptAll = true;
                 goto reset;
             end
 
             for _, t in ipairs(ts) do
                 for _, v in ipairs(t) do
                     L.logf("Detected error in subtask: ret=%s err=%s", tostring(v.Ret), tostring(v.Err));
-                    anyThreadFailed = true;
+                    interruptAll = true;
 
                     -- let it rest a bit before restarting
                     for _ = 1, 600 do

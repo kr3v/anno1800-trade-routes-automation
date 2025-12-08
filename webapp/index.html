@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trade Routes Analyzer</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>Trade Routes Analyzer</h1>
+      <div class="folder-picker">
+        <button id="pick-folder" type="button">Select Log Folder</button>
+        <span id="folder-path" class="folder-path">No folder selected</span>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="trades">Trades</button>
+      <button class="tab" data-tab="ship-usage">Ship Usage</button>
+      <button class="tab" data-tab="area">Area Visualizer</button>
+    </nav>
+
+    <main class="content">
+      <div id="tab-trades" class="tab-content active">
+        <div class="tab-controls">
+          <div class="control-group">
+            <label for="profile-filter">Profile:</label>
+            <select id="profile-filter" disabled>
+              <option value="">Select folder first</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="duration-filter">Time filter:</label>
+            <select id="duration-filter">
+              <option value="">All time</option>
+              <option value="15m">Last 15 min</option>
+              <option value="1h">Last 1 hour</option>
+              <option value="2h">Last 2 hours</option>
+              <option value="6h">Last 6 hours</option>
+              <option value="1d">Last 24 hours</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="region-filter">Region:</label>
+            <select id="region-filter">
+              <option value="OW">Old World</option>
+              <option value="NW">New World</option>
+            </select>
+          </div>
+        </div>
+        <div id="trades-content">
+          <div class="tab-placeholder">Select a log folder to analyze trades</div>
+        </div>
+      </div>
+      <div id="tab-ship-usage" class="tab-content">
+        <div class="tab-placeholder">Select a log folder to view ship usage</div>
+      </div>
+      <div id="tab-area" class="tab-content">
+        <div id="area-content"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

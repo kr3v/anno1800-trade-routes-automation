@@ -6,7 +6,10 @@
       "Read(//data/workspace/repos/personal/anno/Anno-1800-Mods/Recommended-Mods/P RewardDestroyPirate (Serp)/shared_LuaLight/data/scripts_serp/**)",
       "Bash(make run-sample:*)",
       "Read(//data/workspace/repos/personal/anno/modding-guide/**)",
-      "Bash(python utils/analyze_trades.py:*)"
+      "Bash(python utils/analyze_trades.py:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

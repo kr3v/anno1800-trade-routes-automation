@@ -145,9 +145,12 @@ function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas
 
             local _areaCap = areaData.capacity or 75;
 
+            local t = math.floor(math.max(_areaCap * 2 / 3, 50));
+            local g = math.floor((_areaCap - t) / 2)
+
             local doesAreaRequestProduct = areaToProductRequest[areaID] and areaToProductRequest[areaID][productID];
             if doesAreaRequestProduct then
-                _request = math.min(_areaCap, 200);
+                _request = g;
             end
             if _request == 0 and _stock == 0 then
                 goto continue;
@@ -156,36 +159,8 @@ function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas
             L.logf("Area %s (id=%d) %s stock=%s (+%s) request=%s", areaData.city_name, areaID, productName, _stock, inFlightStock, _request);
             _request = _request - inFlightStock;
 
-            if _areaCap == 75 then
-                -- small area
-                if _stock > 0 and _request == 0 then
-                    -- do nothing? we will transfer at least 50
-                elseif _stock == 0 and _request > 0 then
-                    -- do nothing? let it get as much as it can
-                elseif _stock > 0 and _request > 0 then
-                    _request = 10; -- let it transfer at 60 before cap is hit
-                end
-            elseif _areaCap == 125 then
-                -- medium area
-                if _stock > 0 and _request == 0 then
-                    -- do nothing? we will transfer at least 50
-                elseif _stock == 0 and _request > 0 then
-                    -- do nothing? let it get as much as it can
-                elseif _stock > 0 and _request > 0 then
-                    _request = 25; -- let it transfer at 75 before cap is hit
-                end
-            elseif _areaCap == 175 then
-                -- large area
-                if _stock > 0 and _request == 0 then
-                    -- do nothing? we will transfer at least 50
-                elseif _stock == 0 and _request > 0 then
-                    -- do nothing? let it get as much as it can
-                elseif _stock > 0 and _request > 0 then
-                    _request = 50; -- let it transfer at 90 before cap is hit
-                end
-            end
-
-            if _stock >= _request + 50 and _stock >= 50 then
+            local _minTransfer = math.min(50, math.floor(t / 2));
+            if _stock >= _request + _minTransfer and _stock >= _minTransfer then
                 if supply[areaID] == nil then
                     supply[areaID] = {};
                 end
@@ -308,18 +283,11 @@ function TradePlannerLL.SupplyRequest_ToOrders(
             if supply_areas ~= nil then
                 L.logf("found supply areas for goodID=%d %s", goodID, tostring(supply_areas));
                 for supply_areaID, supply_amount in pairs(supply_areas) do
-                    local transfer_amount = math.min(amount, supply_amount)
-
                     local distance = CalculateDistanceBetweenAreas(L, areas, supply_areaID, areaID)
 
                     if distance.dist == math.huge then
                         L.logf("Skipping order from area %d to area %d for good %d due to no water route",
                                 supply_areaID, areaID, goodID);
-                        goto continue;
-                    end
-                    if transfer_amount < 50 then
-                        L.logf("Skipping order from area %d to area %d for good %d due to insufficient transfer amount: %d < 50 (needed=%d available=%d)",
-                                supply_areaID, areaID, goodID, transfer_amount, amount, supply_amount);
                         goto continue;
                     end
 

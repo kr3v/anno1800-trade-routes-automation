@@ -1,5 +1,6 @@
+local _Residence = {};
 local AnnoInfo = {
-    _Residence = {},
+    _Residence = _Residence,
     _Paths = {},
 };
 
@@ -40,7 +41,7 @@ end
 
 ---
 
-function AnnoInfo._Residence.ScanAll(L, productsInfo)
+function _Residence.ScanAll(L, productsInfo)
     local discoveredResidences = {};
     local os = session.getObjectGroupByProperty(serpLight.PropertiesStringToID.Residence7);
     for _, residence in pairs(os) do
@@ -97,7 +98,7 @@ function AnnoInfo._Residence.ScanAll(L, productsInfo)
     return residencesInfo;
 end
 
-function AnnoInfo._Residence.Scan(
+function _Residence.Scan(
         L,
         residenceOID,
         productsInfo
@@ -138,7 +139,7 @@ function AnnoInfo._Residence.Scan(
     return ret;
 end
 
-function AnnoInfo._Residence.FindAndScan(L, region, residenceGuid)
+function _Residence.FindAndScan(L, region, residenceGuid)
     local curr_region = Anno.Region_Current();
     if curr_region ~= region then
         return nil;
@@ -159,7 +160,7 @@ function AnnoInfo._Residence.FindAndScan(L, region, residenceGuid)
     end
 
     local res = AnnoInfo._Residence.Scan(L, residenceOid, AnnoInfo.__products);
-    AnnoInfo.ResidencesInfo[residenceGuid] = res;
+    AnnoInfo.__Residences[residenceGuid] = res;
     return res;
 end
 
@@ -248,9 +249,9 @@ function AnnoInfo.Load(L, base)
     AnnoInfo._Paths.Init(base);
 
     local productsInfo = cache.ReadFrom(L, AnnoInfo._Paths.productInfoPath);
-    AnnoInfo.Products = {};
+    AnnoInfo.__Products = {};
     for _, v in pairs(productsInfo) do
-        AnnoInfo.Products[v.Guid] = v;
+        AnnoInfo.__Products[v.Guid] = v;
     end
     AnnoInfo.__products = productsInfo;
 
@@ -262,7 +263,7 @@ function AnnoInfo.Load(L, base)
             residencesInfo[tonumber(k)][kk] = vv;
         end
     end
-    AnnoInfo.ResidencesInfo = residencesInfo;
+    AnnoInfo.__Residences = residencesInfo;
 
     local factoriesInfoJ = cache.ReadFrom(L, AnnoInfo._Paths.factoriesInfoPath);
     local factoriesInfo = {};
@@ -278,7 +279,7 @@ function AnnoInfo.Load(L, base)
         v.Consumption = consumption;
         factoriesInfo[v.Guid] = v;
     end
-    AnnoInfo.FactoriesInfo = factoriesInfo;
+    AnnoInfo.__Factories = factoriesInfo;
 end
 
 ---
@@ -304,7 +305,7 @@ function AnnoInfo.Product(productGuid)
     if type(productGuid) == "string" then
         productGuid = tonumber(productGuid);
     end
-    return AnnoInfo.Products[productGuid];
+    return AnnoInfo.__Products[productGuid];
 end
 
 ---@param region string
@@ -314,11 +315,18 @@ function AnnoInfo.Residence(L, region, residenceGuid)
     if type(residenceGuid) == "string" then
         residenceGuid = tonumber(residenceGuid);
     end
-    local ret = AnnoInfo.ResidencesInfo[residenceGuid];
+    local ret = AnnoInfo.__Residences[residenceGuid];
     if ret == nil then
         AnnoInfo._Residence.FindAndScan(L, region, residenceGuid);
     end
-    return AnnoInfo.ResidencesInfo[residenceGuid];
+    return AnnoInfo.__Residences[residenceGuid];
+end
+
+function AnnoInfo.Factory(L, region, factoryGuid)
+    if type(factoryGuid) == "string" then
+        factoryGuid = tonumber(factoryGuid);
+    end
+    return AnnoInfo.__Factories[factoryGuid];
 end
 
 ---

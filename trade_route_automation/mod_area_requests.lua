@@ -35,7 +35,7 @@ function AreaRequests.Production(L, region)
     local q = Anno.Region_ProductionGUIDs(region);
     for areaID, productionGUIDs in pairs(q) do
         for _, guid in pairs(productionGUIDs) do
-            local production = AnnoInfo.FactoriesInfo[tonumber(guid)];
+            local production = AnnoInfo.Factory(L, region, guid);
             if production == nil then
                 if AreaRequests.__Internal.ProductGUID_Unknown[tonumber(guid)] == nil then
                     AreaRequests.__Internal.ProductGUID_Unknown[tonumber(guid)] = true;
