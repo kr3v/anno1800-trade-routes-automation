@@ -9,6 +9,10 @@ install: install/mkdir
 	cp -r trade_route_automation/* mods/dev/data/trade_route_automation
 	cp -r mods/dev/* "$(INSTALL_BASEDIR)"
 
+install-script:
+	mkdir -p "$(INSTALL_BASEDIR_E)/trade-automation"
+	cp sample1.lua "$(INSTALL_BASEDIR_E)/trade-automation/execute.lua"
+
 install/mkdir:
 	mkdir -p "$(INSTALL_BASEDIR)"
 
@@ -38,22 +42,9 @@ clean:
 
 ###
 
-run-clean: clean mouse/middle install
-	sleep 1
-	cat $(BASE)/modlog.txt
-
-run: mouse/middle install
-	sleep 1
-	@echo ""
-	@echo "########"
-	@echo ""
-	cat $(BASE)/modlog.txt
+run: install-script
 
 ###
-
-mouse/middle:
-	xdotool mousemove 1920 1080
-	mkdir anno-1800/cache || true
 
 area-visualizations:
 	@for f in $(wildcard $(BASE)/area*.tsv); do \

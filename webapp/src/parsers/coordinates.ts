@@ -19,6 +19,8 @@ export interface CoordinatePoint {
   arrowDir: ArrowDirection;
   /** Optional label for multi-city visualization */
   cityLabel?: string;
+  /** Optional region identifier (e.g., OW, NW) */
+  region?: string;
 }
 
 /** Parsed coordinates result */
@@ -50,6 +52,7 @@ export const DEFAULT_POINT_COLORS: Record<string, string> = {
  * Supports multiple formats:
  * - Space-separated: "prefix x,y,type,direction"
  * - Tab-separated (TSV): "prefix\tx,y,type,direction"
+ * - Log format: "2025-12-09T20:33:09Z loc=Trade.Loop region=OW 360,1500,L"
  */
 function parseLine(line: string, cityLabel?: string): CoordinatePoint | null {
   const trimmed = line.trim();
@@ -62,22 +65,57 @@ function parseLine(line: string, cityLabel?: string): CoordinatePoint | null {
   }
   if (parts.length < 2) return null;
 
-  const coordPart = parts[1];
-  const coordParts = coordPart.split(',');
-  if (coordParts.length < 2) return null;
+  // Detect log format: starts with ISO timestamp (YYYY-MM-DDTHH:MM:SSZ)
+  const isLogFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/.test(parts[0]);
 
-  // Parse x, y (handle "msg=" prefix if present)
-  const xStr = coordParts[0].replace(/^msg=/, '');
-  const x = parseInt(xStr, 10);
-  const y = parseInt(coordParts[1], 10);
+  if (isLogFormat) {
+    // New log format: "timestamp loc=... region=... x,y,type"
+    let region: string | undefined;
+    let coordPart: string | undefined;
 
-  if (isNaN(x) || isNaN(y)) return null;
+    // Find region and coordinates parts
+    for (const part of parts) {
+      if (part.startsWith('region=')) {
+        region = part.substring(7); // Extract region value
+      } else if (part.includes(',')) {
+        // This is likely the coordinates part
+        coordPart = part;
+      }
+    }
 
-  // Parse type and direction
-  const type = (coordParts[2]?.trim() as PointType) || null;
-  const arrowDir = (coordParts[3]?.trim() as ArrowDirection) || null;
+    if (!coordPart) return null;
 
-  return { x, y, type, arrowDir, cityLabel };
+    const coordParts = coordPart.split(',');
+    if (coordParts.length < 2) return null;
+
+    const x = parseInt(coordParts[0], 10);
+    const y = parseInt(coordParts[1], 10);
+
+    if (isNaN(x) || isNaN(y)) return null;
+
+    // In log format, third part is the type (not arrow direction)
+    const type = (coordParts[2]?.trim() as PointType) || null;
+
+    return { x, y, type, arrowDir: null, cityLabel, region };
+  } else {
+    // Original format: "prefix x,y,type,direction"
+    const coordPart = parts[1];
+    const coordParts = coordPart.split(',');
+    if (coordParts.length < 2) return null;
+
+    // Parse x, y (handle "msg=" prefix if present)
+    const xStr = coordParts[0].replace(/^msg=/, '');
+    const x = parseInt(xStr, 10);
+    const y = parseInt(coordParts[1], 10);
+
+    if (isNaN(x) || isNaN(y)) return null;
+
+    // Parse type and direction
+    const type = (coordParts[2]?.trim() as PointType) || null;
+    const arrowDir = (coordParts[3]?.trim() as ArrowDirection) || null;
+
+    return { x, y, type, arrowDir, cityLabel };
+  }
 }
 
 /**

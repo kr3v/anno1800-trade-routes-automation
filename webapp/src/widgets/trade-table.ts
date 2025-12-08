@@ -3,16 +3,14 @@
  * Displays trade history in a table with heatmap coloring
  */
 
-import type {FileSystemDirectoryHandle} from '@/file-access';
+import type { DataStore } from '@/data-store';
 import {
     analyzeTrades,
     filterTradesByDuration,
-    loadTradesResult,
     sortCities,
     sortGoods,
     type TradeAnalysis,
 } from '@/parsers/trades';
-import {loadGoodsNamesResult} from '@/parsers/texts';
 import {createDataTable, type IDataTable, type TableColumn} from '@/visualizations';
 
 export interface TradeTableConfig {
@@ -43,39 +41,29 @@ export class TradeTableWidget {
     }
 
     async load(
-        dirHandle: FileSystemDirectoryHandle,
+        dataStore: DataStore,
         profileName: string
     ): Promise<void> {
         if (!this.container) return;
 
-        // Load goods names
-        const goodsNamesResult = await loadGoodsNamesResult(dirHandle, 'texts.json');
-        if (!goodsNamesResult.ok) {
-            this.container.innerHTML = `<div class="error">Failed to load goods names: ${goodsNamesResult.error.message}</div>`;
+        // Get trades from DataStore (already parsed)
+        const trades = dataStore.getTrades(profileName);
+
+        if (!trades) {
+            this.container.innerHTML = `<div class="error">No trades found for profile: ${profileName}</div>`;
             return;
         }
 
-        // Load and filter trades
-        const tradesResult = await loadTradesResult(
-            dirHandle,
-            `TrRAt_${profileName}_trade-executor-history.json`,
-            goodsNamesResult.value
-        );
-
-        if (!tradesResult.ok) {
-            this.container.innerHTML = `<div class="error">Failed to load trades: ${tradesResult.error.message}</div>`;
-            return;
-        }
-
-        if (tradesResult.value.length === 0) {
+        if (trades.length === 0) {
             this.container.innerHTML = '<div class="error">No trades recorded</div>';
             return;
         }
 
-        const trades = filterTradesByDuration(tradesResult.value, this.config.duration);
+        // Filter trades by duration
+        const filteredTrades = filterTradesByDuration(trades, this.config.duration);
 
         // Analyze trades
-        this.analysis = analyzeTrades(trades);
+        this.analysis = analyzeTrades(filteredTrades);
 
         // Render table
         this.render();

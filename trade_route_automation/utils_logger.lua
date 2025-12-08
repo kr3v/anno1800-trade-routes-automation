@@ -1,5 +1,3 @@
-local default_dst = "tra-log.txt";
-
 local function _write_to_file(t, dst)
     local file = io.open(dst, "a+")
     if file == nil then
@@ -13,21 +11,20 @@ local logs_removed = {}
 
 local function newLogger(dst, base)
     if dst == nil then
-        dst = default_dst
+        error("fixme")
     end
     -- if "/" in dst then
-    if string.find(dst, "/") or string.find(dst, "\\") then
-    elseif base then
+    if base and not (string.find(dst, "/") or string.find(dst, "\\")) then
         dst = base .. dst
     end
-    if not logs_removed[dst] then
-        os.remove(dst)
-        logs_removed[dst] = true
-    end
+    --if not logs_removed[dst] then
+    --    os.remove(dst)
+    --    logs_removed[dst] = true
+    --end
 
     local l = {};
     l.fields = {};
-    l.dst = dst or default_dst;
+    l.dst = dst;
     l.__base = base;
 
     local function formatFields()
@@ -80,14 +77,14 @@ local function newLogger(dst, base)
         end
         fields_copy[key] = value;
 
-        local ret = newLogger(l.dst);
+        local ret = newLogger(l.dst, l.__base);
         ret.fields = fields_copy;
         return ret;
     end
-    l.logger = function(dst, forceRemoval)
+    l.logger = function(new_dst, forceRemoval)
         if forceRemoval then
-            os.remove(dst)
-            logs_removed[dst] = true
+            os.remove(new_dst)
+            logs_removed[new_dst] = true
         end
 
         local fields_copy = {};
@@ -95,7 +92,7 @@ local function newLogger(dst, base)
             fields_copy[k] = v;
         end
 
-        local ret = newLogger(dst, l.__base);
+        local ret = newLogger(new_dst, l.__base);
         ret.fields = fields_copy;
         return ret;
     end
@@ -107,8 +104,10 @@ end
 ---@field log fun(msg: string)
 ---@field logf fun(fmt: string, ...: any)
 ---@field with fun(key: string, value: any): Logger
----@field logger fun(dst: string, forceRemoval: boolean?): Logger
+---@field logger fun(dst: string, forceRemoval: boolean): Logger
 ---@field dst string -- <internal>
+
+local default_dst = "tra-log.txt";
 
 ---@return Logger
 return newLogger(default_dst)

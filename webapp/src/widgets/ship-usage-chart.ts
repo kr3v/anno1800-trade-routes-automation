@@ -3,9 +3,8 @@
  * Displays ship availability and task spawning over time
  */
 
-import type { FileSystemDirectoryHandle } from '@/file-access';
+import type { DataStore } from '@/data-store';
 import {
-  loadShipUsage,
   calculateMovingAverage,
   calculateStats,
   type ShipLogEntry,
@@ -28,6 +27,8 @@ const DEFAULT_CONFIG: ShipUsageConfig = {
   showHub: true,
 };
 
+const AVAILABLE_REGIONS = ['OW', 'NW', 'AR', 'EN', 'CT'];
+
 const COLORS = {
   regularShips: '#2E86AB',
   regularTasks: '#A23B72',
@@ -39,8 +40,10 @@ export class ShipUsageChartWidget {
   private container: HTMLElement | null = null;
   private chartContainer: HTMLElement | null = null;
   private statsContainer: HTMLElement | null = null;
+  private controlsContainer: HTMLElement | null = null;
   private chart: ILineChart | null = null;
   private config: ShipUsageConfig = { ...DEFAULT_CONFIG };
+  private dataStore: DataStore | null = null;
 
   configure(config: Partial<ShipUsageConfig>): void {
     this.config = { ...this.config, ...config };
@@ -51,34 +54,51 @@ export class ShipUsageChartWidget {
     container.innerHTML = '<div class="tab-placeholder">Loading...</div>';
   }
 
-  async load(dirHandle: FileSystemDirectoryHandle): Promise<void> {
+  async load(dataStore: DataStore): Promise<void> {
     if (!this.container) return;
 
+    this.dataStore = dataStore;
+
     try {
-      const data = await loadShipUsage(dirHandle);
-
-      if (data.regular.entries.length === 0 && data.hub.entries.length === 0) {
-        this.container.innerHTML = '<div class="error">No ship usage logs found</div>';
-        return;
-      }
-
-      // Build series
-      const series: SeriesConfig[] = [];
-
-      if (this.config.showRegular && data.regular.entries.length > 0) {
-        series.push(...this.buildSeries(data.regular.entries, 'Regular', COLORS.regularShips, COLORS.regularTasks));
-      }
-
-      if (this.config.showHub && data.hub.entries.length > 0) {
-        series.push(...this.buildSeries(data.hub.entries, 'Hub', COLORS.hubShips, COLORS.hubTasks));
-      }
-
-      // Render
-      this.render(series, data);
+      this.renderData();
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Unknown error';
       this.container.innerHTML = `<div class="error">Failed to load ship usage: ${msg}</div>`;
     }
+  }
+
+  private filterEntriesByRegion(entries: ShipLogEntry[]): ShipLogEntry[] {
+    return entries.filter(e => e.region === this.config.region);
+  }
+
+  private renderData(): void {
+    if (!this.container || !this.dataStore) return;
+
+    // Get ship usage data from DataStore (already parsed)
+    const data = this.dataStore.getShipUsage();
+
+    if (data.regular.entries.length === 0 && data.hub.entries.length === 0) {
+      this.container.innerHTML = '<div class="error">No ship usage logs found</div>';
+      return;
+    }
+
+    // Filter by region
+    const regularFiltered = this.filterEntriesByRegion(data.regular.entries);
+    const hubFiltered = this.filterEntriesByRegion(data.hub.entries);
+
+    // Build series
+    const series: SeriesConfig[] = [];
+
+    if (this.config.showRegular && regularFiltered.length > 0) {
+      series.push(...this.buildSeries(regularFiltered, 'Regular', COLORS.regularShips, COLORS.regularTasks));
+    }
+
+    if (this.config.showHub && hubFiltered.length > 0) {
+      series.push(...this.buildSeries(hubFiltered, 'Hub', COLORS.hubShips, COLORS.hubTasks));
+    }
+
+    // Render
+    this.render(series, { regular: { entries: regularFiltered }, hub: { entries: hubFiltered } });
   }
 
   private buildSeries(
@@ -174,6 +194,12 @@ export class ShipUsageChartWidget {
 
     this.container.innerHTML = '';
 
+    // Controls container (region selector)
+    this.controlsContainer = document.createElement('div');
+    this.controlsContainer.className = 'tab-controls';
+    this.renderControls();
+    this.container.appendChild(this.controlsContainer);
+
     // Stats container
     this.statsContainer = document.createElement('div');
     this.statsContainer.className = 'controls';
@@ -198,6 +224,43 @@ export class ShipUsageChartWidget {
       legendPosition: 'top',
     });
     this.chart.setSeries(series);
+  }
+
+  private renderControls(): void {
+    if (!this.controlsContainer) return;
+
+    // Region selector group
+    const regionGroup = document.createElement('div');
+    regionGroup.className = 'control-group';
+
+    const label = document.createElement('label');
+    label.textContent = 'Region:';
+
+    const select = document.createElement('select');
+    for (const region of AVAILABLE_REGIONS) {
+      const option = document.createElement('option');
+      option.value = region;
+      option.textContent = region;
+      option.selected = region === this.config.region;
+      select.appendChild(option);
+    }
+
+    select.addEventListener('change', () => {
+      this.config.region = select.value;
+      this.renderData();
+    });
+
+    regionGroup.appendChild(label);
+    regionGroup.appendChild(select);
+    this.controlsContainer.appendChild(regionGroup);
+
+    // Reset zoom button
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset Zoom';
+    resetButton.addEventListener('click', () => {
+      this.chart?.resetZoom?.();
+    });
+    this.controlsContainer.appendChild(resetButton);
   }
 
   private renderStats(
@@ -225,6 +288,8 @@ export class ShipUsageChartWidget {
     this.chart = null;
     this.chartContainer = null;
     this.statsContainer = null;
+    this.controlsContainer = null;
     this.container = null;
+    this.dataStore = null;
   }
 }

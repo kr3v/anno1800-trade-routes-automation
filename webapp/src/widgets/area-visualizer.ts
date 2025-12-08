@@ -3,7 +3,7 @@
  * Displays coordinate points on an interactive canvas with cascading filters
  */
 
-import type {FileSystemDirectoryHandle} from '@/file-access';
+import type { DataStore } from '@/data-store';
 import {type CoordinatesData, loadCoordinates, loadMultipleCoordinates,} from '@/parsers/coordinates';
 import {
     type AreaFilesIndex,
@@ -11,7 +11,6 @@ import {
     getCityDisplayName,
     getRegionsForGame,
     REGIONS,
-    scanAreaFiles,
 } from '@/parsers/area-files';
 import {type CoordinateCanvasOptions, createCoordinateCanvas, type ICoordinateCanvas} from '@/visualizations';
 import {writeStateToURL, type AppState} from '@/url-state';
@@ -51,14 +50,14 @@ export class AreaVisualizerWidget {
         this.render();
     }
 
-    async loadFromDirectory(dirHandle: FileSystemDirectoryHandle): Promise<void> {
+    async load(dataStore: DataStore): Promise<void> {
         if (!this.container) return;
 
         try {
-            // Scan for area files
-            this.index = await scanAreaFiles(dirHandle);
+            // Get area files index from DataStore (already scanned)
+            this.index = dataStore.getAreaFiles();
 
-            if (this.index.gameNames.length === 0) {
+            if (!this.index || this.index.gameNames.length === 0) {
                 this.showMessage('No area scan files found (TrRAt_*_area_scan_*.tsv)');
                 return;
             }
@@ -182,22 +181,28 @@ export class AreaVisualizerWidget {
             return;
         }
 
-        // Populate region selector
+        // Populate region selector (auto-selects first region)
         const regions = getRegionsForGame(this.index, this.selectedGame);
         this.populateRegionSelector(regions);
 
-        // Populate city selector with all cities
+        // Populate city selector for the selected region
         this.populateCitySelector(skipURLWrite);
 
         if (!skipURLWrite) {
-            writeStateToURL({ game: this.selectedGame, areaRegion: null, city: null });
+            writeStateToURL({ game: this.selectedGame, areaRegion: this.selectedRegion, city: null });
         }
     }
 
     private populateRegionSelector(regions: string[]): void {
         if (!this.regionSelect) return;
 
-        this.regionSelect.innerHTML = '<option value="">All Regions</option>';
+        this.regionSelect.innerHTML = '';
+        if (regions.length === 0) {
+            this.regionSelect.innerHTML = '<option value="">No regions found</option>';
+            this.regionSelect.disabled = true;
+            return;
+        }
+
         for (const region of regions) {
             const option = document.createElement('option');
             option.value = region;
@@ -205,6 +210,12 @@ export class AreaVisualizerWidget {
             this.regionSelect.appendChild(option);
         }
         this.regionSelect.disabled = false;
+
+        // Auto-select first region
+        if (regions.length > 0) {
+            this.selectedRegion = regions[0];
+            this.regionSelect.value = regions[0];
+        }
     }
 
     private resetRegionSelector(): void {
@@ -297,14 +308,18 @@ export class AreaVisualizerWidget {
         }
     }
 
-    private renderCanvas(): void {
+    private async renderCanvas(): Promise<void> {
         if (!this.canvasContainer || !this.data || !this.infoContainer) return;
 
         // Update info
         const cityCount = new Set(this.data.points.map(p => p.cityLabel).filter(Boolean)).size;
+        const regions = new Set(this.data.points.map(p => p.region).filter(Boolean));
+        const regionInfo = regions.size > 0 ? `<span>Regions: ${Array.from(regions).join(', ')}</span>` : '';
+
         this.infoContainer.innerHTML = `
       <span>Points: ${this.data.points.length}</span>
       ${cityCount > 1 ? `<span>Cities: ${cityCount}</span>` : ''}
+      ${regionInfo}
       <span>Bounds: X=[${this.data.bounds.minX}, ${this.data.bounds.maxX}], Y=[${this.data.bounds.minY}, ${this.data.bounds.maxY}]</span>
       <span>Size: ${this.data.bounds.width} x ${this.data.bounds.height}</span>
     `;
@@ -314,7 +329,7 @@ export class AreaVisualizerWidget {
         if (!this.canvas) {
             this.canvasContainer.innerHTML = '';
             this.canvas = createCoordinateCanvas(this.options);
-            this.canvas.mount(this.canvasContainer);
+            await this.canvas.mount(this.canvasContainer);
         }
 
         this.canvas.setPoints(this.data.points);

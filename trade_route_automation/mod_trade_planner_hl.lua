@@ -29,21 +29,43 @@ local TradePlannerHL = {
 function TPHL_Internal.Ships_RenameAll(L, region)
     local ships = Anno.Region_Ships_GetAll(region);
 
-    local total = 1;
+    local names = {};
+    local toBeRenamed = {};
 
     for _, oid in pairs(ships) do
         local route_name = Anno.Ship_TradeRoute_GetName(oid);
-        if route_name and route_name:match("^TRA_" .. region) then
-            local newName = TradeExecutor.numberToBase62(total);
-            total = total + 1;
+        if not (route_name and route_name:match("^TRA_" .. region)) then
+            goto continue;
+        end
+        local shipName = TradeExecutor.Ship_Name_FetchCmdInfo(oid).name;
 
-            local info = TradeExecutor.Ship_Name_FetchCmdInfo(oid);
-            if info == nil then
-                Anno.Ship_Name_Set(oid, newName);
-            else
+        if shipName:len() <= 2 and names[shipName] == nil then
+            names[shipName] = 1;
+            goto continue;
+        end
+
+        table.insert(toBeRenamed, oid);
+
+        :: continue ::
+    end
+
+    table.sort(toBeRenamed);
+
+    local c = utable.length(toBeRenamed);
+    for oid, _ in pairs(toBeRenamed) do
+        while true do
+            local newName = TradeExecutor.numberToBase62(c);
+            if names[newName] == nil then
+                names[newName] = 1;
+
+                local info = TradeExecutor.Ship_Name_FetchCmdInfo(oid);
                 info.name = newName;
                 TradeExecutor.Ship_Name_StoreCmdInfo(oid, info);
+
+                L.logf("Renamed ship oid=%d to '%s' for trade route automation.", oid, newName);
+                break ;
             end
+            c = c + 1;
         end
     end
 end
@@ -161,36 +183,91 @@ local function tradeExecutor_remainingSurplusDeficit(
 end
 
 ---@param L Logger
+local function tradeExecutor_iteration_hub(
+        L,
+        areas,
+        region,
+
+        ships_inUse
+)
+    for _ = 1, 10 do
+        coroutine.yield();
+    end
+
+    L.log("Attempting hub run with remaining available ships.");
+    L = L.with("type", "hub")
+
+    local ships_available_H, ships_stillMoving_H, _ = TradePlannerHL.__Internal.Ships_Available(L, region);
+    -- sometimes, 'is moving' does not reflect reality, so we filter ships again
+    for oid, _ in pairs(ships_inUse) do
+        ships_stillMoving_H[oid] = { route_name = "???" };
+        if ships_available_H[oid] ~= nil then
+            ships_available_H[oid] = nil;
+        end
+    end
+
+    if utable.length(ships_available_H) == 0 then
+        L.log("No available ships for trade routes automation, exiting iteration.");
+        return nil;
+    end
+    local srt = TradePlannerLL.SupplyRequest_BuildHubs(
+            L,
+            region,
+            TradePlannerLL.Ships_StockInFlight(L, region, ships_stillMoving_H),
+            areas
+    );
+    if srt == nil then
+        L.log("No supply request table generated for hub run, exiting iteration.");
+        return nil;
+    end
+    local rq = TradePlannerLL.SupplyRequest_ToOrders(L, srt, areas);
+    local acs = TradePlannerLL.SupplyRequestOrders_ToShipCommands(L, areas, ships_available_H, rq);
+    local tasks = TradePlannerLL.SupplyRequestShipCommands_Execute(
+            L, region,
+            srt, acs, ships_available_H
+    )
+    L.logf("Spawned %d async tasks for trade route execution (hub run).", #tasks);
+    return tasks;
+end
+
+---@param L Logger
 ---@param areas table<AreaID, AreaData>
 ---@param region RegionID
-local function tradeExecutor_iteration(L, areas, region)
+local function tradeExecutor_iteration(L, areas, region, ships_inUse)
+    local iteration = os.time();
+    L = L.with("iteration", iteration).with("type", "regular")
+
     local now = os.date("%Y-%m-%d %H:%M:%S");
     L.logf("start at %s time", now);
 
     -- 3.1. Find all ships allocated to trade routes automation.
-    local available_ships, stillMoving, hasCargo = TradePlannerHL.__Internal.Ships_Available(L, region);
-    if utable.length(available_ships) == 0 then
+    local ships_available, ships_stillMoving, ships_withCargo_notMoving = TradePlannerHL.__Internal.Ships_Available(L, region);
+    for oid, _ in pairs(ships_inUse) do
+        if ships_available[oid] ~= nil then
+            ships_available[oid] = nil;
+        end
+        if ships_withCargo_notMoving[oid] ~= nil then
+            ships_withCargo_notMoving[oid] = nil;
+        end
+        ships_stillMoving[oid] = { route_name = "???" };
+    end
+    if utable.length(ships_available) == 0 then
         L.log("No available ships for trade routes automation, exiting iteration.");
-        return ;
+        return {};
     end
 
-    local Lu = L.logger("force-unload-ships.log");
-    TradePlannerLL.Ships_ForceUnloadStoppedShips(Lu, region, areas, hasCargo);
+    TradePlannerLL.Ships_ForceUnloadStoppedShips(L, region, areas, ships_withCargo_notMoving);
 
     -- 4. (work in progress) Determine product disbalances in the areas. Assign ship to balance the good
     local srt = TradePlannerLL.SupplyRequest_Build(
             L,
             region,
-            TradePlannerLL.Ships_StockInFlight(L, region, stillMoving),
+            TradePlannerLL.Ships_StockInFlight(L, region, ships_stillMoving),
             areas
     );
-    L.log("supply request table - done");
 
     local request_orders = TradePlannerLL.SupplyRequest_ToOrders(L, srt, areas);
-    L.log("request_orders - done");
-
-    local available_commands_kv = TradePlannerLL.SupplyRequestOrders_ToShipCommands(L, available_ships, request_orders);
-    L.log("available_commands - done");
+    local available_commands_kv = TradePlannerLL.SupplyRequestOrders_ToShipCommands(L, areas, ships_available, request_orders);
 
     -- ========================================================================
     -- NEW: Spawn async tasks for trade orders
@@ -198,62 +275,46 @@ local function tradeExecutor_iteration(L, areas, region)
 
     local tasks = TradePlannerLL.SupplyRequestShipCommands_Execute(
             L, region,
-            srt, available_commands_kv, available_ships
+            srt, available_commands_kv, ships_available
     )
+    for ship, task in pairs(tasks) do
+        ships_inUse[ship] = task;
+    end
+
     L.logf("Spawned %d async tasks for trade route execution.", #tasks);
 
-    local stillAvailableShips = 0;
-    for _, v in pairs(available_ships) do
+    local ships_available_after = 0;
+    for _, v in pairs(ships_available) do
         if v ~= nil then
-            stillAvailableShips = stillAvailableShips + 1;
+            ships_available_after = ships_available_after + 1;
         end
     end
-    local stillExistingRequestsC = tradeExecutor_remainingSurplusDeficit(L, region, srt);
-    if stillAvailableShips == 0 then
+    local requests_after = tradeExecutor_remainingSurplusDeficit(L, region, srt);
+    if ships_available_after == 0 then
         L.log("No more available ships for trade routes automation.");
-    elseif stillExistingRequestsC == 0 then
+    elseif requests_after == 0 then
         L.log("No more existing requests for trade routes automation.");
     else
-        L.logf("Still available ships: %d, still existing requests: %d", stillAvailableShips, stillExistingRequestsC);
+        L.logf("Still available ships: %d, still existing requests: %d", ships_available_after, requests_after);
     end
 
-    if stillAvailableShips > 0 then
-        for _ = 1, 10 do
-            coroutine.yield();
-        end
-
-        L.log("Attempting hub run with remaining available ships.");
-        local L_dest = L.dst .. ".hub";
-        L = L.logger(L_dest);
-
-        local shipsAvailable, shipsMoving, _ = TradePlannerHL.__Internal.Ships_Available(L, region);
-        if utable.length(shipsAvailable) == 0 then
-            L.log("No available ships for trade routes automation, exiting iteration.");
-            return ;
-        end
-        local srt = TradePlannerLL.SupplyRequest_BuildHubs(
-                L,
-                region,
-                TradePlannerLL.Ships_StockInFlight(L, region, shipsMoving),
-                areas
-        );
-        if srt == nil then
-            L.log("No supply request table generated for hub run, exiting iteration.");
-            goto done;
-        end
-        local rq = TradePlannerLL.SupplyRequest_ToOrders(L, srt, areas);
-        local acs = TradePlannerLL.SupplyRequestOrders_ToShipCommands(L, shipsAvailable, rq);
-        local tasks = TradePlannerLL.SupplyRequestShipCommands_Execute(
-                L, region,
-                srt, acs, shipsAvailable
-        )
-        L.logf("Spawned %d async tasks for trade route execution (hub run).", #tasks);
+    local tasks_hub = nil;
+    if ships_available_after > 0 then
+        tasks_hub = tradeExecutor_iteration_hub(L, areas, region, ships_inUse);
     end
-    :: done ::
     L.logf("end at %s time", os.date("%Y-%m-%d %H:%M:%S"));
+
+    if tasks_hub ~= nil then
+        for ship, task in pairs(tasks_hub) do
+            tasks[ship] = task;
+        end
+    end
+    return tasks;
 end
 
 function TradePlannerHL.Loop(L, region, interrupt)
+    local L = L.with("region", region);
+
     local _yields = 0;
     -- 1. Wait for region cache to be ready.
     while true do
@@ -299,8 +360,7 @@ function TradePlannerHL.Loop(L, region, interrupt)
     coroutine.yield();
 
     local _, _, withCargo = TradePlannerHL.__Internal.Ships_Available(L, region);
-    local Lu = L.logger("force-unload-ships.log");
-    TradePlannerLL.Ships_ForceUnloadStoppedShips(Lu, region, areas, withCargo);
+    TradePlannerLL.Ships_ForceUnloadStoppedShips(L, region, areas, withCargo);
     coroutine.yield();
     coroutine.yield();
     coroutine.yield();
@@ -320,15 +380,15 @@ function TradePlannerHL.Loop(L, region, interrupt)
     table.insert(TrRAt_UI.AreaRescan.Events, resetScan);
     table.insert(TrRAt_UI.RegionRescan.Events, resetScan);
 
+    local activeTasks = {};
+
     while true do
         if interrupt() then
             L.log("Trade route executor loop received interrupt signal, stopping.");
             break
         end
 
-        local Li = L.logger("trade-execute-iteration.log");
         L.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
-        Li.log("Starting trade execute iteration loop at " .. os.date("%Y-%m-%d %H:%M:%S"));
 
         if Anno.Region_CanCache(region) then
             Anno.Region_RefreshCache(region);
@@ -336,21 +396,37 @@ function TradePlannerHL.Loop(L, region, interrupt)
 
         if areas == nil then
             L.log("Rescanning areas due to area rescan event.");
-            Li.log("Rescanning areas due to area rescan event.");
             areas = MapScannerHL.Areas(L, region);
             coroutine.yield();
             coroutine.yield();
             coroutine.yield();
         end
 
-        local success, err = xpcall(function()
-            return tradeExecutor_iteration(Li, areas, region);
-        end, debug.traceback);
-        if not success then
-            L.logf("[Error] trade execute iteration: %s", tostring(err));
-            Li.logf("[Error] trade execute iteration: %s", tostring(err));
+        for areaID, area in pairs(areas) do
+            area.capacity = Anno.Area_GetGoodCapacity(region, areaID, 120008);
         end
 
+        -- prune finished tasks
+        for ship, taskID in pairs(activeTasks) do
+            local task = async.get_task(taskID);
+            if task == nil or async.is_finished(task) then
+                activeTasks[ship] = nil;
+            end
+        end
+
+        local success, ret = xpcall(function()
+            return tradeExecutor_iteration(L, areas, region, activeTasks);
+        end, debug.traceback);
+        if not success then
+            L.logf("[Error] trade execute iteration: %s", tostring(ret));
+            goto continue;
+        end
+
+        for ship, task in pairs(ret) do
+            activeTasks[ship] = task;
+        end
+
+        :: continue ::
         for i = 1, 600 do
             coroutine.yield();
         end

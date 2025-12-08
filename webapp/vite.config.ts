@@ -7,6 +7,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  publicDir: 'static', // Serve static assets from 'static' folder
   base: './', // For GitHub Pages compatibility
   build: {
     outDir: 'dist',

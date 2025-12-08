@@ -18,6 +18,7 @@ import {
   Filler,
 } from 'chart.js';
 import 'chart.js/auto';
+import zoomPlugin from 'chartjs-plugin-zoom';
 import type { ILineChart, LineChartOptions, SeriesConfig } from '../../types';
 
 // Register Chart.js components
@@ -30,7 +31,8 @@ Chart.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  zoomPlugin
 );
 
 export class ChartJSLineChart implements ILineChart {
@@ -58,6 +60,10 @@ export class ChartJSLineChart implements ILineChart {
 
   resize(): void {
     this.chart?.resize();
+  }
+
+  resetZoom(): void {
+    this.chart?.resetZoom();
   }
 
   destroy(): void {
@@ -133,6 +139,21 @@ export class ChartJSLineChart implements ILineChart {
               const date = new Date(x);
               return date.toLocaleTimeString();
             },
+          },
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'x',
+          },
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            pinch: {
+              enabled: true,
+            },
+            mode: 'x',
           },
         },
       },

@@ -78,7 +78,7 @@ function TradePlannerLL.Ships_StockInFlight(L, region, ships)
     -- 3.2. In flight
     for ship, _ in pairs(ships) do
         local info = TradeExecutor.Ship_Name_FetchCmdInfo(ship);
-        if info == nil then
+        if info.area_id == nil then
             goto continue;
         end
 
@@ -114,7 +114,10 @@ end
 ---@param _stockFromInFlight TradePlanner.AreaGoodAmount
 ---@param areas table<AreaID, AreaData>
 ---@return TradePlanner.SupplyRequestTable
-function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas)
+function TradePlannerLL.supplyRequest_Build(
+        L, region, _stockFromInFlight, areas,
+        _request_modifier
+)
     local areaToProductRequest = AreasRequest.All(L, region);
     local allProducts = {};
     for areaID, products in pairs(areaToProductRequest) do
@@ -122,18 +125,25 @@ function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas
             allProducts[productID] = true;
         end
     end
+    for productID in allProducts do
+        local product = AnnoInfo.Product(productID);
+        if product == nil then
+            if not TradePlannerLL.__Internal.ProductGUID_Unknown[productID] then
+                L.logf("Warning: Product ID %d not found in AnnoInfo", productID);
+                TradePlannerLL.__Internal.ProductGUID_Unknown[productID] = true;
+            end
+        end
+    end
 
     local supply = {};
     local request = {};
     for areaID, areaData in pairs(areas) do
         local inFlightStock_area = _stockFromInFlight[areaID] or {};
+        local _areaCap = areaData.capacity or 75;
+
         for productID in pairs(allProducts) do
             local product = AnnoInfo.Product(productID);
             if product == nil then
-                if not TradePlannerLL.__Internal.ProductGUID_Unknown[productID] then
-                    L.logf("Warning: Product ID %d not found in AnnoInfo", productID);
-                    TradePlannerLL.__Internal.ProductGUID_Unknown[productID] = true;
-                end
                 goto continue;
             end
             local productName = product.Name;
@@ -141,17 +151,16 @@ function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas
             local inFlightStock = inFlightStock_area[productID] or 0;
 
             local _stock = Anno.Area_GetGood(region, areaID, productID);
+
             local _request = 0;
-
-            local _areaCap = areaData.capacity or 75;
-
             local t = math.floor(math.max(_areaCap * 2 / 3, 50));
             local g = math.floor((_areaCap - t) / 2)
-
             local doesAreaRequestProduct = areaToProductRequest[areaID] and areaToProductRequest[areaID][productID];
             if doesAreaRequestProduct then
                 _request = g;
             end
+            _request = _request_modifier(areaID, _request)
+
             if _request == 0 and _stock == 0 then
                 goto continue;
             end
@@ -165,7 +174,7 @@ function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas
                     supply[areaID] = {};
                 end
                 supply[areaID][productID] = _stock - _request;
-            elseif _request - _stock >= 50 then
+            elseif _request - _stock >= _minTransfer then
                 if request[areaID] == nil then
                     request[areaID] = {};
                 end
@@ -187,6 +196,24 @@ end
 ---@param region RegionID
 ---@param _stockFromInFlight TradePlanner.AreaGoodAmount
 ---@param areas table<AreaID, AreaData>
+---@return TradePlanner.SupplyRequestTable
+function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas)
+    return TradePlannerLL.supplyRequest_Build(
+            L,
+            region,
+            _stockFromInFlight,
+            areas,
+            function(areaID, request)
+                return request
+            end
+    );
+end
+
+---@param L Logger
+---@param region RegionID
+---@param _stockFromInFlight TradePlanner.AreaGoodAmount
+---@param areas table<AreaID, AreaData>
+---@return TradePlanner.SupplyRequestTable
 function TradePlannerLL.SupplyRequest_BuildHubs(L, region, _stockFromInFlight, areas)
     local hub = nil;
     for areaID, areaData in pairs(areas) do
@@ -201,67 +228,20 @@ function TradePlannerLL.SupplyRequest_BuildHubs(L, region, _stockFromInFlight, a
         return nil;
     end
 
-    local areaToProductRequest = AreasRequest.All(L, region);
-    local allProducts = {};
-    for areaID, products in pairs(areaToProductRequest) do
-        for productID, _ in pairs(products) do
-            allProducts[productID] = true;
-        end
-    end
-
-    local supply = {};
-    local request = {};
-    for areaID, areaData in pairs(areas) do
-        local inFlightStock_area = _stockFromInFlight[areaID] or {};
-        for productID in pairs(allProducts) do
-            local product = AnnoInfo.Product(productID);
-            if product == nil then
-                L.logf("Warning: Product ID %s not found in AnnoInfo", productID);
-                goto continue;
-            end
-            local productName = product.Name;
-
-            local inFlightStock = inFlightStock_area[productID] or 0;
-
-            local _stock = Anno.Area_GetGood(region, areaID, productID);
-
-            local _request = 0;
-            local _areaCap = areaData.capacity or 75;
-            local doesAreaRequestProduct = areaToProductRequest[areaID] and areaToProductRequest[areaID][productID];
-            if areaID == hub then
-                _request = _areaCap * 90 / 100;
-            elseif doesAreaRequestProduct then
-                _request = math.min(_areaCap, 200);
-            end
-
-            if _request == 0 and _stock == 0 then
-                goto continue;
-            end
-
-            L.logf("Area %s (id=%s) %s stock=%s (+%s) request=%s", areaData.city_name, areaID, productName, _stock, inFlightStock, _request);
-            _stock = _stock + inFlightStock;
-
-            if _stock >= _request * 2 and _stock >= 50 then
-                if supply[areaID] == nil then
-                    supply[areaID] = {};
+    return TradePlannerLL.supplyRequest_Build(
+            L,
+            region,
+            _stockFromInFlight,
+            areas,
+            function(areaID, request)
+                if areaID == hub then
+                    local _areaCap = areas[areaID].capacity or 75;
+                    return math.ceil(_areaCap * 9 / 10);
+                else
+                    return 0;
                 end
-                supply[areaID][productID] = _stock - _request;
-            elseif _request - _stock >= 50 and areaID == hub then
-                if request[areaID] == nil then
-                    request[areaID] = {};
-                end
-                request[areaID][productID] = _request - _stock;
             end
-
-            :: continue ::
-        end
-    end
-
-    ---@type TradePlanner.SupplyRequestTable
-    local ret = {};
-    ret.Supply = supply;
-    ret.Request = request;
-    return ret;
+    );
 end
 
 ---@param L Logger
@@ -319,7 +299,9 @@ end
 ---@return TradePlanner.Commands
 function TradePlannerLL.SupplyRequestOrders_ToShipCommands(
         L,
+        areas,
         available_ships,
+        stock,
         request_orders
 )
     ---@type TradePlanner.Commands
@@ -338,7 +320,7 @@ function TradePlannerLL.SupplyRequestOrders_ToShipCommands(
             local ship_position = order_value.OrderDistance.src
 
             local info = TradeExecutor.Ship_Name_FetchCmdInfo(ship)
-            if info ~= nil then
+            if info.x ~= nil and info.y ~= nil then
                 ship_position = { x = info.x, y = info.y }
             end
 
@@ -355,12 +337,6 @@ function TradePlannerLL.SupplyRequestOrders_ToShipCommands(
                 amount = cap;
             else
                 amount = order_key.SupplyAmount;
-            end
-
-            if amount < 50 then
-                L.logf("Skipping command for ship %d due to insufficient transfer amount: %d < 50",
-                        ship, amount);
-                goto continue;
             end
 
             ---@type TradePlanner.CommandKey
@@ -412,6 +388,8 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
         local available_supply = supplyRequestTable.Supply[order.AreaID_from][order.GoodID]
         local available_request = supplyRequestTable.Request[order.AreaID_to][order.GoodID]
 
+        local original_request
+
         if available_request <= 0 then
             -- filled
             goto continue;
@@ -430,11 +408,11 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
                     available_supply, amount);
             goto continue;
         end
-        if available_request < 50 then
-            L.logf("Skipping order: insufficient request: available_request=%d (type=%s) < 50 %s",
-                    available_request, type(available_request), available_request < 50);
-            goto continue;
-        end
+        --if available_request < 50 then
+        --    L.logf("Skipping order: insufficient request: available_request=%d (type=%s) < 50 %s",
+        --            available_request, type(available_request), available_request < 50);
+        --    goto continue;
+        --end
 
         supplyRequestTable.Supply[order.AreaID_from][order.GoodID] = supplyRequestTable.Supply[order.AreaID_from][order.GoodID] - amount
         supplyRequestTable.Request[order.AreaID_to][order.GoodID] = supplyRequestTable.Request[order.AreaID_to][order.GoodID] - amount
@@ -464,19 +442,7 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
             }
         }
 
-        local shipName = Anno.Ship_Name_Get(ship);
-        local info = TradeExecutor.Ship_Name_FetchCmdInfo(ship);
-        if info ~= nil then
-            shipName = info.name;
-        end
-
-        --local orderLogKey = string.format("%s-%s-%s-%s-%s",
-        --        shipName,
-        --        os.date("%Y-%m-%dT%H:%M:%SZ"),
-        --        Anno.Area_CityName(region, order.AreaID_from),
-        --        Anno.Area_CityName(region, order.AreaID_to),
-        --        order.GoodID .. "_" .. string.gsub(AnnoInfo.Product(order.GoodID).Name, " ", "_")
-        --);
+        local shipName = TradeExecutor.Ship_Name_FetchCmdInfo(ship).name;
 
         local tags = {
             ship = tostring(ship) .. " (" .. shipName .. ")",
@@ -485,20 +451,14 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
             good = order.GoodID .. " (" .. AnnoInfo.Product(order.GoodID).Name .. ")",
             amount = tostring(amount),
         }
-        local L1 = L;
+        local Lt = L;
         for k, v in pairs(tags) do
-            L1 = L1.with(k, v);
+            Lt = Lt.with(k, v);
         end
-        local Lo = L.logger("trades.log");
-        for k, v in pairs(tags) do
-            Lo = Lo.with(k, v);
-        end
+        Lt.logf("Spawning trade order");
 
-        L1.logf("Spawning trade order");
-        Lo.logf("Spawning trade order");
-
-        local task_id = TradeExecutor.SpawnTradeOrder(Lo, region, ship, cmd)
-        table.insert(spawned_tasks, task_id)
+        local task_id = TradeExecutor.SpawnTradeOrder(Lt, region, ship, cmd)
+        spawned_tasks[ship] = task_id;
 
         :: continue ::
     end
@@ -582,20 +542,18 @@ function TradePlannerLL.Ships_ForceUnloadStoppedShips(
         :: continue ::
     end
     for _, trade in ipairs(trades) do
-        L.logf("Forcing ship %d to unload %d of good %d to area %d",
+        local goodID = trade.good_id;
+        local shipName = Anno.Ship_Name_Get(trade.ship_oid);
+        local Lt = L.with("ship", tostring(trade.ship_oid) .. " (" .. shipName .. ")")
+                    .with("aDst", trade.areaID_dst .. " (" .. Anno.Area_CityName(region, trade.areaID_dst) .. ")")
+                    .with("good", goodID .. " (" .. AnnoInfo.Product(goodID).Name .. ")")
+                    .with("amount", tostring(trade.total_cargo));
+        Lt.logf("Forcing ship %d to unload %d of good %d to area %d",
                 trade.ship_oid,
                 trade.total_cargo,
                 trade.good_id,
                 trade.areaID_dst
         );
-
-        local goodID = trade.good_id;
-        local shipName = Anno.Ship_Name_Get(trade.ship_oid);
-        local Lt = L.logger("trades.log")
-                    .with("ship", tostring(trade.ship_oid) .. " (" .. shipName .. ")")
-                    .with("aDst", trade.areaID_dst .. " (" .. Anno.Area_CityName(region, trade.areaID_dst) .. ")")
-                    .with("good", goodID .. " (" .. AnnoInfo.Product(goodID).Name .. ")")
-                    .with("amount", tostring(trade.total_cargo));
         TradeExecutor._ExecuteUnloadWithShip(
                 Lt,
                 region,

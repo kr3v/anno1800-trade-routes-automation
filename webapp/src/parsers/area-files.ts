@@ -35,14 +35,25 @@ export interface AreaFilesIndex {
 }
 
 /**
- * Extract region from city name prefix
- * e.g., "OW_c1" -> "OW", "c1" -> null
+ * Extract region from the first line of a TSV file
+ * Format: "2025-12-09T20:33:09Z loc=Trade.Loop region=OW 360,1500,L"
  */
-function extractRegion(cityName: string): string | null {
-  for (const regionCode of Object.keys(REGIONS)) {
-    if (cityName.startsWith(`${regionCode}_`)) {
-      return regionCode;
+async function extractRegionFromFile(fileHandle: FileSystemFileHandle): Promise<string | null> {
+  try {
+    const file = await fileHandle.getFile();
+    const text = await file.text();
+    const firstLine = text.split('\n')[0];
+
+    // Look for "region=XX" in the line
+    const parts = firstLine.split(' ');
+    for (const part of parts) {
+      if (part.startsWith('region=')) {
+        return part.substring(7); // Extract region value
+      }
     }
+  } catch (error) {
+    // If we can't read the file, return null
+    console.warn(`Failed to extract region from ${fileHandle.name}:`, error);
   }
   return null;
 }
@@ -80,7 +91,8 @@ export async function scanAreaFiles(
     const parsed = parseAreaFileName(handle.name);
     if (!parsed) continue;
 
-    const region = extractRegion(parsed.cityName);
+    // Extract region from first line of file
+    const region = await extractRegionFromFile(handle);
     const info: AreaFileInfo = {
       handle,
       fileName: handle.name,

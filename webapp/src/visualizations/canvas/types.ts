@@ -27,7 +27,7 @@ export interface CoordinateCanvasOptions {
 /** Coordinate canvas interface */
 export interface ICoordinateCanvas {
   /** Mount canvas to a container */
-  mount(container: HTMLElement): void;
+  mount(container: HTMLElement): Promise<void>;
 
   /** Set points to render */
   setPoints(points: CoordinatePoint[]): void;

@@ -208,6 +208,10 @@ function Async.get_active_tasks()
     return result
 end
 
+function Async.is_finished(task)
+    return task.state == TASK_COMPLETED or task.state == TASK_ERROR
+end
+
 -- Utility: Creates a promise-like interface
 -- @return table - Promise object with resolve/reject functions
 function Async.promise()

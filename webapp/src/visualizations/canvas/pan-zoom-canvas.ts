@@ -30,6 +30,7 @@ export class PanZoomCanvas implements ICoordinateCanvas {
   private scale: number = 1;
   private offsetX: number = 0;
   private offsetY: number = 0;
+  private needsViewReset: boolean = false;
 
   // Bounds
   private bounds = { minX: 0, maxX: 0, minY: 0, maxY: 0 };
@@ -39,6 +40,9 @@ export class PanZoomCanvas implements ICoordinateCanvas {
   private lastMouseX: number = 0;
   private lastMouseY: number = 0;
 
+  // ResizeObserver for container
+  private containerResizeObserver: ResizeObserver | null = null;
+
   // Bound event handlers
   private handleMouseDown = this.onMouseDown.bind(this);
   private handleMouseMove = this.onMouseMove.bind(this);
@@ -46,7 +50,7 @@ export class PanZoomCanvas implements ICoordinateCanvas {
   private handleWheel = this.onWheel.bind(this);
   private handleResize = this.onResize.bind(this);
 
-  mount(container: HTMLElement): void {
+  mount(container: HTMLElement): Promise<void> {
     this.container = container;
 
     // Create canvas
@@ -74,12 +78,60 @@ export class PanZoomCanvas implements ICoordinateCanvas {
     this.canvas.addEventListener('dblclick', () => this.resetView());
     window.addEventListener('resize', this.handleResize);
 
-    this.onResize();
+    // Set up a ResizeObserver that stays active to handle lazy container sizing
+    // (e.g., when container is in a hidden tab that becomes visible later)
+    let mountResolved = false;
+    this.containerResizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+
+      if (entry && entry.contentRect.width > 100 && entry.contentRect.height > 100) {
+        // Container has valid dimensions now
+        this.onResize();
+
+        // If mount hasn't resolved yet, resolve it now
+        if (!mountResolved) {
+          mountResolved = true;
+        }
+      }
+    });
+
+    this.containerResizeObserver.observe(container);
+
+    // Return a promise that resolves either when we get valid dimensions or after timeout
+    return new Promise<void>((resolve) => {
+      // Check if container already has valid dimensions (unlikely but possible)
+      const rect = container.getBoundingClientRect();
+      if (rect.width > 100 && rect.height > 100) {
+        this.onResize();
+        mountResolved = true;
+        resolve();
+        return;
+      }
+
+      // Wait for ResizeObserver to fire with valid dimensions
+      const checkResolved = setInterval(() => {
+        if (mountResolved) {
+          clearInterval(checkResolved);
+          resolve();
+        }
+      }, 50);
+
+      // Timeout fallback: resolve after 100ms even if no valid dimensions yet
+      // ResizeObserver stays active to handle late sizing
+      setTimeout(() => {
+        if (!mountResolved) {
+          mountResolved = true;
+          clearInterval(checkResolved);
+          resolve();
+        }
+      }, 100);
+    });
   }
 
   setPoints(points: CoordinatePoint[]): void {
     this.points = points;
     this.calculateBounds();
+    this.needsViewReset = true;
     this.resetView();
   }
 
@@ -93,6 +145,14 @@ export class PanZoomCanvas implements ICoordinateCanvas {
 
     const width = this.canvas.width;
     const height = this.canvas.height;
+
+    // Don't reset if canvas doesn't have valid dimensions yet
+    if (width === 0 || height === 0 || width < 50 || height < 50) {
+      // Mark that we need to reset later when we have valid dimensions
+      this.needsViewReset = true;
+      return;
+    }
+
     const padding = this.options.padding;
 
     const dataWidth = this.bounds.maxX - this.bounds.minX;
@@ -115,6 +175,7 @@ export class PanZoomCanvas implements ICoordinateCanvas {
       this.offsetY = height / 2 - centerY * this.scale;
     }
 
+    this.needsViewReset = false;
     this.render();
   }
 
@@ -127,6 +188,11 @@ export class PanZoomCanvas implements ICoordinateCanvas {
       this.canvas.removeEventListener('wheel', this.handleWheel);
     }
     window.removeEventListener('resize', this.handleResize);
+
+    if (this.containerResizeObserver) {
+      this.containerResizeObserver.disconnect();
+      this.containerResizeObserver = null;
+    }
 
     this.canvas = null;
     this.ctx = null;
@@ -178,9 +244,24 @@ export class PanZoomCanvas implements ICoordinateCanvas {
     if (!this.canvas || !this.container) return;
 
     const rect = this.container.getBoundingClientRect();
-    this.canvas.width = rect.width;
-    this.canvas.height = rect.height;
-    this.render();
+    const newWidth = rect.width;
+    const newHeight = rect.height;
+
+    // Only update if we have valid dimensions
+    if (newWidth > 50 && newHeight > 50) {
+      this.canvas.width = newWidth;
+      this.canvas.height = newHeight;
+
+      // If we have points loaded, always reset view to ensure proper scaling
+      // This handles the case where points were loaded before container had valid size
+      if (this.points.length > 0) {
+        this.resetView();
+      } else if (this.needsViewReset) {
+        this.resetView();
+      } else {
+        this.render();
+      }
+    }
   }
 
   private onMouseDown(e: MouseEvent): void {
@@ -198,7 +279,8 @@ export class PanZoomCanvas implements ICoordinateCanvas {
       const dx = e.clientX - this.lastMouseX;
       const dy = e.clientY - this.lastMouseY;
       this.offsetX += dx;
-      this.offsetY += dy;
+      // Invert Y for panning since Y-axis is inverted in toScreenY()
+      this.offsetY -= dy;
       this.lastMouseX = e.clientX;
       this.lastMouseY = e.clientY;
       this.render();

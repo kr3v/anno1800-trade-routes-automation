@@ -50,6 +50,9 @@ export interface ILineChart {
   /** Resize chart */
   resize(): void;
 
+  /** Reset zoom to default view */
+  resetZoom?(): void;
+
   /** Clean up resources */
   destroy(): void;
 }

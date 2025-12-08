@@ -8,6 +8,33 @@ local Anno = {
 
 ---
 
+---@class SessionObject
+---@field GUID number
+---@field userdata userdata
+---@field OID number
+---@field ParticipantID number
+---@field SessionGuid number
+
+---@class TsVectorType
+---@field Guid number
+---@field Icon string
+---@field Text string
+---@field Value string
+
+---@alias Coordinate { x: number, y: number }
+---@alias CoordinateString string
+---@alias AreaID number
+---@alias AreaID_str string
+---@alias ShipID number
+
+---@class AreaData
+---@field city_name string
+---@field scan table<CoordinateString, string>
+---@field water_points Coordinate[]
+---@field capacity number
+
+---
+
 function Anno.Camera_MoveTo_Object(oid)
     ts.MetaObjects.CheatLookAtObject(oid);
 end
@@ -25,24 +52,13 @@ end
 
 -- Objects[OID] = { GUID = GUID, userdata = userdata, OID = OID, ParticipantID = ParticipantID, SessionGuid = SessionGuid }
 
----@class SessionObject
----@field GUID number
----@field userdata userdata
----@field OID number
----@field ParticipantID number
----@field SessionGuid number
-
 ---@return table<number, SessionObject>
 function Anno.Objects_GetAll_ByProperty(property)
     return serpLight.GetCurrentSessionObjectsFromLocaleByProperty(property);
 end
 
----@class TsVectorType
----@field Guid number
----@field Icon string
----@field Text string
----@field Value string
 
+---
 Anno.TsVectorType = {
     Guid = "number",
     Icon = "string",

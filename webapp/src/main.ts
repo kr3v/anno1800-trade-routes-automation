@@ -14,6 +14,7 @@ import {
   DeficitSurplusWidget,
   ShipUsageChartWidget,
   AreaVisualizerWidget,
+  LogsTableWidget,
 } from './widgets';
 import {
   readStateFromURL,
@@ -21,9 +22,11 @@ import {
   onURLStateChange,
   type AppState,
 } from './url-state';
+import { DataStore } from './data-store';
 
 // App state
 let dirHandle: FileSystemDirectoryHandle | null = null;
+let dataStore: DataStore | null = null;
 let currentDuration: string | null = null;
 let currentRegion: string = 'OW';
 let currentProfileName: string | null = null;
@@ -33,6 +36,7 @@ const tradeTableWidget = new TradeTableWidget();
 const deficitSurplusWidget = new DeficitSurplusWidget();
 const shipUsageWidget = new ShipUsageChartWidget();
 const areaVisualizerWidget = new AreaVisualizerWidget();
+const logsTableWidget = new LogsTableWidget();
 
 // DOM elements (will be initialized in init)
 let pickFolderBtn: HTMLButtonElement;
@@ -83,21 +87,24 @@ function init(): void {
   profileFilter.addEventListener('change', () => {
     currentProfileName = profileFilter.value || null;
     writeStateToURL({ profileName: currentProfileName });
-    if (dirHandle) loadTradesTab();
+    if (dataStore) {
+      loadTradesTab();
+      loadLogsTab();
+    }
   });
 
   durationFilter.addEventListener('change', () => {
     currentDuration = durationFilter.value || null;
     tradeTableWidget.configure({ duration: currentDuration });
     writeStateToURL({ duration: currentDuration });
-    if (dirHandle) loadTradesTab();
+    if (dataStore) loadTradesTab();
   });
 
   regionFilter.addEventListener('change', () => {
     currentRegion = regionFilter.value;
     shipUsageWidget.configure({ region: currentRegion });
     writeStateToURL({ region: currentRegion });
-    if (dirHandle) loadTradesTab();
+    if (dataStore) loadTradesTab();
   });
 
   // Listen for browser back/forward
@@ -112,6 +119,7 @@ function init(): void {
   const tradesContent = document.getElementById('trades-content')!;
   const shipUsageContainer = document.getElementById('tab-ship-usage')!;
   const areaContent = document.getElementById('area-content')!;
+  const logsContent = document.getElementById('logs-content')!;
 
   // Create sub-containers for trades tab
   const tradeTableContainer = document.createElement('div');
@@ -132,6 +140,9 @@ function init(): void {
 
   // Area visualizer
   areaVisualizerWidget.mount(areaContent);
+
+  // Logs table
+  logsTableWidget.mount(logsContent);
 
   // Show initial state
   updateFolderPath();
@@ -154,6 +165,11 @@ async function handlePickFolder(): Promise<void> {
     await saveDirectoryHandle(dirHandle);
 
     updateFolderPath();
+
+    // Create DataStore and load all data upfront
+    dataStore = new DataStore(dirHandle);
+    await dataStore.load();
+
     await loadAllTabs();
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
@@ -176,6 +192,11 @@ async function tryAutoLoadDirectory(): Promise<void> {
       console.log('Auto-loaded directory:', handle.name);
       dirHandle = handle;
       updateFolderPath();
+
+      // Create DataStore and load all data upfront
+      dataStore = new DataStore(dirHandle);
+      await dataStore.load();
+
       await loadAllTabs();
     }
   } catch (error) {
@@ -206,11 +227,10 @@ function switchTab(tab: string): void {
  * Populate profile name selector
  */
 async function populateProfileSelector(): Promise<void> {
-  if (!dirHandle) return;
+  if (!dataStore) return;
 
   try {
-    const { scanProfileNames } = await import('./parsers/deficit-surplus');
-    const profileNames = await scanProfileNames(dirHandle);
+    const profileNames = dataStore.getProfileNames();
 
     profileFilter.innerHTML = '';
 
@@ -240,7 +260,7 @@ async function populateProfileSelector(): Promise<void> {
       writeStateToURL({ profileName: currentProfileName });
     }
   } catch (error) {
-    console.error('Failed to scan profile names:', error);
+    console.error('Failed to load profile names:', error);
     profileFilter.innerHTML = '<option value="">Error loading profiles</option>';
     profileFilter.disabled = true;
   }
@@ -250,7 +270,7 @@ async function populateProfileSelector(): Promise<void> {
  * Load all tabs with data from directory
  */
 async function loadAllTabs(): Promise<void> {
-  if (!dirHandle) return;
+  if (!dataStore) return;
 
   // Populate profile selector first
   await populateProfileSelector();
@@ -258,8 +278,9 @@ async function loadAllTabs(): Promise<void> {
   // Load all tabs in parallel
   await Promise.all([
     loadTradesTab(),
-    shipUsageWidget.load(dirHandle),
-    areaVisualizerWidget.loadFromDirectory(dirHandle),
+    loadLogsTab(),
+    shipUsageWidget.load(dataStore),
+    areaVisualizerWidget.load(dataStore),
   ]);
 }
 
@@ -267,14 +288,21 @@ async function loadAllTabs(): Promise<void> {
  * Load trades tab data
  */
 async function loadTradesTab(): Promise<void> {
-  if (!dirHandle || !currentProfileName) return;
+  if (!dataStore || !currentProfileName) return;
 
-  // TradeTableWidget now uses Result internally and handles errors
-  // DeficitSurplusWidget still uses old pattern
   await Promise.all([
-    tradeTableWidget.load(dirHandle, currentProfileName),
-    deficitSurplusWidget.load(dirHandle, currentProfileName, currentRegion),
+    tradeTableWidget.load(dataStore, currentProfileName),
+    deficitSurplusWidget.load(dataStore, currentProfileName, currentRegion),
   ]);
+}
+
+/**
+ * Load logs tab data
+ */
+async function loadLogsTab(): Promise<void> {
+  if (!dataStore || !currentProfileName) return;
+
+  await logsTableWidget.load(dataStore, currentProfileName);
 }
 
 /**
@@ -287,21 +315,24 @@ function handleURLStateChange(state: AppState): void {
     if (profileFilter && state.profileName) {
       profileFilter.value = state.profileName;
     }
-    if (dirHandle) loadTradesTab();
+    if (dataStore) {
+      loadTradesTab();
+      loadLogsTab();
+    }
   }
 
   if (state.duration !== currentDuration) {
     currentDuration = state.duration;
     durationFilter.value = state.duration || '';
     tradeTableWidget.configure({ duration: currentDuration });
-    if (dirHandle) loadTradesTab();
+    if (dataStore) loadTradesTab();
   }
 
   if (state.region !== currentRegion) {
     currentRegion = state.region;
     regionFilter.value = state.region;
     shipUsageWidget.configure({ region: currentRegion });
-    if (dirHandle) loadTradesTab();
+    if (dataStore) loadTradesTab();
   }
 
   // Update area visualizer state

@@ -1,738 +1,738 @@
-[
-  {
+{
+  "1010223": {
     "Name": "Advanced Weapons",
     "Guid": 1010223
   },
-  {
+  "120036": {
     "Name": "Alpaca Wool",
     "Guid": 120036
   },
-  {
+  "838": {
     "Name": "Aluminium Profiles",
     "Guid": 838
   },
-  {
+  "5399": {
     "Name": "Ammonia",
     "Guid": 5399
   },
-  {
+  "112706": {
     "Name": "Arctic Gas",
     "Guid": 112706
   },
-  {
+  "25131": {
     "Name": "Atole",
     "Guid": 25131
   },
-  {
+  "836": {
     "Name": "Bauxite",
     "Guid": 836
   },
-  {
+  "112695": {
     "Name": "Bear Fur",
     "Guid": 112695
   },
-  {
+  "1010193": {
     "Name": "Beef",
     "Guid": 1010193
   },
-  {
+  "1010214": {
     "Name": "Beer",
     "Guid": 1010214
   },
-  {
+  "114370": {
     "Name": "Beeswax",
     "Guid": 114370
   },
-  {
+  "135232": {
     "Name": "Billiard Tables",
     "Guid": 135232
   },
-  {
+  "135229": {
     "Name": "Biscuits",
     "Guid": 135229
   },
-  {
+  "120037": {
     "Name": "Bombins",
     "Guid": 120037
   },
-  {
+  "846": {
     "Name": "Bombs",
     "Guid": 846
   },
-  {
+  "1010204": {
     "Name": "Brass",
     "Guid": 1010204
   },
-  {
+  "1010213": {
     "Name": "Bread",
     "Guid": 1010213
   },
-  {
+  "1010205": {
     "Name": "Bricks",
     "Guid": 1010205
   },
-  {
+  "5380": {
     "Name": "Calamari",
     "Guid": 5380
   },
-  {
+  "134616": {
     "Name": "Camphor Wax",
     "Guid": 134616
   },
-  {
+  "1010217": {
     "Name": "Canned Food",
     "Guid": 1010217
   },
-  {
+  "1010255": {
     "Name": "Caoutchouc",
     "Guid": 1010255
   },
-  {
+  "849": {
     "Name": "Care Packages",
     "Guid": 849
   },
-  {
+  "112694": {
     "Name": "Caribou Meat",
     "Guid": 112694
   },
-  {
+  "135150": {
     "Name": "Celluloid",
     "Guid": 135150
   },
-  {
+  "1010231": {
     "Name": "Cement",
     "Guid": 1010231
   },
-  {
+  "118724": {
     "Name": "Ceramics",
     "Guid": 118724
   },
-  {
+  "120016": {
     "Name": "Champagne",
     "Guid": 120016
   },
-  {
+  "1010211": {
     "Name": "Chassis",
     "Guid": 1010211
   },
-  {
+  "135087": {
     "Name": "Cherry Wood",
     "Guid": 135087
   },
-  {
+  "135186": {
     "Name": "Chewing Gum",
     "Guid": 135186
   },
-  {
+  "1010258": {
     "Name": "Chocolate",
     "Guid": 1010258
   },
-  {
+  "1010259": {
     "Name": "Cigars",
     "Guid": 1010259
   },
-  {
+  "133093": {
     "Name": "Cinnamon",
     "Guid": 133093
   },
-  {
+  "133097": {
     "Name": "Citrus",
     "Guid": 133097
   },
-  {
+  "1010201": {
     "Name": "Clay",
     "Guid": 1010201
   },
-  {
+  "114414": {
     "Name": "Clay Pipes",
     "Guid": 114414
   },
-  {
+  "1010226": {
     "Name": "Coal",
     "Guid": 1010226
   },
-  {
+  "1010254": {
     "Name": "Cocoa",
     "Guid": 1010254
   },
-  {
+  "133095": {
     "Name": "Coconut Oil",
     "Guid": 133095
   },
-  {
+  "120032": {
     "Name": "Coffee",
     "Guid": 120032
   },
-  {
+  "120031": {
     "Name": "Coffee Beans",
     "Guid": 120031
   },
-  {
+  "135234": {
     "Name": "Cognac",
     "Guid": 135234
   },
-  {
+  "1010230": {
     "Name": "Copper",
     "Guid": 1010230
   },
-  {
+  "120034": {
     "Name": "Corn",
     "Guid": 120034
   },
-  {
+  "5389": {
     "Name": "Costumes",
     "Guid": 5389
   },
-  {
+  "1010253": {
     "Name": "Cotton",
     "Guid": 1010253
   },
-  {
+  "1010240": {
     "Name": "Cotton Fabric",
     "Guid": 1010240
   },
-  {
+  "114359": {
     "Name": "Dried Meat",
     "Guid": 114359
   },
-  {
+  "24807": {
     "Name": "Dung",
     "Guid": 24807
   },
-  {
+  "1010222": {
     "Name": "Dynamite",
     "Guid": 1010222
   },
-  {
+  "6280": {
     "Name": "Electric Cables",
     "Guid": 6280
   },
-  {
+  "134623": {
     "Name": "Elevator",
     "Guid": 134623
   },
-  {
+  "135130": {
     "Name": "Ethanol",
     "Guid": 135130
   },
-  {
+  "5395": {
     "Name": "Fans",
     "Guid": 5395
   },
-  {
+  "120044": {
     "Name": "Felt",
     "Guid": 120044
   },
-  {
+  "24808": {
     "Name": "Fertiliser",
     "Guid": 24808
   },
-  {
+  "1010243": {
     "Name": "Filaments",
     "Guid": 1010243
   },
-  {
+  "5392": {
     "Name": "Film Reel",
     "Guid": 5392
   },
-  {
+  "114401": {
     "Name": "Finery",
     "Guid": 114401
   },
-  {
+  "5393": {
     "Name": "Fire Extinguishers",
     "Guid": 5393
   },
-  {
+  "1010200": {
     "Name": "Fish",
     "Guid": 1010200
   },
-  {
+  "120042": {
     "Name": "Fish Oil",
     "Guid": 120042
   },
-  {
+  "1010235": {
     "Name": "Flour",
     "Guid": 1010235
   },
-  {
+  "120033": {
     "Name": "Fried Plantains",
     "Guid": 120033
   },
-  {
+  "1010247": {
     "Name": "Fur Coats",
     "Guid": 1010247
   },
-  {
+  "1010209": {
     "Name": "Furs",
     "Guid": 1010209
   },
-  {
+  "1010241": {
     "Name": "Glass",
     "Guid": 1010241
   },
-  {
+  "114371": {
     "Name": "Goat Milk",
     "Guid": 114371
   },
-  {
+  "1010249": {
     "Name": "Gold",
     "Guid": 1010249
   },
-  {
+  "1010233": {
     "Name": "Gold Ore",
     "Guid": 1010233
   },
-  {
+  "112697": {
     "Name": "Goose Feathers",
     "Guid": 112697
   },
-  {
+  "1010215": {
     "Name": "Goulash",
     "Guid": 1010215
   },
-  {
+  "1010192": {
     "Name": "Grain",
     "Guid": 1010192
   },
-  {
+  "1010248": {
     "Name": "Gramophones",
     "Guid": 1010248
   },
-  {
+  "120014": {
     "Name": "Grapes",
     "Guid": 120014
   },
-  {
+  "840": {
     "Name": "Helium",
     "Guid": 840
   },
-  {
+  "5383": {
     "Name": "Herbs",
     "Guid": 5383
   },
-  {
+  "114364": {
     "Name": "Hibiscus Petals",
     "Guid": 114364
   },
-  {
+  "114390": {
     "Name": "Hibiscus Tea",
     "Guid": 114390
   },
-  {
+  "1010194": {
     "Name": "Hops",
     "Guid": 1010194
   },
-  {
+  "25506": {
     "Name": "Hot Sauce",
     "Guid": 25506
   },
-  {
+  "112698": {
     "Name": "Huskies",
     "Guid": 112698
   },
-  {
+  "112703": {
     "Name": "Husky Sleds",
     "Guid": 112703
   },
-  {
+  "5382": {
     "Name": "Ice Cream",
     "Guid": 5382
   },
-  {
+  "5387": {
     "Name": "Ice Cube",
     "Guid": 5387
   },
-  {
+  "117698": {
     "Name": "Illuminated Script",
     "Guid": 117698
   },
-  {
+  "114368": {
     "Name": "Indigo Dye",
     "Guid": 114368
   },
-  {
+  "1414": {
     "Name": "Industrial Lubricant",
     "Guid": 1414
   },
-  {
+  "1010227": {
     "Name": "Iron",
     "Guid": 1010227
   },
-  {
+  "5381": {
     "Name": "Jalea",
     "Guid": 5381
   },
-  {
+  "133183": {
     "Name": "Jam",
     "Guid": 133183
   },
-  {
+  "1010250": {
     "Name": "Jewellery",
     "Guid": 1010250
   },
-  {
+  "135129": {
     "Name": "Lacquer",
     "Guid": 135129
   },
-  {
+  "117699": {
     "Name": "Lanterns",
     "Guid": 117699
   },
-  {
+  "114428": {
     "Name": "Leather Boots",
     "Guid": 114428
   },
-  {
+  "133185": {
     "Name": "Lemonade",
     "Guid": 133185
   },
-  {
+  "1010208": {
     "Name": "Light Bulbs",
     "Guid": 1010208
   },
-  {
+  "114391": {
     "Name": "Linen",
     "Guid": 114391
   },
-  {
+  "114365": {
     "Name": "Linseed",
     "Guid": 114365
   },
-  {
+  "118728": {
     "Name": "Lobster",
     "Guid": 118728
   },
-  {
+  "115980": {
     "Name": "Lost Expedition Scrap",
     "Guid": 115980
   },
-  {
+  "1010236": {
     "Name": "Malt",
     "Guid": 1010236
   },
-  {
+  "5397": {
     "Name": "Medicine",
     "Guid": 5397
   },
-  {
+  "6600": {
     "Name": "Mezcal",
     "Guid": 6600
   },
-  {
+  "5385": {
     "Name": "Milk",
     "Guid": 5385
   },
-  {
+  "5398": {
     "Name": "Minerals",
     "Guid": 5398
   },
-  {
+  "5390": {
     "Name": "Motor",
     "Guid": 5390
   },
-  {
+  "114402": {
     "Name": "Mud Bricks",
     "Guid": 114402
   },
-  {
+  "5401": {
     "Name": "Nandu Feathers",
     "Guid": 5401
   },
-  {
+  "5384": {
     "Name": "Nandu Leather",
     "Guid": 5384
   },
-  {
+  "112520": {
     "Name": "Nice Scrap",
     "Guid": 112520
   },
-  {
+  "112702": {
     "Name": "Oil Lamps",
     "Guid": 112702
   },
-  {
+  "5386": {
     "Name": "Orchid",
     "Guid": 5386
   },
-  {
+  "117701": {
     "Name": "Ornate Candles",
     "Guid": 117701
   },
-  {
+  "848": {
     "Name": "Pamphlets",
     "Guid": 848
   },
-  {
+  "117702": {
     "Name": "Paper",
     "Guid": 117702
   },
-  {
+  "112700": {
     "Name": "Parkas",
     "Guid": 112700
   },
-  {
+  "1010256": {
     "Name": "Pearls",
     "Guid": 1010256
   },
-  {
+  "112705": {
     "Name": "Pemmican",
     "Guid": 112705
   },
-  {
+  "1010245": {
     "Name": "Penny Farthings",
     "Guid": 1010245
   },
-  {
+  "5388": {
     "Name": "Perfumes",
     "Guid": 5388
   },
-  {
+  "5400": {
     "Name": "Pigments",
     "Guid": 5400
   },
-  {
+  "1010199": {
     "Name": "Pigs",
     "Guid": 1010199
   },
-  {
+  "120041": {
     "Name": "Plantains",
     "Guid": 120041
   },
-  {
+  "1010246": {
     "Name": "Pocket Watches",
     "Guid": 1010246
   },
-  {
+  "5394": {
     "Name": "Police Equipment",
     "Guid": 5394
   },
-  {
+  "120043": {
     "Name": "Ponchos",
     "Guid": 120043
   },
-  {
+  "1010195": {
     "Name": "Potatoes",
     "Guid": 1010195
   },
-  {
+  "1010228": {
     "Name": "Quartz Sand",
     "Guid": 1010228
   },
-  {
+  "1010198": {
     "Name": "Red Peppers",
     "Guid": 1010198
   },
-  {
+  "1010202": {
     "Name": "Reinforced Concrete",
     "Guid": 1010202
   },
-  {
+  "135086": {
     "Name": "Resin",
     "Guid": 135086
   },
-  {
+  "1010257": {
     "Name": "Rum",
     "Guid": 1010257
   },
-  {
+  "1010210": {
     "Name": "Sails",
     "Guid": 1010210
   },
-  {
+  "114358": {
     "Name": "Salt",
     "Guid": 114358
   },
-  {
+  "1010232": {
     "Name": "Saltpetre",
     "Guid": 1010232
   },
-  {
+  "114357": {
     "Name": "Sanga Cow",
     "Guid": 114357
   },
-  {
+  "1010238": {
     "Name": "Sausages",
     "Guid": 1010238
   },
-  {
+  "1010216": {
     "Name": "Schnapps",
     "Guid": 1010216
   },
-  {
+  "5391": {
     "Name": "Scooter",
     "Guid": 5391
   },
-  {
+  "112518": {
     "Name": "Scrap",
     "Guid": 112518
   },
-  {
+  "847": {
     "Name": "Sea Mines",
     "Guid": 847
   },
-  {
+  "114410": {
     "Name": "Seafood Stew",
     "Guid": 114410
   },
-  {
+  "112696": {
     "Name": "Seal Skin",
     "Guid": 112696
   },
-  {
+  "1010206": {
     "Name": "Sewing Machines",
     "Guid": 1010206
   },
-  {
+  "133181": {
     "Name": "Shampoo",
     "Guid": 133181
   },
-  {
+  "6360": {
     "Name": "Silver Ore",
     "Guid": 6360
   },
-  {
+  "112704": {
     "Name": "Sleds",
     "Guid": 112704
   },
-  {
+  "112701": {
     "Name": "Sleeping Bags",
     "Guid": 112701
   },
-  {
+  "1010203": {
     "Name": "Soap",
     "Guid": 1010203
   },
-  {
+  "5803": {
     "Name": "Soccer Balls",
     "Guid": 5803
   },
-  {
+  "133532": {
     "Name": "Souvenirs",
     "Guid": 133532
   },
-  {
+  "112523": {
     "Name": "Special Scrap",
     "Guid": 112523
   },
-  {
+  "120030": {
     "Name": "Spectacles",
     "Guid": 120030
   },
-  {
+  "114408": {
     "Name": "Spiced Flour",
     "Guid": 114408
   },
-  {
+  "114369": {
     "Name": "Spices",
     "Guid": 114369
   },
-  {
+  "1010225": {
     "Name": "Steam Carriages",
     "Guid": 1010225
   },
-  {
+  "1010224": {
     "Name": "Steam Motors",
     "Guid": 1010224
   },
-  {
+  "1010219": {
     "Name": "Steel",
     "Guid": 1010219
   },
-  {
+  "1010218": {
     "Name": "Steel Beams",
     "Guid": 1010218
   },
-  {
+  "1010239": {
     "Name": "Sugar",
     "Guid": 1010239
   },
-  {
+  "1010251": {
     "Name": "Sugar Cane",
     "Guid": 1010251
   },
-  {
+  "114430": {
     "Name": "Tailored Suits",
     "Guid": 114430
   },
-  {
+  "1010234": {
     "Name": "Tallow",
     "Guid": 1010234
   },
-  {
+  "114404": {
     "Name": "Tapestries",
     "Guid": 114404
   },
-  {
+  "114367": {
     "Name": "Teff",
     "Guid": 114367
   },
-  {
+  "114431": {
     "Name": "Telephones",
     "Guid": 114431
   },
-  {
+  "1010196": {
     "Name": "Timber",
     "Guid": 1010196
   },
-  {
+  "1010252": {
     "Name": "Tobacco",
     "Guid": 1010252
   },
-  {
+  "120035": {
     "Name": "Tortillas",
     "Guid": 120035
   },
-  {
+  "135231": {
     "Name": "Toys",
     "Guid": 135231
   },
-  {
+  "135230": {
     "Name": "Typewriter",
     "Guid": 135230
   },
-  {
+  "135233": {
     "Name": "Violins",
     "Guid": 135233
   },
-  {
+  "114356": {
     "Name": "Wanza Timber",
     "Guid": 114356
   },
-  {
+  "850": {
     "Name": "Water Drop",
     "Guid": 850
   },
-  {
+  "1010221": {
     "Name": "Weapons",
     "Guid": 1010221
   },
-  {
+  "112699": {
     "Name": "Whale Oil",
     "Guid": 112699
   },
-  {
+  "1010207": {
     "Name": "Windows",
     "Guid": 1010207
   },
-  {
+  "120008": {
     "Name": "Wood",
     "Guid": 120008
   },
-  {
+  "1010242": {
     "Name": "Wood Veneers",
     "Guid": 1010242
   },
-  {
+  "1010197": {
     "Name": "Wool",
     "Guid": 1010197
   },
-  {
+  "1010237": {
     "Name": "Work Clothes",
     "Guid": 1010237
   },
-  {
+  "1010229": {
     "Name": "Zinc",
     "Guid": 1010229
   }
-]
+}

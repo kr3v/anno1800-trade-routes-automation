@@ -8,3 +8,4 @@ export * from './deficit-surplus';
 export * from './ship-logs';
 export * from './coordinates';
 export * from './area-files';
+export * from './base-log';

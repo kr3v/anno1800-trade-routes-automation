@@ -1,16 +1,17 @@
 /**
- * Parser for trade-execute-iteration.*.log files
+ * Parser for base.log files
  */
 
 import type {FileSystemDirectoryHandle} from '@/file-access';
 import {listFiles, readFileAsText} from '@/file-access';
-import {parseTimestamp} from './trades';
+import {parseBaseLog, type ShipCountLogEntry, type TasksSpawnedLogEntry} from './base-log';
 
 /** Parsed log entry */
 export interface ShipLogEntry {
     timestamp: Date;
     shipsAvailable: number;
     tasksSpawned: number;
+    region?: string;
 }
 
 /** Ship usage data for a mode (regular or hub) */
@@ -25,24 +26,72 @@ export interface ShipUsageResult {
 }
 
 /**
- * Parse a single log file content
+ * Parse base.log content for ship usage data
  */
-function parseLogContent(content: string): ShipLogEntry | null {
-    // Extract timestamp
-    const timestampMatch = content.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?)/);
-    if (!timestampMatch) return null;
+function parseLogContent(content: string): {regular: ShipLogEntry[]; hub: ShipLogEntry[]} {
+    const entries = parseBaseLog(content);
 
-    const timestamp = parseTimestamp(timestampMatch[1]);
+    // Group data by iteration and type
+    const regularData = new Map<number, {timestamp: Date; ships?: number; tasks?: number; region?: string}>();
+    const hubData = new Map<number, {timestamp: Date; ships?: number; tasks?: number; region?: string}>();
 
-    // Extract ships available
-    const shipsMatch = content.match(/Total available trade route automation ships:\s*(\d+)/);
-    const shipsAvailable = shipsMatch ? parseInt(shipsMatch[1], 10) : 0;
+    for (const entry of entries) {
+        if (entry.type === 'ship_count') {
+            const shipCount = entry as ShipCountLogEntry;
+            if (shipCount.iteration && shipCount.countType === 'available') {
+                const map = shipCount.tradeType === 'hub' ? hubData : regularData;
+                if (!map.has(shipCount.iteration)) {
+                    map.set(shipCount.iteration, {timestamp: shipCount.timestamp!, region: shipCount.region});
+                }
+                map.get(shipCount.iteration)!.ships = shipCount.count;
+                if (shipCount.region) {
+                    map.get(shipCount.iteration)!.region = shipCount.region;
+                }
+            }
+        } else if (entry.type === 'tasks_spawned') {
+            const tasksSpawned = entry as TasksSpawnedLogEntry;
+            const map = tasksSpawned.tradeType === 'hub' ? hubData : regularData;
+            if (!map.has(tasksSpawned.iteration)) {
+                map.set(tasksSpawned.iteration, {timestamp: tasksSpawned.timestamp!, region: tasksSpawned.region});
+            }
+            map.get(tasksSpawned.iteration)!.tasks = tasksSpawned.tasksSpawned;
+            if (tasksSpawned.region) {
+                map.get(tasksSpawned.iteration)!.region = tasksSpawned.region;
+            }
+        }
+    }
 
-    // Extract tasks spawned
-    const tasksMatch = content.match(/Spawned\s+(\d+)\s+async tasks for trade route execution/);
-    const tasksSpawned = tasksMatch ? parseInt(tasksMatch[1], 10) : 0;
+    // Convert to entries array
+    const regularEntries: ShipLogEntry[] = [];
+    const hubEntries: ShipLogEntry[] = [];
 
-    return {timestamp, shipsAvailable, tasksSpawned};
+    for (const [_iteration, data] of regularData.entries()) {
+        if (data.ships !== undefined || data.tasks !== undefined) {
+            regularEntries.push({
+                timestamp: data.timestamp,
+                shipsAvailable: data.ships ?? 0,
+                tasksSpawned: data.tasks ?? 0,
+                region: data.region,
+            });
+        }
+    }
+
+    for (const [_iteration, data] of hubData.entries()) {
+        if (data.ships !== undefined || data.tasks !== undefined) {
+            hubEntries.push({
+                timestamp: data.timestamp,
+                shipsAvailable: data.ships ?? 0,
+                tasksSpawned: data.tasks ?? 0,
+                region: data.region,
+            });
+        }
+    }
+
+    // Sort by timestamp
+    regularEntries.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    hubEntries.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+    return {regular: regularEntries, hub: hubEntries};
 }
 
 /**
@@ -50,7 +99,6 @@ function parseLogContent(content: string): ShipLogEntry | null {
  */
 export async function loadShipUsage(
     dirHandle: FileSystemDirectoryHandle,
-    // region: string = 'OW'
 ): Promise<ShipUsageResult> {
     const logDir = dirHandle;
 
@@ -61,8 +109,8 @@ export async function loadShipUsage(
         };
     }
 
-    // List all log files
-    const logPattern = /^TrRAt_([a-zA-Z0-9_\s-]+?)_trade-execute-iteration\.log(\.hub)?$/;
+    // List all base.log files
+    const logPattern = /^TrRAt_([a-zA-Z0-9_\s-]+?)_base\.log$/;
     const logFiles = await listFiles(logDir, logPattern);
 
     // Parse log files
@@ -71,15 +119,9 @@ export async function loadShipUsage(
 
     for (const fileHandle of logFiles) {
         const content = await readFileAsText(fileHandle);
-        const entry = parseLogContent(content);
-
-        if (entry) {
-            if (fileHandle.name.endsWith('.hub')) {
-                hubEntries.push(entry);
-            } else {
-                regularEntries.push(entry);
-            }
-        }
+        const {regular, hub} = parseLogContent(content);
+        regularEntries.push(...regular);
+        hubEntries.push(...hub);
     }
 
     // Sort by timestamp

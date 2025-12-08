@@ -11,7 +11,6 @@ local Anno = require("trade_route_automation/anno_interface");
 local async = require("trade_route_automation/utils_async");
 local shipCmd = require("trade_route_automation/mod_ship_cmd");
 local objectAccessor = require("trade_route_automation/anno_object_accessor");
-local logger = require("trade_route_automation/utils_logger");
 local AnnoInfo = require("trade_route_automation/generator/products");
 
 ---
@@ -52,17 +51,22 @@ function TradeExecutor.Ship_Name_StoreCmdInfo(oid, dst)
     local x = dst.x;
     local y = dst.y;
     local areaID = dst.area_id;
+    local name = dst.name;
 
     if dst.x == nil or dst.y == nil or dst.area_id == nil
             or dst.x <= 0 or dst.y <= 0 or dst.area_id <= 0 then
         error(string.format("Invalid dst info to store in ship name: x=%s, y=%s, area_id=%s",
-            tostring(dst.x), tostring(dst.y), tostring(dst.area_id)));
+                tostring(dst.x), tostring(dst.y), tostring(dst.area_id)));
     end
 
-    local name = Anno.Ship_Name_Get(oid);
-    local sep = string.find(name, SEPARATOR);
-    if sep then
-        name = string.sub(name, 1, sep - 1);
+    if not name then
+        local name1 = Anno.Ship_Name_Get(oid);
+        local sep = string.find(name1, SEPARATOR);
+        if sep then
+            name = string.sub(name1, 1, sep - 1);
+        else
+            name = name1:sub(1, 2);
+        end
     end
 
     local info = name .. SEPARATOR ..
@@ -72,12 +76,19 @@ function TradeExecutor.Ship_Name_StoreCmdInfo(oid, dst)
     Anno.Ship_Name_Set(oid, info);
 end
 
+---@class ShipInfo
+---@field name string
+---@field x number|nil
+---@field y number|nil
+---@field area_id number|nil
+
+---@return ShipInfo
 function TradeExecutor.Ship_Name_FetchCmdInfo(oid)
     local name = Anno.Ship_Name_Get(oid);
     -- if name characters are outside the alphabet, then no info is packed
     for c in string.gmatch(name, ".") do
         if not string.find(alphabet, c, 1, true) and c ~= SEPARATOR then
-            return nil; -- No info packed
+            return { name = name };
         end
     end
 
@@ -87,7 +98,7 @@ function TradeExecutor.Ship_Name_FetchCmdInfo(oid)
     end
 
     if #parts < 4 then
-        return nil; -- No info packed
+        return { name = name }; -- No info packed
     end
 
     local info = {
@@ -98,8 +109,8 @@ function TradeExecutor.Ship_Name_FetchCmdInfo(oid)
     };
 
     if info.x == nil or info.y == nil or info.area_id == nil
-        or info.x <= 0 or info.y <= 0 or info.area_id <= 0 then
-        return nil; -- Invalid info
+            or info.x <= 0 or info.y <= 0 or info.area_id <= 0 then
+        return { name = name }; -- Invalid info
     end
 
     return info;
@@ -135,10 +146,13 @@ local function dst_unload(
     for i, cargo_item in pairs(cargo) do
         if cargo_item.Guid == good_id then
             Anno.Area_AddGood(region, areaID_dst, cargo_item.Guid, cargo_item.Value)
-            Anno.Ship_Cargo_Clear(ship_oid, i)
             total_unloaded = total_unloaded + cargo_item.Value
         end
     end
+    for i = 0, Anno.Ship_Cargo_SlotCapacity(ship_oid)+1 do
+        Anno.Ship_Cargo_Clear(ship_oid, i)
+    end
+
     return total_unloaded
 end
 
@@ -275,14 +289,8 @@ end
 
 -- Helper: Clears all cargo from a ship
 function TradeExecutor._ClearAllShipCargo(ship_oid)
-    local cargo = Anno.Ship_Cargo_Get(ship_oid)
-
-    for i, cargo_item in ipairs(cargo) do
+    for i = 0, Anno.Ship_Cargo_SlotCapacity(ship_oid)+1 do
         Anno.Ship_Cargo_Clear(ship_oid, i)
-    end
-
-    if logger then
-        logger.logf("Cleared %d cargo slots from ship %d", #cargo, ship_oid)
     end
 end
 
@@ -298,9 +306,17 @@ function TradeExecutor._ExecuteUnloadWithShip(L, region, ship_oid, good_id, area
     return async.spawn(function()
         L.logf("Moving ship %d to unload at area %d (x=%d, y=%d)", ship_oid, areaID_dst, area_dst_coords.x, area_dst_coords.y)
         dst_moveTo(ship_oid, area_dst_coords, areaID_dst)
-
         L.logf("Ship %d arrived at unload area %d, unloading good %d", ship_oid, areaID_dst, good_id)
-        dst_unload(region, ship_oid, good_id, areaID_dst)
+
+
+        local areaDst_before = Anno.Area_GetGood(region, areaID_dst, good_id)
+        async.sleep(1)
+        local unloaded = dst_unload(region, ship_oid, good_id, areaID_dst);
+        async.sleep(1)
+        local areaDst_after = Anno.Area_GetGood(region, areaID_dst, good_id)
+
+        L.logf("Unloaded %d units of good %d at area %d; area good before: %d, after: %d",
+                unloaded, good_id, areaID_dst, areaDst_before, areaDst_after)
     end)
 end
 

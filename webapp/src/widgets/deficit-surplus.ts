@@ -3,9 +3,8 @@
  * Displays current deficit and surplus goods
  */
 
-import type { FileSystemDirectoryHandle } from '@/file-access';
-import { loadDeficitSurplus, type DeficitSurplusData } from '@/parsers/deficit-surplus';
-import { loadGoodsNames } from '@/parsers/texts';
+import type { DataStore } from '@/data-store';
+import type { DeficitSurplusData } from '@/parsers/deficit-surplus';
 
 export class DeficitSurplusWidget {
   private container: HTMLElement | null = null;
@@ -15,12 +14,18 @@ export class DeficitSurplusWidget {
     this.container = container;
   }
 
-  async load(dirHandle: FileSystemDirectoryHandle, profileName: string, region: string = 'OW'): Promise<void> {
+  async load(dataStore: DataStore, profileName: string, region: string = 'OW'): Promise<void> {
     if (!this.container) return;
 
     try {
-      const goodsNames = await loadGoodsNames(dirHandle, 'texts.json');
-      this.data = await loadDeficitSurplus(dirHandle, profileName, region, goodsNames);
+      // Get deficit/surplus data from DataStore (already parsed)
+      this.data = dataStore.getDeficitSurplus(profileName, region);
+
+      if (!this.data) {
+        this.container.innerHTML = `<div class="error">No deficit/surplus data found for ${profileName} (${region})</div>`;
+        return;
+      }
+
       this.render();
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Unknown error';

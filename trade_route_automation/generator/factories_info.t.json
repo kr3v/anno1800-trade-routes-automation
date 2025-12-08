@@ -1,0 +1,4211 @@
+{
+  "1010282": {
+    "Guid": 1010282,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010230,
+        "Text": "Copper"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010229,
+        "Text": "Zinc"
+      }
+    ],
+    "Name": "Brass Smeltery"
+  },
+  "135418": {
+    "Guid": 135418,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135087,
+        "Text": "Cherry Wood"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      },
+      {
+        "Value": "1",
+        "Guid": 120014,
+        "Text": "Grapes"
+      }
+    ],
+    "Name": "Artisan's Workshop: Cognac"
+  },
+  "1010323": {
+    "Guid": 1010323,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      }
+    ],
+    "Name": "Bicycle Factory"
+  },
+  "118571": {
+    "Guid": 118571,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010566,
+        "Text": "Oil"
+      }
+    ],
+    "Name": "Fuel Station"
+  },
+  "1010283": {
+    "Guid": 1010283,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010201,
+        "Text": "Clay"
+      }
+    ],
+    "Name": "Brick Factory"
+  },
+  "1010342": {
+    "Guid": 1010342,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010252,
+        "Text": "Tobacco"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010242,
+        "Text": "Wood Veneers"
+      }
+    ],
+    "Name": "Cigar Factory"
+  },
+  "112685": {
+    "Guid": 112685,
+    "Consumption": [
+      {
+        "Value": "3",
+        "Guid": 1010231,
+        "Text": "Cement"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Arctic Airship Hangar: Foundations"
+  },
+  "133341": {
+    "Guid": 133341,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010252,
+        "Text": "Tobacco"
+      },
+      {
+        "Value": "1",
+        "Guid": 118728,
+        "Text": "Lobster"
+      }
+    ],
+    "Name": "Restaurant: Lobster Cheminée"
+  },
+  "101186": {
+    "Guid": 101186,
+    "Consumption": [
+      {
+        "Value": "15",
+        "Guid": 1010197,
+        "Text": "Wool"
+      }
+    ],
+    "Name": "Excavation Site"
+  },
+  "135088": {
+    "Guid": 135088,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Orchard: Cherry Wood"
+  },
+  "133339": {
+    "Guid": 133339,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010195,
+        "Text": "Potatoes"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010200,
+        "Text": "Fish"
+      }
+    ],
+    "Name": "Restaurant: Fish and Frites"
+  },
+  "119026": {
+    "Guid": 119026,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 270042,
+        "Text": "Fuel"
+      }
+    ],
+    "Name": "Tractor Barn"
+  },
+  "112680": {
+    "Guid": 112680,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 112704,
+        "Text": "Sleds"
+      },
+      {
+        "Value": "1",
+        "Guid": 112698,
+        "Text": "Huskies"
+      }
+    ],
+    "Name": "Husky Sled Factory"
+  },
+  "101040": {
+    "Guid": 101040,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Excavation Site"
+  },
+  "117744": {
+    "Guid": 117744,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Paper Mill"
+  },
+  "112681": {
+    "Guid": 112681,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      },
+      {
+        "Value": "1",
+        "Guid": 112696,
+        "Text": "Seal Skin"
+      }
+    ],
+    "Name": "Sled Frame Factory"
+  },
+  "1010289": {
+    "Guid": 1010289,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Coachmakers"
+  },
+  "135193": {
+    "Guid": 135193,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 133095,
+        "Text": "Coconut Oil"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      },
+      {
+        "Value": "1",
+        "Guid": 112699,
+        "Text": "Whale Oil"
+      }
+    ],
+    "Name": "Drug Store: Face Cream"
+  },
+  "119027": {
+    "Guid": 119027,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 270042,
+        "Text": "Fuel"
+      }
+    ],
+    "Name": "Tractor Barn"
+  },
+  "1010313": {
+    "Guid": 1010313,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010192,
+        "Text": "Grain"
+      }
+    ],
+    "Name": "Flour Mill"
+  },
+  "1010328": {
+    "Guid": 1010328,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010249,
+        "Text": "Gold"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010256,
+        "Text": "Pearls"
+      }
+    ],
+    "Name": "Jewellers"
+  },
+  "101311": {
+    "Guid": 101311,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Gold Mine"
+  },
+  "1010304": {
+    "Guid": 1010304,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Coal Mine"
+  },
+  "1010307": {
+    "Guid": 1010307,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Zinc Mine"
+  },
+  "24861": {
+    "Guid": 24861,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010232,
+        "Text": "Saltpetre"
+      },
+      {
+        "Value": "1",
+        "Guid": 24807,
+        "Text": "Dung"
+      }
+    ],
+    "Name": "Ammonia Plant"
+  },
+  "1010300": {
+    "Guid": 1010300,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010232,
+        "Text": "Saltpetre"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010234,
+        "Text": "Tallow"
+      }
+    ],
+    "Name": "Dynamite Factory"
+  },
+  "101273": {
+    "Guid": 101273,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120044,
+        "Text": "Felt"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010240,
+        "Text": "Cotton Fabric"
+      }
+    ],
+    "Name": "Bombín Weaver"
+  },
+  "24856": {
+    "Guid": 24856,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 24821,
+        "Text": "Coke"
+      },
+      {
+        "Value": "1",
+        "Guid": 24846,
+        "Text": "Silver Amalgam"
+      }
+    ],
+    "Name": "Silver Smelter"
+  },
+  "133346": {
+    "Guid": 133346,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010257,
+        "Text": "Rum"
+      },
+      {
+        "Value": "1",
+        "Guid": 114369,
+        "Text": "Spices"
+      },
+      {
+        "Value": "1",
+        "Guid": 114364,
+        "Text": "Hibiscus Petals"
+      }
+    ],
+    "Name": "Bar: Enbesa Sunrise"
+  },
+  "101266": {
+    "Guid": 101266,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120036,
+        "Text": "Alpaca Wool"
+      }
+    ],
+    "Name": "Poncho Darner"
+  },
+  "133930": {
+    "Guid": 133930,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010213,
+        "Text": "Bread"
+      },
+      {
+        "Value": "1",
+        "Guid": 120014,
+        "Text": "Grapes"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010257,
+        "Text": "Rum"
+      }
+    ],
+    "Name": "The Iron Tower: Trifle Tower"
+  },
+  "124737": {
+    "Guid": 124737,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010195,
+        "Text": "Potatoes"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      }
+    ],
+    "Name": "Advanced Rum Distillery"
+  },
+  "112667": {
+    "Guid": 112667,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Caribou Hunting Cabin"
+  },
+  "7399": {
+    "Guid": 7399,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010234,
+        "Text": "Tallow"
+      }
+    ],
+    "Name": "Fuel Power Plant"
+  },
+  "1010312": {
+    "Guid": 1010312,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010199,
+        "Text": "Pigs"
+      }
+    ],
+    "Name": "Rendering Works"
+  },
+  "114468": {
+    "Guid": 114468,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114364,
+        "Text": "Hibiscus Petals"
+      }
+    ],
+    "Name": "Tea Spicer"
+  },
+  "2399": {
+    "Guid": 2399,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Coal Mine"
+  },
+  "132766": {
+    "Guid": 132766,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "2",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      }
+    ],
+    "Name": "The Iron Tower: Superstructure"
+  },
+  "124738": {
+    "Guid": 124738,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010236,
+        "Text": "Malt"
+      }
+    ],
+    "Name": "Advanced Coffee Roaster"
+  },
+  "101265": {
+    "Guid": 101265,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010240,
+        "Text": "Cotton Fabric"
+      }
+    ],
+    "Name": "Sailmakers"
+  },
+  "135224": {
+    "Guid": 135224,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 134616,
+        "Text": "Camphor Wax"
+      },
+      {
+        "Value": "1",
+        "Guid": 135130,
+        "Text": "Ethanol"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010253,
+        "Text": "Cotton"
+      }
+    ],
+    "Name": "Chemical Plant: Celluloid"
+  },
+  "101252": {
+    "Guid": 101252,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120031,
+        "Text": "Coffee Beans"
+      }
+    ],
+    "Name": "Coffee Roaster"
+  },
+  "6005": {
+    "Guid": 6005,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010207,
+        "Text": "Windows"
+      }
+    ],
+    "Name": "Dam Phase 3/3: Engineering"
+  },
+  "6004": {
+    "Guid": 6004,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      }
+    ],
+    "Name": "Dam Phase 2/3: Structure"
+  },
+  "6003": {
+    "Guid": 6003,
+    "Consumption": [
+      {
+        "Value": "3",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "2",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Dam Phase 1/3: Foundations"
+  },
+  "6260": {
+    "Guid": 6260,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5397,
+        "Text": "Medicine"
+      }
+    ],
+    "Name": "City Hospital"
+  },
+  "7314": {
+    "Guid": 7314,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010234,
+        "Text": "Tallow"
+      }
+    ],
+    "Name": "Loading Crane"
+  },
+  "6258": {
+    "Guid": 6258,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5394,
+        "Text": "Police Equipment"
+      }
+    ],
+    "Name": "Police Headquarters"
+  },
+  "6018": {
+    "Guid": 6018,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5392,
+        "Text": "Film Reel"
+      }
+    ],
+    "Name": "Cinema"
+  },
+  "5164": {
+    "Guid": 5164,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010566,
+        "Text": "Oil"
+      }
+    ],
+    "Name": "Power Station"
+  },
+  "5462": {
+    "Guid": 5462,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010232,
+        "Text": "Saltpetre"
+      },
+      {
+        "Value": "1",
+        "Guid": 5398,
+        "Text": "Minerals"
+      }
+    ],
+    "Name": "Laboratory: Pigments"
+  },
+  "6631": {
+    "Guid": 6631,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5386,
+        "Text": "Orchid"
+      },
+      {
+        "Value": "1",
+        "Guid": 135130,
+        "Text": "Ethanol"
+      },
+      {
+        "Value": "1",
+        "Guid": 5383,
+        "Text": "Herbs"
+      }
+    ],
+    "Name": "Laboratory: Medicine"
+  },
+  "6629": {
+    "Guid": 6629,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      }
+    ],
+    "Name": "Laboratory: Fire Extinguisher"
+  },
+  "6630": {
+    "Guid": 6630,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010240,
+        "Text": "Cotton Fabric"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Arsenal: Police Equipment"
+  },
+  "5828": {
+    "Guid": 5828,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135150,
+        "Text": "Celluloid"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010232,
+        "Text": "Saltpetre"
+      }
+    ],
+    "Name": "Chemical Plant: Film Reels"
+  },
+  "5933": {
+    "Guid": 5933,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5400,
+        "Text": "Pigments"
+      },
+      {
+        "Value": "1",
+        "Guid": 5401,
+        "Text": "Nandu Feathers"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010240,
+        "Text": "Cotton Fabric"
+      }
+    ],
+    "Name": "Costume Shop"
+  },
+  "5657": {
+    "Guid": 5657,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135130,
+        "Text": "Ethanol"
+      },
+      {
+        "Value": "1",
+        "Guid": 133095,
+        "Text": "Coconut Oil"
+      },
+      {
+        "Value": "1",
+        "Guid": 5386,
+        "Text": "Orchid"
+      }
+    ],
+    "Name": "Perfume Mixer"
+  },
+  "5862": {
+    "Guid": 5862,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 838,
+        "Text": "Aluminium Profiles"
+      },
+      {
+        "Value": "1",
+        "Guid": 5390,
+        "Text": "Motor"
+      }
+    ],
+    "Name": "Fan Factory"
+  },
+  "5659": {
+    "Guid": 5659,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135150,
+        "Text": "Celluloid"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 6280,
+        "Text": "Electric Cables"
+      }
+    ],
+    "Name": "Motor Assembly Plant"
+  },
+  "5658": {
+    "Guid": 5658,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5400,
+        "Text": "Pigments"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      },
+      {
+        "Value": "1",
+        "Guid": 5390,
+        "Text": "Motor"
+      }
+    ],
+    "Name": "Scooter Factory"
+  },
+  "5459": {
+    "Guid": 5459,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010258,
+        "Text": "Chocolate"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      },
+      {
+        "Value": "1",
+        "Guid": 5385,
+        "Text": "Milk"
+      }
+    ],
+    "Name": "Ice Cream Factory"
+  },
+  "5458": {
+    "Guid": 5458,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5383,
+        "Text": "Herbs"
+      },
+      {
+        "Value": "1",
+        "Guid": 120034,
+        "Text": "Corn"
+      },
+      {
+        "Value": "1",
+        "Guid": 5380,
+        "Text": "Calamari"
+      }
+    ],
+    "Name": "Jalea Kitchen"
+  },
+  "6279": {
+    "Guid": 6279,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010230,
+        "Text": "Copper"
+      }
+    ],
+    "Name": "Cable Factory"
+  },
+  "6083": {
+    "Guid": 6083,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 838,
+        "Text": "Aluminium Profiles"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Sewing Machine Factory"
+  },
+  "6080": {
+    "Guid": 6080,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010227,
+        "Text": "Iron"
+      }
+    ],
+    "Name": "Furnace"
+  },
+  "6137": {
+    "Guid": 6137,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010216,
+        "Text": "Schnapps"
+      },
+      {
+        "Value": "1",
+        "Guid": 5383,
+        "Text": "Herbs"
+      }
+    ],
+    "Name": "Bar: Absinthe"
+  },
+  "6136": {
+    "Guid": 6136,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5383,
+        "Text": "Herbs"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010235,
+        "Text": "Flour"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010193,
+        "Text": "Beef"
+      }
+    ],
+    "Name": "Restaurant: Empanadas"
+  },
+  "6355": {
+    "Guid": 6355,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5397,
+        "Text": "Medicine"
+      }
+    ],
+    "Name": "City Hospital"
+  },
+  "6354": {
+    "Guid": 6354,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5393,
+        "Text": "Fire Extinguishers"
+      }
+    ],
+    "Name": "Fire Department"
+  },
+  "1010309": {
+    "Guid": 1010309,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Limestone Quarry"
+  },
+  "134622": {
+    "Guid": 134622,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010242,
+        "Text": "Wood Veneers"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010224,
+        "Text": "Steam Motors"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      }
+    ],
+    "Name": "Assembly Line: Elevators"
+  },
+  "112675": {
+    "Guid": 112675,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 112697,
+        "Text": "Goose Feathers"
+      },
+      {
+        "Value": "1",
+        "Guid": 112696,
+        "Text": "Seal Skin"
+      }
+    ],
+    "Name": "Sleeping Bag Factory"
+  },
+  "1010296": {
+    "Guid": 1010296,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      }
+    ],
+    "Name": "Steelworks"
+  },
+  "1010314": {
+    "Guid": 1010314,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010192,
+        "Text": "Grain"
+      }
+    ],
+    "Name": "Malthouse"
+  },
+  "133345": {
+    "Guid": 133345,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120014,
+        "Text": "Grapes"
+      },
+      {
+        "Value": "1",
+        "Guid": 133093,
+        "Text": "Cinnamon"
+      },
+      {
+        "Value": "1",
+        "Guid": 112699,
+        "Text": "Whale Oil"
+      }
+    ],
+    "Name": "Bar: Arctic Glogg"
+  },
+  "5840": {
+    "Guid": 5840,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5389,
+        "Text": "Costumes"
+      }
+    ],
+    "Name": "Samba School"
+  },
+  "133343": {
+    "Guid": 133343,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120016,
+        "Text": "Champagne"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      }
+    ],
+    "Name": "Bar: Montmartre '75'"
+  },
+  "2397": {
+    "Guid": 2397,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010227,
+        "Text": "Iron"
+      }
+    ],
+    "Name": "Furnace"
+  },
+  "133932": {
+    "Guid": 133932,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010195,
+        "Text": "Potatoes"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010198,
+        "Text": "Red Peppers"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010193,
+        "Text": "Beef"
+      },
+      {
+        "Value": "1",
+        "Guid": 112706,
+        "Text": "Arctic Gas"
+      }
+    ],
+    "Name": "The Iron Tower: Age of Exploration"
+  },
+  "135188": {
+    "Guid": 135188,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135150,
+        "Text": "Celluloid"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010197,
+        "Text": "Wool"
+      }
+    ],
+    "Name": "Department Store: Vacuum Cleaners"
+  },
+  "133031": {
+    "Guid": 133031,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Orchard: Citrus"
+  },
+  "1010316": {
+    "Guid": 1010316,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010199,
+        "Text": "Pigs"
+      }
+    ],
+    "Name": "Slaughterhouse"
+  },
+  "6138": {
+    "Guid": 6138,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5386,
+        "Text": "Orchid"
+      },
+      {
+        "Value": "1",
+        "Guid": 133183,
+        "Text": "Jam"
+      },
+      {
+        "Value": "1",
+        "Guid": 5385,
+        "Text": "Milk"
+      }
+    ],
+    "Name": "Cafe: Cone O'Copia"
+  },
+  "133004": {
+    "Guid": 133004,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Orchard: Coconut Oil"
+  },
+  "118735": {
+    "Guid": 118735,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010242,
+        "Text": "Wood Veneers"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010243,
+        "Text": "Filaments"
+      }
+    ],
+    "Name": "Telephone Manufacturer"
+  },
+  "135397": {
+    "Guid": 135397,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135087,
+        "Text": "Cherry Wood"
+      },
+      {
+        "Value": "1",
+        "Guid": 135129,
+        "Text": "Lacquer"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      }
+    ],
+    "Name": "Artisan's Workshop: Violins"
+  },
+  "906": {
+    "Guid": 906,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010222,
+        "Text": "Dynamite"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010232,
+        "Text": "Saltpetre"
+      }
+    ],
+    "Name": "Bomb Factory"
+  },
+  "2400": {
+    "Guid": 2400,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Iron Mine"
+  },
+  "1353": {
+    "Guid": 1353,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010201,
+        "Text": "Clay"
+      },
+      {
+        "Value": "1",
+        "Guid": 1414,
+        "Text": "Industrial Lubricant"
+      }
+    ],
+    "Name": "Helium Extractor"
+  },
+  "916": {
+    "Guid": 916,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010258,
+        "Text": "Chocolate"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010216,
+        "Text": "Schnapps"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010217,
+        "Text": "Canned Food"
+      }
+    ],
+    "Name": "Care Package Factory"
+  },
+  "835": {
+    "Guid": 835,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      },
+      {
+        "Value": "1",
+        "Guid": 836,
+        "Text": "Bauxite"
+      }
+    ],
+    "Name": "Aluminium Smelter"
+  },
+  "1418": {
+    "Guid": 1418,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010232,
+        "Text": "Saltpetre"
+      },
+      {
+        "Value": "1",
+        "Guid": 120042,
+        "Text": "Fish Oil"
+      }
+    ],
+    "Name": "Industrial Oil Press"
+  },
+  "693": {
+    "Guid": 693,
+    "Consumption": [
+      {
+        "Value": "4",
+        "Guid": 838,
+        "Text": "Aluminium Profiles"
+      },
+      {
+        "Value": "3",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      }
+    ],
+    "Name": "Rigid Airship Hangar: Structure"
+  },
+  "692": {
+    "Guid": 692,
+    "Consumption": [
+      {
+        "Value": "3",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Rigid Airship Hangar: Foundations"
+  },
+  "937": {
+    "Guid": 937,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 917,
+        "Text": "Water"
+      }
+    ],
+    "Name": "Water Drop Factory"
+  },
+  "935": {
+    "Guid": 935,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010253,
+        "Text": "Cotton"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Pamphlet Printer"
+  },
+  "934": {
+    "Guid": 934,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010222,
+        "Text": "Dynamite"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010230,
+        "Text": "Copper"
+      }
+    ],
+    "Name": "Sea Mine Factory"
+  },
+  "649": {
+    "Guid": 649,
+    "Consumption": [
+      {
+        "Value": "4",
+        "Guid": 838,
+        "Text": "Aluminium Profiles"
+      },
+      {
+        "Value": "3",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      }
+    ],
+    "Name": "Rigid Airship Hangar: Structure"
+  },
+  "6118": {
+    "Guid": 6118,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "10",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      }
+    ],
+    "Name": "Grand Stadium: Superstructure"
+  },
+  "651": {
+    "Guid": 651,
+    "Consumption": [
+      {
+        "Value": "4",
+        "Guid": 1010207,
+        "Text": "Windows"
+      },
+      {
+        "Value": "4",
+        "Guid": 838,
+        "Text": "Aluminium Profiles"
+      }
+    ],
+    "Name": "Rigid Airship Hangar: Roof"
+  },
+  "24857": {
+    "Guid": 24857,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      },
+      {
+        "Value": "1",
+        "Guid": 24850,
+        "Text": "Silver Bars"
+      }
+    ],
+    "Name": "Royal Mint"
+  },
+  "112687": {
+    "Guid": 112687,
+    "Consumption": [
+      {
+        "Value": "4",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      }
+    ],
+    "Name": "Arctic Airship Hangar: Structure"
+  },
+  "133030": {
+    "Guid": 133030,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Orchard: Cinnamon"
+  },
+  "269837": {
+    "Guid": 269837,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 270042,
+        "Text": "Fuel"
+      }
+    ],
+    "Name": "Tractor Barn"
+  },
+  "269849": {
+    "Guid": 269849,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 270042,
+        "Text": "Fuel"
+      }
+    ],
+    "Name": "Tractor Barn"
+  },
+  "6594": {
+    "Guid": 6594,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      },
+      {
+        "Value": "1",
+        "Guid": 5383,
+        "Text": "Herbs"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      }
+    ],
+    "Name": "Mezcal Bar"
+  },
+  "133350": {
+    "Guid": 133350,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120041,
+        "Text": "Plantains"
+      },
+      {
+        "Value": "1",
+        "Guid": 133093,
+        "Text": "Cinnamon"
+      },
+      {
+        "Value": "1",
+        "Guid": 114371,
+        "Text": "Goat Milk"
+      }
+    ],
+    "Name": "Cafe: Banana Surprise"
+  },
+  "5988": {
+    "Guid": 5988,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010234,
+        "Text": "Tallow"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010231,
+        "Text": "Cement"
+      }
+    ],
+    "Name": "Concrete Works"
+  },
+  "114441": {
+    "Guid": 114441,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114365,
+        "Text": "Linseed"
+      }
+    ],
+    "Name": "Linen Mill"
+  },
+  "1010291": {
+    "Guid": 1010291,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010235,
+        "Text": "Flour"
+      }
+    ],
+    "Name": "Bakery"
+  },
+  "135134": {
+    "Guid": 135134,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120034,
+        "Text": "Corn"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Chemical Plant: Ethanol"
+  },
+  "133342": {
+    "Guid": 133342,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010257,
+        "Text": "Rum"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010216,
+        "Text": "Schnapps"
+      },
+      {
+        "Value": "1",
+        "Guid": 120032,
+        "Text": "Coffee"
+      }
+    ],
+    "Name": "Bar: Black Muscovy"
+  },
+  "100451": {
+    "Guid": 100451,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Sawmill"
+  },
+  "1010299": {
+    "Guid": 1010299,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      }
+    ],
+    "Name": "Weapon Factory"
+  },
+  "25242": {
+    "Guid": 25242,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 24808,
+        "Text": "Fertiliser"
+      }
+    ],
+    "Name": "Fertiliser Silo"
+  },
+  "25350": {
+    "Guid": 25350,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010195,
+        "Text": "Potatoes"
+      }
+    ],
+    "Name": "Hacienda Schnapps Distillery"
+  },
+  "25126": {
+    "Guid": 25126,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010251,
+        "Text": "Sugar Cane"
+      },
+      {
+        "Value": "1",
+        "Guid": 120034,
+        "Text": "Corn"
+      }
+    ],
+    "Name": "Hacienda Atole Maker"
+  },
+  "25064": {
+    "Guid": 25064,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120034,
+        "Text": "Corn"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010192,
+        "Text": "Grain"
+      }
+    ],
+    "Name": "Hacienda Beer Brewery"
+  },
+  "24801": {
+    "Guid": 24801,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010251,
+        "Text": "Sugar Cane"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Hacienda Rum Distillery"
+  },
+  "114459": {
+    "Guid": 114459,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114369,
+        "Text": "Spices"
+      },
+      {
+        "Value": "1",
+        "Guid": 114367,
+        "Text": "Teff"
+      }
+    ],
+    "Name": "Teff Mill"
+  },
+  "133931": {
+    "Guid": 133931,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120016,
+        "Text": "Champagne"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      },
+      {
+        "Value": "1",
+        "Guid": 133183,
+        "Text": "Jam"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010257,
+        "Text": "Rum"
+      }
+    ],
+    "Name": "The Iron Tower: Lady Marmalade"
+  },
+  "101415": {
+    "Guid": 101415,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120036,
+        "Text": "Alpaca Wool"
+      }
+    ],
+    "Name": "Felt Producer"
+  },
+  "100659": {
+    "Guid": 100659,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010241,
+        "Text": "Glass"
+      },
+      {
+        "Value": "1",
+        "Guid": 120014,
+        "Text": "Grapes"
+      }
+    ],
+    "Name": "Champagne Cellar"
+  },
+  "101264": {
+    "Guid": 101264,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120041,
+        "Text": "Plantains"
+      },
+      {
+        "Value": "1",
+        "Guid": 120042,
+        "Text": "Fish Oil"
+      }
+    ],
+    "Name": "Fried Plantain Kitchen"
+  },
+  "133340": {
+    "Guid": 133340,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010195,
+        "Text": "Potatoes"
+      },
+      {
+        "Value": "1",
+        "Guid": 112694,
+        "Text": "Caribou Meat"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010235,
+        "Text": "Flour"
+      }
+    ],
+    "Name": "Restaurant: Venison en Croûte"
+  },
+  "24828": {
+    "Guid": 24828,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "2",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Basin: Foundations"
+  },
+  "25548": {
+    "Guid": 25548,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 24837,
+        "Text": "Fuel"
+      }
+    ],
+    "Name": "Tractor Barn"
+  },
+  "1010293": {
+    "Guid": 1010293,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010198,
+        "Text": "Red Peppers"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010193,
+        "Text": "Beef"
+      }
+    ],
+    "Name": "Artisanal Kitchen"
+  },
+  "133928": {
+    "Guid": 133928,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010213,
+        "Text": "Bread"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010193,
+        "Text": "Beef"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010249,
+        "Text": "Gold"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010238,
+        "Text": "Sausages"
+      }
+    ],
+    "Name": "The Iron Tower: Brioche Royale"
+  },
+  "1010326": {
+    "Guid": 1010326,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010204,
+        "Text": "Brass"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010242,
+        "Text": "Wood Veneers"
+      }
+    ],
+    "Name": "Gramophone Factory"
+  },
+  "118725": {
+    "Guid": 118725,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114368,
+        "Text": "Indigo Dye"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010201,
+        "Text": "Clay"
+      }
+    ],
+    "Name": "Ceramics Workshop"
+  },
+  "132750": {
+    "Guid": 132750,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010198,
+        "Text": "Red Peppers"
+      },
+      {
+        "Value": "1",
+        "Guid": 120034,
+        "Text": "Corn"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010193,
+        "Text": "Beef"
+      }
+    ],
+    "Name": "Restaurant: Stroggof Goulash"
+  },
+  "135191": {
+    "Guid": 135191,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135130,
+        "Text": "Ethanol"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010232,
+        "Text": "Saltpetre"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      }
+    ],
+    "Name": "Drug Store: Detergent"
+  },
+  "25240": {
+    "Guid": 25240,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 24808,
+        "Text": "Fertiliser"
+      }
+    ],
+    "Name": "Fertiliser Silo"
+  },
+  "135194": {
+    "Guid": 135194,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 134616,
+        "Text": "Camphor Wax"
+      },
+      {
+        "Value": "1",
+        "Guid": 114364,
+        "Text": "Hibiscus Petals"
+      },
+      {
+        "Value": "1",
+        "Guid": 114370,
+        "Text": "Beeswax"
+      }
+    ],
+    "Name": "Drug Store: Pomade"
+  },
+  "680": {
+    "Guid": 680,
+    "Consumption": [
+      {
+        "Value": "10",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "25",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      }
+    ],
+    "Name": "Dam Phase 2/3: Foundations"
+  },
+  "949": {
+    "Guid": 949,
+    "Consumption": [
+      {
+        "Value": "3",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "2",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Dam Phase 1/3: Scaffolding"
+  },
+  "118939": {
+    "Guid": 118939,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "4",
+        "Guid": 1010207,
+        "Text": "Windows"
+      },
+      {
+        "Value": "4",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      }
+    ],
+    "Name": "Research Institute: Superstructure"
+  },
+  "135105": {
+    "Guid": 135105,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010204,
+        "Text": "Brass"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010241,
+        "Text": "Glass"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010208,
+        "Text": "Light Bulbs"
+      }
+    ],
+    "Name": "Furniture Store: Banker's Lamps"
+  },
+  "132753": {
+    "Guid": 132753,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010234,
+        "Text": "Tallow"
+      },
+      {
+        "Value": "1",
+        "Guid": 133183,
+        "Text": "Jam"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010235,
+        "Text": "Flour"
+      }
+    ],
+    "Name": "Cafe: Donut Fourré"
+  },
+  "6353": {
+    "Guid": 6353,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5394,
+        "Text": "Police Equipment"
+      }
+    ],
+    "Name": "Police Headquarters"
+  },
+  "101261": {
+    "Guid": 101261,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Sawmill"
+  },
+  "907": {
+    "Guid": 907,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010222,
+        "Text": "Dynamite"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010230,
+        "Text": "Copper"
+      }
+    ],
+    "Name": "Sea Mine Factory"
+  },
+  "1010320": {
+    "Guid": 1010320,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Marquetry Workshop"
+  },
+  "25549": {
+    "Guid": 25549,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120034,
+        "Text": "Corn"
+      }
+    ],
+    "Name": "Silo"
+  },
+  "24825": {
+    "Guid": 24825,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      }
+    ],
+    "Name": "Chewing Gum Factory"
+  },
+  "24845": {
+    "Guid": 24845,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 24852,
+        "Text": "Cyanide"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010233,
+        "Text": "Gold Ore"
+      }
+    ],
+    "Name": "Oxidation Pool"
+  },
+  "908": {
+    "Guid": 908,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010253,
+        "Text": "Cotton"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Pamphlet Printer"
+  },
+  "135709": {
+    "Guid": 135709,
+    "Consumption": [
+      {
+        "Value": "3",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "6",
+        "Guid": 1010207,
+        "Text": "Windows"
+      },
+      {
+        "Value": "4",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      },
+      {
+        "Value": "2",
+        "Guid": 134623,
+        "Text": "Elevator"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Skyline Tower: Glazing"
+  },
+  "404": {
+    "Guid": 404,
+    "Consumption": [
+      {
+        "Value": "4",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "8",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "2",
+        "Guid": 1010207,
+        "Text": "Windows"
+      },
+      {
+        "Value": "9",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      },
+      {
+        "Value": "2",
+        "Guid": 134623,
+        "Text": "Elevator"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Skyline Tower: Superstructure"
+  },
+  "403": {
+    "Guid": 403,
+    "Consumption": [
+      {
+        "Value": "4",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "4",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "2",
+        "Guid": 1010207,
+        "Text": "Windows"
+      },
+      {
+        "Value": "10",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      },
+      {
+        "Value": "2",
+        "Guid": 134623,
+        "Text": "Elevator"
+      },
+      {
+        "Value": "2",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Skyline Tower: Foundations"
+  },
+  "135192": {
+    "Guid": 135192,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120042,
+        "Text": "Fish Oil"
+      },
+      {
+        "Value": "1",
+        "Guid": 135129,
+        "Text": "Lacquer"
+      },
+      {
+        "Value": "1",
+        "Guid": 133095,
+        "Text": "Coconut Oil"
+      }
+    ],
+    "Name": "Drug Store: Lipstick"
+  },
+  "134631": {
+    "Guid": 134631,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010203,
+        "Text": "Soap"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      }
+    ],
+    "Name": "Drug Store: Toothpaste"
+  },
+  "135123": {
+    "Guid": 135123,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114357,
+        "Text": "Sanga Cow"
+      },
+      {
+        "Value": "1",
+        "Guid": 114356,
+        "Text": "Wanza Timber"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010197,
+        "Text": "Wool"
+      }
+    ],
+    "Name": "Furniture Store: Lounge Seating"
+  },
+  "135120": {
+    "Guid": 135120,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135129,
+        "Text": "Lacquer"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010204,
+        "Text": "Brass"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010242,
+        "Text": "Wood Veneers"
+      }
+    ],
+    "Name": "Furniture Store: Writing Desks"
+  },
+  "135121": {
+    "Guid": 135121,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135087,
+        "Text": "Cherry Wood"
+      },
+      {
+        "Value": "1",
+        "Guid": 135129,
+        "Text": "Lacquer"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010240,
+        "Text": "Cotton Fabric"
+      }
+    ],
+    "Name": "Furniture Store: Vanity Screens"
+  },
+  "135190": {
+    "Guid": 135190,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010204,
+        "Text": "Brass"
+      },
+      {
+        "Value": "1",
+        "Guid": 135150,
+        "Text": "Celluloid"
+      },
+      {
+        "Value": "1",
+        "Guid": 114357,
+        "Text": "Sanga Cow"
+      }
+    ],
+    "Name": "Department Store: Briefcases"
+  },
+  "135103": {
+    "Guid": 135103,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010229,
+        "Text": "Zinc"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010243,
+        "Text": "Filaments"
+      }
+    ],
+    "Name": "Department Store: Toasters"
+  },
+  "135407": {
+    "Guid": 135407,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120044,
+        "Text": "Felt"
+      },
+      {
+        "Value": "1",
+        "Guid": 135150,
+        "Text": "Celluloid"
+      },
+      {
+        "Value": "1",
+        "Guid": 135087,
+        "Text": "Cherry Wood"
+      }
+    ],
+    "Name": "Artisan's Workshop: Billiard Tables"
+  },
+  "114471": {
+    "Guid": 114471,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114408,
+        "Text": "Spiced Flour"
+      },
+      {
+        "Value": "1",
+        "Guid": 118728,
+        "Text": "Lobster"
+      }
+    ],
+    "Name": "Wat Kitchen"
+  },
+  "135148": {
+    "Guid": 135148,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010204,
+        "Text": "Brass"
+      },
+      {
+        "Value": "1",
+        "Guid": 135129,
+        "Text": "Lacquer"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      }
+    ],
+    "Name": "Assembly Line: Typewriters"
+  },
+  "135085": {
+    "Guid": 135085,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Orchard: Resin"
+  },
+  "1010319": {
+    "Guid": 1010319,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010228,
+        "Text": "Quartz Sand"
+      }
+    ],
+    "Name": "Glassmakers"
+  },
+  "101296": {
+    "Guid": 101296,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Marquetry Workshop"
+  },
+  "101268": {
+    "Guid": 101268,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010201,
+        "Text": "Clay"
+      }
+    ],
+    "Name": "Brick Factory"
+  },
+  "648": {
+    "Guid": 648,
+    "Consumption": [
+      {
+        "Value": "3",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Rigid Airship Hangar: Foundations"
+  },
+  "1010325": {
+    "Guid": 1010325,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010240,
+        "Text": "Cotton Fabric"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010209,
+        "Text": "Furs"
+      }
+    ],
+    "Name": "Fur Dealer"
+  },
+  "25508": {
+    "Guid": 25508,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114369,
+        "Text": "Spices"
+      }
+    ],
+    "Name": "Hacienda Hot Sauce Factory"
+  },
+  "133496": {
+    "Guid": 133496,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Orchard: Jam"
+  },
+  "133533": {
+    "Guid": 133533,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010253,
+        "Text": "Cotton"
+      },
+      {
+        "Value": "1",
+        "Guid": 134616,
+        "Text": "Camphor Wax"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010241,
+        "Text": "Glass"
+      }
+    ],
+    "Name": "Chemical Plant: Souvenirs"
+  },
+  "132786": {
+    "Guid": 132786,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 133095,
+        "Text": "Coconut Oil"
+      },
+      {
+        "Value": "1",
+        "Guid": 133093,
+        "Text": "Cinnamon"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010203,
+        "Text": "Soap"
+      }
+    ],
+    "Name": "Chemical Plant: Shampoo"
+  },
+  "132777": {
+    "Guid": 132777,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010232,
+        "Text": "Saltpetre"
+      }
+    ],
+    "Name": "Chemical Plant: Lemonade"
+  },
+  "132765": {
+    "Guid": 132765,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010231,
+        "Text": "Cement"
+      },
+      {
+        "Value": "2",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "The Iron Tower: Foundations"
+  },
+  "133933": {
+    "Guid": 133933,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114357,
+        "Text": "Sanga Cow"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010195,
+        "Text": "Potatoes"
+      },
+      {
+        "Value": "1",
+        "Guid": 114369,
+        "Text": "Spices"
+      },
+      {
+        "Value": "1",
+        "Guid": 118728,
+        "Text": "Lobster"
+      }
+    ],
+    "Name": "The Iron Tower: Homard sur Lit de Terroir"
+  },
+  "133349": {
+    "Guid": 133349,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 112694,
+        "Text": "Caribou Meat"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      },
+      {
+        "Value": "1",
+        "Guid": 120014,
+        "Text": "Grapes"
+      }
+    ],
+    "Name": "Cafe: Venison Tartare"
+  },
+  "133348": {
+    "Guid": 133348,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010234,
+        "Text": "Tallow"
+      },
+      {
+        "Value": "1",
+        "Guid": 133093,
+        "Text": "Cinnamon"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010235,
+        "Text": "Flour"
+      }
+    ],
+    "Name": "Cafe: Palmier Biscuit"
+  },
+  "133347": {
+    "Guid": 133347,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010258,
+        "Text": "Chocolate"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010235,
+        "Text": "Flour"
+      }
+    ],
+    "Name": "Cafe: Eclair"
+  },
+  "132747": {
+    "Guid": 132747,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010195,
+        "Text": "Potatoes"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010234,
+        "Text": "Tallow"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010199,
+        "Text": "Pigs"
+      }
+    ],
+    "Name": "Restaurant: Archduke's Schnitzel"
+  },
+  "118938": {
+    "Guid": 118938,
+    "Consumption": [
+      {
+        "Value": "4",
+        "Guid": 1010231,
+        "Text": "Cement"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      }
+    ],
+    "Name": "Research Institute: Foundations"
+  },
+  "924": {
+    "Guid": 924,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010222,
+        "Text": "Dynamite"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010232,
+        "Text": "Saltpetre"
+      }
+    ],
+    "Name": "Bomb Factory"
+  },
+  "135189": {
+    "Guid": 135189,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      },
+      {
+        "Value": "1",
+        "Guid": 112706,
+        "Text": "Arctic Gas"
+      }
+    ],
+    "Name": "Department Store: Refrigerators"
+  },
+  "915": {
+    "Guid": 915,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 917,
+        "Text": "Water"
+      }
+    ],
+    "Name": "Water Drop Factory"
+  },
+  "936": {
+    "Guid": 936,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010258,
+        "Text": "Chocolate"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010216,
+        "Text": "Schnapps"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010217,
+        "Text": "Canned Food"
+      }
+    ],
+    "Name": "Care Package Factory"
+  },
+  "685": {
+    "Guid": 685,
+    "Consumption": [
+      {
+        "Value": "25",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      },
+      {
+        "Value": "10",
+        "Guid": 1010207,
+        "Text": "Windows"
+      }
+    ],
+    "Name": "Dam Phase 3/3: Structure"
+  },
+  "135669": {
+    "Guid": 135669,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135150,
+        "Text": "Celluloid"
+      },
+      {
+        "Value": "1",
+        "Guid": 135129,
+        "Text": "Lacquer"
+      },
+      {
+        "Value": "1",
+        "Guid": 120044,
+        "Text": "Felt"
+      }
+    ],
+    "Name": "Artisan's Workshop: Toys"
+  },
+  "112679": {
+    "Guid": 112679,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010204,
+        "Text": "Brass"
+      },
+      {
+        "Value": "1",
+        "Guid": 112699,
+        "Text": "Whale Oil"
+      }
+    ],
+    "Name": "Oil Lamp Factory"
+  },
+  "1010321": {
+    "Guid": 1010321,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      }
+    ],
+    "Name": "Filament Factory"
+  },
+  "695": {
+    "Guid": 695,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010210,
+        "Text": "Sails"
+      },
+      {
+        "Value": "4",
+        "Guid": 838,
+        "Text": "Aluminium Profiles"
+      }
+    ],
+    "Name": "Rigid Airship Hangar: Roof"
+  },
+  "1010315": {
+    "Guid": 1010315,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010197,
+        "Text": "Wool"
+      }
+    ],
+    "Name": "Framework Knitters"
+  },
+  "1010490": {
+    "Guid": 1010490,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "10",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      }
+    ],
+    "Name": "World's Fair: Superstructure"
+  },
+  "1010281": {
+    "Guid": 1010281,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010234,
+        "Text": "Tallow"
+      }
+    ],
+    "Name": "Soap Factory"
+  },
+  "1010491": {
+    "Guid": 1010491,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010208,
+        "Text": "Light Bulbs"
+      },
+      {
+        "Value": "10",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      },
+      {
+        "Value": "10",
+        "Guid": 1010243,
+        "Text": "Filaments"
+      }
+    ],
+    "Name": "World's Fair: Infrastructure"
+  },
+  "25547": {
+    "Guid": 25547,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 24837,
+        "Text": "Fuel"
+      }
+    ],
+    "Name": "Tractor Barn"
+  },
+  "269848": {
+    "Guid": 269848,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 270042,
+        "Text": "Fuel"
+      }
+    ],
+    "Name": "Tractor Barn"
+  },
+  "1010284": {
+    "Guid": 1010284,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Sewing Machine Factory"
+  },
+  "1010285": {
+    "Guid": 1010285,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010241,
+        "Text": "Glass"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Window Makers"
+  },
+  "24820": {
+    "Guid": 24820,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      }
+    ],
+    "Name": "Coal Coking Furnace"
+  },
+  "114464": {
+    "Guid": 114464,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010241,
+        "Text": "Glass"
+      },
+      {
+        "Value": "1",
+        "Guid": 117701,
+        "Text": "Ornate Candles"
+      }
+    ],
+    "Name": "Lanternsmith"
+  },
+  "25241": {
+    "Guid": 25241,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 24808,
+        "Text": "Fertiliser"
+      }
+    ],
+    "Name": "Fertiliser Silo"
+  },
+  "135122": {
+    "Guid": 135122,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 112695,
+        "Text": "Bear Fur"
+      },
+      {
+        "Value": "1",
+        "Guid": 112697,
+        "Text": "Goose Feathers"
+      },
+      {
+        "Value": "1",
+        "Guid": 135087,
+        "Text": "Cherry Wood"
+      }
+    ],
+    "Name": "Furniture Store: Four-Poster Beds"
+  },
+  "124739": {
+    "Guid": 124739,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010197,
+        "Text": "Wool"
+      }
+    ],
+    "Name": "Advanced Cotton Mill"
+  },
+  "118734": {
+    "Guid": 118734,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010240,
+        "Text": "Cotton Fabric"
+      },
+      {
+        "Value": "1",
+        "Guid": 114391,
+        "Text": "Linen"
+      }
+    ],
+    "Name": "Tailor's Shop"
+  },
+  "114472": {
+    "Guid": 114472,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010252,
+        "Text": "Tobacco"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010201,
+        "Text": "Clay"
+      }
+    ],
+    "Name": "Pipe Maker"
+  },
+  "114467": {
+    "Guid": 114467,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114367,
+        "Text": "Teff"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010201,
+        "Text": "Clay"
+      }
+    ],
+    "Name": "Brick Dry-House"
+  },
+  "114466": {
+    "Guid": 114466,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114391,
+        "Text": "Linen"
+      }
+    ],
+    "Name": "Embroiderer"
+  },
+  "114444": {
+    "Guid": 114444,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114358,
+        "Text": "Salt"
+      },
+      {
+        "Value": "1",
+        "Guid": 114357,
+        "Text": "Sanga Cow"
+      }
+    ],
+    "Name": "Dry-House"
+  },
+  "114461": {
+    "Guid": 114461,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010253,
+        "Text": "Cotton"
+      },
+      {
+        "Value": "1",
+        "Guid": 114370,
+        "Text": "Beeswax"
+      }
+    ],
+    "Name": "Chandler"
+  },
+  "114469": {
+    "Guid": 114469,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114368,
+        "Text": "Indigo Dye"
+      },
+      {
+        "Value": "1",
+        "Guid": 114391,
+        "Text": "Linen"
+      }
+    ],
+    "Name": "Tapestry Looms"
+  },
+  "1010318": {
+    "Guid": 1010318,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010253,
+        "Text": "Cotton"
+      }
+    ],
+    "Name": "Cotton Mill"
+  },
+  "1010280": {
+    "Guid": 1010280,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010231,
+        "Text": "Cement"
+      }
+    ],
+    "Name": "Concrete Factory"
+  },
+  "1010489": {
+    "Guid": 1010489,
+    "Consumption": [
+      {
+        "Value": "10",
+        "Guid": 1010231,
+        "Text": "Cement"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "World's Fair: Foundations"
+  },
+  "135185": {
+    "Guid": 135185,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      },
+      {
+        "Value": "1",
+        "Guid": 133093,
+        "Text": "Cinnamon"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      }
+    ],
+    "Name": "Chemical Plant: Chewing Gum"
+  },
+  "24805": {
+    "Guid": 24805,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 24807,
+        "Text": "Dung"
+      }
+    ],
+    "Name": "Hacienda Fertiliser Works"
+  },
+  "1010341": {
+    "Guid": 1010341,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010254,
+        "Text": "Cocoa"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010239,
+        "Text": "Sugar"
+      }
+    ],
+    "Name": "Chocolate Factory"
+  },
+  "1010292": {
+    "Guid": 1010292,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010236,
+        "Text": "Malt"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010194,
+        "Text": "Hops"
+      }
+    ],
+    "Name": "Brewery"
+  },
+  "119025": {
+    "Guid": 119025,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114367,
+        "Text": "Teff"
+      }
+    ],
+    "Name": "Silo"
+  },
+  "1010327": {
+    "Guid": 1010327,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010233,
+        "Text": "Gold Ore"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      }
+    ],
+    "Name": "Goldsmiths"
+  },
+  "101250": {
+    "Guid": 101250,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010204,
+        "Text": "Brass"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010241,
+        "Text": "Glass"
+      }
+    ],
+    "Name": "Spectacle Factory"
+  },
+  "116034": {
+    "Guid": 116034,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Prime Hunting Cabin"
+  },
+  "1010288": {
+    "Guid": 1010288,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010197,
+        "Text": "Wool"
+      }
+    ],
+    "Name": "Sailmakers"
+  },
+  "1010308": {
+    "Guid": 1010308,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Copper Mine"
+  },
+  "119028": {
+    "Guid": 119028,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010566,
+        "Text": "Oil"
+      }
+    ],
+    "Name": "Fuel Station"
+  },
+  "270041": {
+    "Guid": 270041,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 270042,
+        "Text": "Fuel"
+      }
+    ],
+    "Name": "Tractor Barn (Gasoline Good)"
+  },
+  "269958": {
+    "Guid": 269958,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120034,
+        "Text": "Corn"
+      }
+    ],
+    "Name": "Silo"
+  },
+  "269957": {
+    "Guid": 269957,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010192,
+        "Text": "Grain"
+      }
+    ],
+    "Name": "Silo"
+  },
+  "269839": {
+    "Guid": 269839,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 270042,
+        "Text": "Fuel"
+      }
+    ],
+    "Name": "Tractor Barn"
+  },
+  "114751": {
+    "Guid": 114751,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      }
+    ],
+    "Name": "Heater"
+  },
+  "135361": {
+    "Guid": 135361,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010235,
+        "Text": "Flour"
+      },
+      {
+        "Value": "1",
+        "Guid": 133097,
+        "Text": "Citrus"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010234,
+        "Text": "Tallow"
+      }
+    ],
+    "Name": "Assembly Line: Biscuits"
+  },
+  "269840": {
+    "Guid": 269840,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010566,
+        "Text": "Oil"
+      }
+    ],
+    "Name": "Fuel Station"
+  },
+  "117547": {
+    "Guid": 117547,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 112706,
+        "Text": "Arctic Gas"
+      }
+    ],
+    "Name": "Gas-Fired Power Plant"
+  },
+  "116029": {
+    "Guid": 116029,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Deep Gold Mine"
+  },
+  "114704": {
+    "Guid": 114704,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Sawmill"
+  },
+  "135187": {
+    "Guid": 135187,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010228,
+        "Text": "Quartz Sand"
+      },
+      {
+        "Value": "1",
+        "Guid": 135129,
+        "Text": "Lacquer"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010201,
+        "Text": "Clay"
+      }
+    ],
+    "Name": "Department Store: Crockery"
+  },
+  "114470": {
+    "Guid": 114470,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 117702,
+        "Text": "Paper"
+      },
+      {
+        "Value": "1",
+        "Guid": 114368,
+        "Text": "Indigo Dye"
+      }
+    ],
+    "Name": "Luminer"
+  },
+  "1010317": {
+    "Guid": 1010317,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010251,
+        "Text": "Sugar Cane"
+      }
+    ],
+    "Name": "Sugar Refinery"
+  },
+  "1010302": {
+    "Guid": 1010302,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010204,
+        "Text": "Brass"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      }
+    ],
+    "Name": "Motor Assembly Line"
+  },
+  "134614": {
+    "Guid": 134614,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Orchard: Camphor Wax"
+  },
+  "112668": {
+    "Guid": 112668,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 112694,
+        "Text": "Caribou Meat"
+      },
+      {
+        "Value": "1",
+        "Guid": 112699,
+        "Text": "Whale Oil"
+      }
+    ],
+    "Name": "Pemmican Cookhouse"
+  },
+  "112688": {
+    "Guid": 112688,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010224,
+        "Text": "Steam Motors"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010210,
+        "Text": "Sails"
+      },
+      {
+        "Value": "2",
+        "Guid": 1010207,
+        "Text": "Windows"
+      }
+    ],
+    "Name": "Arctic Airship Hangar: Roof"
+  },
+  "112673": {
+    "Guid": 112673,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1955,
+        "Text": "Cultivation Area"
+      }
+    ],
+    "Name": "Bear Hunting Cabin"
+  },
+  "1010340": {
+    "Guid": 1010340,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010251,
+        "Text": "Sugar Cane"
+      },
+      {
+        "Value": "1",
+        "Guid": 120008,
+        "Text": "Wood"
+      }
+    ],
+    "Name": "Rum Distillery"
+  },
+  "101953": {
+    "Guid": 101953,
+    "Consumption": [
+      {
+        "Value": "8",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "3",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      }
+    ],
+    "Name": "Court of Justice: Steel Structure"
+  },
+  "100780": {
+    "Guid": 100780,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010566,
+        "Text": "Oil"
+      }
+    ],
+    "Name": "Oil Power Plant"
+  },
+  "132752": {
+    "Guid": 132752,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010257,
+        "Text": "Rum"
+      },
+      {
+        "Value": "1",
+        "Guid": 120041,
+        "Text": "Plantains"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010251,
+        "Text": "Sugar Cane"
+      }
+    ],
+    "Name": "Bar: Daiquiri Tropic"
+  },
+  "5879": {
+    "Guid": 5879,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010255,
+        "Text": "Caoutchouc"
+      },
+      {
+        "Value": "1",
+        "Guid": 5384,
+        "Text": "Nandu Leather"
+      }
+    ],
+    "Name": "Ball Manufactory"
+  },
+  "101271": {
+    "Guid": 101271,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 120034,
+        "Text": "Corn"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010193,
+        "Text": "Beef"
+      }
+    ],
+    "Name": "Tortilla Maker"
+  },
+  "135133": {
+    "Guid": 135133,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 135086,
+        "Text": "Resin"
+      },
+      {
+        "Value": "1",
+        "Guid": 135130,
+        "Text": "Ethanol"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010228,
+        "Text": "Quartz Sand"
+      }
+    ],
+    "Name": "Chemical Plant: Lacquer"
+  },
+  "6259": {
+    "Guid": 6259,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 5393,
+        "Text": "Fire Extinguishers"
+      }
+    ],
+    "Name": "Fire Department"
+  },
+  "1010324": {
+    "Guid": 1010324,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010249,
+        "Text": "Gold"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010241,
+        "Text": "Glass"
+      }
+    ],
+    "Name": "Clockmakers"
+  },
+  "5989": {
+    "Guid": 5989,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Cement Mine"
+  },
+  "102035": {
+    "Guid": 102035,
+    "Consumption": [
+      {
+        "Value": "8",
+        "Guid": 1010205,
+        "Text": "Bricks"
+      },
+      {
+        "Value": "3",
+        "Guid": 1010207,
+        "Text": "Windows"
+      }
+    ],
+    "Name": "Court of Justice: Glazing"
+  },
+  "118733": {
+    "Guid": 118733,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 114357,
+        "Text": "Sanga Cow"
+      }
+    ],
+    "Name": "Bootmakers"
+  },
+  "101336": {
+    "Guid": 101336,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010224,
+        "Text": "Steam Motors"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010242,
+        "Text": "Wood Veneers"
+      },
+      {
+        "Value": "10",
+        "Guid": 1010207,
+        "Text": "Windows"
+      }
+    ],
+    "Name": "World's Fair: Glazing"
+  },
+  "6117": {
+    "Guid": 6117,
+    "Consumption": [
+      {
+        "Value": "10",
+        "Guid": 1010202,
+        "Text": "Reinforced Concrete"
+      },
+      {
+        "Value": "5",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Grand Stadium: Foundations"
+  },
+  "1010294": {
+    "Guid": 1010294,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010195,
+        "Text": "Potatoes"
+      }
+    ],
+    "Name": "Schnapps Distillery"
+  },
+  "101951": {
+    "Guid": 101951,
+    "Consumption": [
+      {
+        "Value": "5",
+        "Guid": 1010218,
+        "Text": "Steel Beams"
+      },
+      {
+        "Value": "10",
+        "Guid": 1010196,
+        "Text": "Timber"
+      }
+    ],
+    "Name": "Court of Justice: Foundations"
+  },
+  "1010297": {
+    "Guid": 1010297,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010226,
+        "Text": "Coal"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010227,
+        "Text": "Iron"
+      }
+    ],
+    "Name": "Furnace"
+  },
+  "1010303": {
+    "Guid": 1010303,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010224,
+        "Text": "Steam Motors"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010211,
+        "Text": "Chassis"
+      }
+    ],
+    "Name": "Cab Assembly Line"
+  },
+  "112672": {
+    "Guid": 112672,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 112696,
+        "Text": "Seal Skin"
+      },
+      {
+        "Value": "1",
+        "Guid": 112695,
+        "Text": "Bear Fur"
+      }
+    ],
+    "Name": "Parka Factory"
+  },
+  "1010305": {
+    "Guid": 1010305,
+    "Consumption": [
+      {
+        "Value": "0",
+        "Guid": 1591,
+        "Text": "Mineral Resource"
+      }
+    ],
+    "Name": "Iron Mine"
+  },
+  "270044": {
+    "Guid": 270044,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010566,
+        "Text": "Oil"
+      }
+    ],
+    "Name": "Fuel Station (GASOLINE TEST)"
+  },
+  "1010286": {
+    "Guid": 1010286,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010243,
+        "Text": "Filaments"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010241,
+        "Text": "Glass"
+      }
+    ],
+    "Name": "Light Bulb Factory"
+  },
+  "1010295": {
+    "Guid": 1010295,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010215,
+        "Text": "Goulash"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010227,
+        "Text": "Iron"
+      }
+    ],
+    "Name": "Cannery"
+  },
+  "1010301": {
+    "Guid": 1010301,
+    "Consumption": [
+      {
+        "Value": "1",
+        "Guid": 1010222,
+        "Text": "Dynamite"
+      },
+      {
+        "Value": "1",
+        "Guid": 1010219,
+        "Text": "Steel"
+      }
+    ],
+    "Name": "Heavy Weapons Factory"
+  }
+}

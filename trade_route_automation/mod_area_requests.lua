@@ -22,7 +22,7 @@ function AreaRequests.Population(L, region)
                 if ret[areaID_num] == nil then
                     ret[areaID_num] = {};
                 end
-                ret[areaID_num][tonumber(product.Guid)] = true;
+                ret[areaID_num][product.Guid] = true;
             end
             :: continue ::
         end
