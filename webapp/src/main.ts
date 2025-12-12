@@ -15,6 +15,7 @@ import {
   ShipUsageChartWidget,
   AreaVisualizerWidget,
   LogsTableWidget,
+  StockTableWidget,
 } from './widgets';
 import {
   readStateFromURL,
@@ -37,6 +38,7 @@ const deficitSurplusWidget = new DeficitSurplusWidget();
 const shipUsageWidget = new ShipUsageChartWidget();
 const areaVisualizerWidget = new AreaVisualizerWidget();
 const logsTableWidget = new LogsTableWidget();
+const stockTableWidget = new StockTableWidget();
 
 // DOM elements (will be initialized in init)
 let pickFolderBtn: HTMLButtonElement;
@@ -90,6 +92,7 @@ function init(): void {
     if (dataStore) {
       loadTradesTab();
       loadLogsTab();
+      loadStockTab();
     }
   });
 
@@ -120,6 +123,7 @@ function init(): void {
   const shipUsageContainer = document.getElementById('tab-ship-usage')!;
   const areaContent = document.getElementById('area-content')!;
   const logsContent = document.getElementById('logs-content')!;
+  const stockContent = document.getElementById('stock-content')!;
 
   // Create sub-containers for trades tab
   const tradeTableContainer = document.createElement('div');
@@ -143,6 +147,9 @@ function init(): void {
 
   // Logs table
   logsTableWidget.mount(logsContent);
+
+  // Stock table
+  stockTableWidget.mount(stockContent);
 
   // Show initial state
   updateFolderPath();
@@ -279,6 +286,7 @@ async function loadAllTabs(): Promise<void> {
   await Promise.all([
     loadTradesTab(),
     loadLogsTab(),
+    loadStockTab(),
     shipUsageWidget.load(dataStore),
     areaVisualizerWidget.load(dataStore),
   ]);
@@ -306,6 +314,15 @@ async function loadLogsTab(): Promise<void> {
 }
 
 /**
+ * Load stock tab data
+ */
+async function loadStockTab(): Promise<void> {
+  if (!dataStore || !currentProfileName) return;
+
+  await stockTableWidget.load(dataStore, currentProfileName);
+}
+
+/**
  * Handle URL state changes from browser back/forward
  */
 function handleURLStateChange(state: AppState): void {
@@ -318,6 +335,7 @@ function handleURLStateChange(state: AppState): void {
     if (dataStore) {
       loadTradesTab();
       loadLogsTab();
+      loadStockTab();
     }
   }
 

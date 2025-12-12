@@ -39,9 +39,17 @@ end
 
 ---
 
+---@class AnnoThread
+---@field name string
+---@field fn function
+---@field co thread
+---@field co_finished boolean
+---@field co_ret any
+---@field co_err any
 local AnnoThread = {}
 AnnoThread.__index = AnnoThread
 
+---@return AnnoThread
 function AnnoThread:new(name, fn)
     local o = {}
     setmetatable(o, self)
@@ -78,7 +86,7 @@ local function theTradeRouteAutomation_init()
     while true do
         profileName = getProfileName();
         if profileName ~= nil and profileName ~= "" then
-            break ;
+            break;
         end
 
         for _ = 1, 30 do
@@ -114,7 +122,6 @@ local function theTradeRouteAutomation_init()
     return luaRoot, profileName;
 end
 
-
 local function theTradeRouteAutomation()
     local luaRoot, profileName = theTradeRouteAutomation_init();
     local M = require("trade_route_automation/_main");
@@ -124,7 +131,7 @@ end
 local function theTradeRouteAutomation_unique()
     if TradeRouteAutomationThread ~= nil then
         if not TradeRouteAutomationThread:is_finished() then
-            return ;
+            return;
         end
         TradeRouteAutomationThread = nil;
     end
@@ -138,13 +145,15 @@ function trade_route_automation_enable()
     _G["trade_route_automation_enabled"] = true;
     theTradeRouteAutomation_unique();
 end
+
 function trade_route_automation_disable()
     _G["trade_route_automation_enabled"] = false;
 end
+
 function trade_route_automation_restart()
     local r = TRA_restart;
-    if r ~= nil and not r.is_finished()then
-        return ;
+    if r ~= nil and not r:is_finished() then
+        return;
     end
 
     TRA_restart = AnnoThread:new("trade_route_automation-restart", function()
@@ -162,7 +171,6 @@ function trade_route_automation_restart()
 
         TRA_restart = nil;
     end);
-
 end
 
 theTradeRouteAutomation_unique();

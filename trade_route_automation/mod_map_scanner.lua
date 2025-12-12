@@ -343,7 +343,7 @@ local function areaScanner_dfs(L, minX, minY, maxX, maxY, resolution)
         local _, res = _visit(x0, y0, NOT_ACCESSIBLE);
         L.logf("%d,%d,%s,%s", x0, y0, encodeResult(res), encodeDirection(DOWN));
         if res ~= NOT_ACCESSIBLE then
-            break ;
+            break;
         end
 
         y0 = y0 - dy;
@@ -389,13 +389,13 @@ local function areaScanner_dfs(L, minX, minY, maxX, maxY, resolution)
 
         _dfs_visit_inv = _dfs_visit_inv + 1;
         if halt() then
-            return ;
+            return;
         end
 
         local t = CCW[dir];
         while true do
             if halt_on_too_many_invocations() then
-                return ;
+                return;
             end
 
             local tX = x + t.dx;
@@ -408,7 +408,7 @@ local function areaScanner_dfs(L, minX, minY, maxX, maxY, resolution)
             log_dfs(tX, tY, res, t);
             if isVisited or res == NOT_ACCESSIBLE then
                 if halt_on_origin(tX, tY) then
-                    return ;
+                    return;
                 end
                 goto continue;
             end
@@ -419,7 +419,7 @@ local function areaScanner_dfs(L, minX, minY, maxX, maxY, resolution)
             t = CW[t];
 
             if t == INVERT[dir] then
-                break ;
+                break;
             end
         end
     end
@@ -437,14 +437,14 @@ local function visualizationTsvs(L, areas)
     for areaID, grid in pairs(areas) do
         local area = objectAccessor.AreaFromID(areaID);
         L.logf("%s / %d (owner=%d %s) grid{ minX=%d minY=%d maxX=%d maxY=%d }",
-                area.CityName,
-                areaID,
-                area.Owner,
-                area.OwnerName,
-                tostring(grid.min_x),
-                tostring(grid.min_y),
-                tostring(grid.max_x),
-                tostring(grid.max_y)
+            area.CityName,
+            areaID,
+            area.Owner,
+            area.OwnerName,
+            tostring(grid.min_x),
+            tostring(grid.min_y),
+            tostring(grid.max_x),
+            tostring(grid.max_y)
         );
 
         if area.Owner ~= 0 then

@@ -1,3 +1,10 @@
+---@class AnnoThread
+---@field name string
+---@field fn function
+---@field co thread
+---@field co_finished boolean
+---@field co_ret any
+---@field co_err any
 local AnnoThread = {}
 AnnoThread.__index = AnnoThread
 

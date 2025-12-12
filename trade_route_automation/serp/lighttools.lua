@@ -128,9 +128,9 @@ local function TableToFormattedString(var, sorted, indent)
         local indent = indent or 0
         for _, key in ipairs(keys) do
             strings[#strings + 1] = rep('\t', indent + 1)
-                    .. TableToFormattedString(key, sorted, indent + 1)
-                    .. ' = '
-                    .. TableToFormattedString(var[key], sorted, indent + 1)
+                .. TableToFormattedString(key, sorted, indent + 1)
+                .. ' = '
+                .. TableToFormattedString(var[key], sorted, indent + 1)
         end
         return 'table (\n' .. concat(strings, '\n') .. '\n' .. rep('\t', indent) .. ')'
     else
@@ -399,13 +399,13 @@ end
 
 -- https://www.lua.org/pil/19.3.html
 -- f is optional sorting function
-local function pairsByKeys (t, f)
+local function pairsByKeys(t, f)
     local a = {}
     for n in pairs(t) do
         table.insert(a, n)
     end
     table.sort(a, f)
-    local i = 0      -- iterator variable
+    local i = 0 -- iterator variable
     local iter = function()
         -- iterator function
         i = i + 1
@@ -489,7 +489,8 @@ local function _ValueToString(_value)
         end
     else
         --failsafe
-        serpLight.modlog("unsupported value type for ValueToString: " .. tostring(type(_value)) .. " " .. tostring(_value), ModID)
+        serpLight.modlog(
+        "unsupported value type for ValueToString: " .. tostring(type(_value)) .. " " .. tostring(_value), ModID)
         return 'nil'
     end
 end
@@ -500,7 +501,8 @@ local function _IndexToString(_index)
         return "[\'" .. _index .. "\']"
     else
         --failsafe
-        serpLight.modlog("unsupported index type for IndexToString: " .. tostring(type(_index)) .. " " .. tostring(_index), ModID)
+        serpLight.modlog(
+        "unsupported index type for IndexToString: " .. tostring(type(_index)) .. " " .. tostring(_index), ModID)
         return 'nil'
     end
 end
@@ -611,7 +613,11 @@ local function start_thread(threadname, _ModID, fn, ...)
     local final_threadname = tostring(_ModID) .. ": " .. tostring(threadname)
     if system.internal.coroutines[final_threadname] ~= nil then
         -- no need to check status, because done threads are already set nil again
-        serpLight.modlog("WARNING start_thread: A thread with the name " .. tostring(final_threadname) .. " is currently running. Are you sure you want to overwrite it? Choose a unique threadname if you dont want this (you can include _random_ in the threadname to add random number or include _nodouble_ to not overwrite a previous thread and so nothing)", _ModID)
+        serpLight.modlog(
+        "WARNING start_thread: A thread with the name " ..
+        tostring(final_threadname) ..
+        " is currently running. Are you sure you want to overwrite it? Choose a unique threadname if you dont want this (you can include _random_ in the threadname to add random number or include _nodouble_ to not overwrite a previous thread and so nothing)",
+            _ModID)
         if string.find(threadname, "_nodouble_") then
             -- if we dont want to overwrite previous thread
             return false
@@ -709,7 +715,9 @@ local function GetNameInvisible(name)
             table.insert(result, v)
         end
     end
-    return result[2], result[1] -- first the invisible part (expect it containing # as seperator), because this is what we are most liklely interested in
+    return result[2],
+        result
+        [1]                     -- first the invisible part (expect it containing # as seperator), because this is what we are most liklely interested in
 end
 -- to support adding multiple invisible strings to the name, it adds "#" as seperator
 local function AddToNameInvisible(origname, addstring, onlifnotaddedyet)
@@ -720,9 +728,12 @@ local function AddToNameInvisible(origname, addstring, onlifnotaddedyet)
             new_name = name
             for i = name:len(), maxdisplayedlength - 1, 2 do
                 -- can not add spaces, because the game handles them very strange...
-                new_name = "‎" .. new_name .. "‎" -- -- add spaces front and back until we reached the max displayed length (so the position of the displayed text does not change)
+                new_name = "‎" ..
+                new_name ..
+                "‎" -- -- add spaces front and back until we reached the max displayed length (so the position of the displayed text does not change)
             end
-            new_name = new_name .. "‎" -- add one at the end, so even if it is already 16 chars, we have one to use the split on in GetNameInvisible
+            new_name = new_name ..
+            "‎" -- add one at the end, so even if it is already 16 chars, we have one to use the split on in GetNameInvisible
         else
             new_name = origname
         end
@@ -823,9 +834,11 @@ local function OIDtableToOID(OIDtable)
         end
     end
     -- local OID = ((AreaID << 32) + (ObjectID) + (EditorFlag << 63) + (EditorChunkID << 50))
-    local OID = ((ObjectID & 0xFFFFFFFF) << 0 | (AreaID & 0xFFFF) << 32 | (EditorChunkID & 0xFF) << 50) | (EditorFlag & 0xF) << 63
-    OID = tostring(OID) -- return it as string if Editor Stuff is used
-    OID = tostring(EditorFlag) == "0" and tostring(EditorChunkID) == "0" and tonumber(OID) or OID -- to make an bint to number, you first have to do tostring I think
+    local OID = ((ObjectID & 0xFFFFFFFF) << 0 | (AreaID & 0xFFFF) << 32 | (EditorChunkID & 0xFF) << 50) |
+    (EditorFlag & 0xF) << 63
+    OID = tostring(OID)                                                                           -- return it as string if Editor Stuff is used
+    OID = tostring(EditorFlag) == "0" and tostring(EditorChunkID) == "0" and tonumber(OID) or
+    OID                                                                                           -- to make an bint to number, you first have to do tostring I think
     return OID
 end
 
@@ -863,7 +876,7 @@ end
 -- For these too high OIDs to be used by lua, better use to_type "string"
 local function get_OID(userdata, to_type)
     local oid, Namestring
-    to_type = to_type or "number" -- for editor objects string/bint might be better, because number is too high for lua
+    to_type = to_type or "number"   -- for editor objects string/bint might be better, because number is too high for lua
     Namestring = userdata:getName() -- returns eg. "GameObject, oid 8589934647", while :getOID returns a OIDtable.
     if Namestring ~= nil and type(Namestring) == "string" then
         oid = string.match(Namestring, "oid (.*)")
@@ -913,7 +926,8 @@ end
 local function t_FnViaTextEmbed(PID)
     if PID == nil or PID == ts.Participants.GetGetCurrentParticipantID() then
         -- only the correct Participant
-        local TaskString = ts.Participants.GetParticipant(121).Profile.CompanyName -- TaskString eg: "g_ObjectFinderSerp.IsLoadedSessionByID_2_false"
+        local TaskString = ts.Participants.GetParticipant(121).Profile
+        .CompanyName                                                               -- TaskString eg: "g_ObjectFinderSerp.IsLoadedSessionByID_2_false"
         -- g_LTL_Serp.modlog("t_FnViaTextEmbed called with: "..tostring(TaskString),ModID)
         local oldname1 = ts.GetAssetData(101507).Text
         local oldname2 = ts.GetAssetData(101508).Text
@@ -933,28 +947,32 @@ local function t_FnViaTextEmbed(PID)
                 tasksplit[i] = serpLight.myeval(tasksplit[i])
             end
             -- call the func within a new thread, to not longer block this function
-            serpLight.start_thread("t_FnViaTextEmbed_random_ call " .. tostring(funcname), ModID, function(func, funcname, tasksplit, TaskString, ModID)
-                local notstop = 0
-                while func == nil do
-                    -- in case this is executed with AlwaysTrue Trigger or so, give it a second to init all lua scripts
-                    coroutine.yield() -- 100ms
-                    notstop = notstop + 1
-                    if notstop > 20 then
-                        --2seconds
-                        break
+            serpLight.start_thread("t_FnViaTextEmbed_random_ call " .. tostring(funcname), ModID,
+                function(func, funcname, tasksplit, TaskString, ModID)
+                    local notstop = 0
+                    while func == nil do
+                        -- in case this is executed with AlwaysTrue Trigger or so, give it a second to init all lua scripts
+                        coroutine.yield() -- 100ms
+                        notstop = notstop + 1
+                        if notstop > 20 then
+                            --2seconds
+                            break
+                        end
+                        func = serpLight.myeval(funcname)
                     end
-                    func = serpLight.myeval(funcname)
-                end
-                local success, err
-                if func == nil then
-                    success, err = false, "t_FnViaTextEmbed: func does not exist (nil)" -- its a bit more clear than "attempt to call a nil value"
-                else
-                    success, err = xpcall(func, serpLight.log_error, table.unpack(tasksplit))
-                end
-                if success == false then
-                    serpLight.modlog("ERROR t_FnViaTextEmbed while trying to execute TaskString: " .. tostring(TaskString) .. " , error: " .. tostring(err), ModID)
-                end
-            end, func, funcname, tasksplit, TaskString, ModID)
+                    local success, err
+                    if func == nil then
+                        success, err = false,
+                            "t_FnViaTextEmbed: func does not exist (nil)"               -- its a bit more clear than "attempt to call a nil value"
+                    else
+                        success, err = xpcall(func, serpLight.log_error, table.unpack(tasksplit))
+                    end
+                    if success == false then
+                        serpLight.modlog(
+                        "ERROR t_FnViaTextEmbed while trying to execute TaskString: " ..
+                        tostring(TaskString) .. " , error: " .. tostring(err), ModID)
+                    end
+                end, func, funcname, tasksplit, TaskString, ModID)
         end
     end
     serpLight.start_thread("t_FnViaTextEmbed release it again", ModID, function()
@@ -965,14 +983,15 @@ end
 
 local lock = 0
 
-local function DoForSessionGameObjectRaw (cmd)
+local function DoForSessionGameObjectRaw(cmd)
     while lock == 1 do
         coroutine.yield() -- wait until unlocked
     end
     lock = 1
     local ret = nil
     local success, err = xpcall(function()
-        game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(cmd) .. " )]")
+        game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " ..
+        tostring(cmd) .. " )]")
         ret = ts.Participants.GetParticipant(120).Profile.CompanyName;
         local old = ts.GetAssetData(100939).Text
         ts.Participants.GetParticipant(120).Profile.SetCompanyName(old)
@@ -998,15 +1017,17 @@ local function DoForSessionGameObject(ts_embed_string, doreturnstring, keepasstr
         local returnstring, ret, oldtext;
         local success, err = xpcall(function()
             -- we want to get what the textembed returns, but game.TextSourceManager.setDebugTextSource does not return anything. I only know a workarkund to get it, by setting and reading out the name of a namable helper object
-            game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " .. tostring(ts_embed_string) .. " )]")
+            game.TextSourceManager.setDebugTextSource("[Participants Participant(120) Profile SetCompanyName( " ..
+            tostring(ts_embed_string) .. " )]")
             returnstring = ts.Participants.GetParticipant(120).Profile.CompanyName
-            oldtext = ts.GetAssetData(100939).Text -- does not work to call this directly in SetCompanyName
+            oldtext = ts.GetAssetData(100939).Text                              -- does not work to call this directly in SetCompanyName
             ts.Participants.GetParticipant(120).Profile.SetCompanyName(oldtext) -- set it to nil again, so you can notice if sth did not work
             ret = returnstring
         end, debug.traceback)
         lock = 0
         if not success then
-            error(string.format("DoForSessionGameObjectRaw failed for cmd '%s' with error: %s", tostring(ts_embed_string), tostring(err)))
+            error(string.format("DoForSessionGameObjectRaw failed for cmd '%s' with error: %s", tostring(ts_embed_string),
+                tostring(err)))
         end
 
         if returnstring == oldtext then
@@ -1031,14 +1052,18 @@ end
 -- we can only access AreaFromID from the current active session of the local player
 -- set FertilitiesOrLodesString to "Fertilities" or "Lodes" (ores), depending of what you want to get returned
 local function GetFertilitiesOrLodesFromArea_CurrentSession(AreaID, FertilitiesOrLodesString)
-    local count = serpLight.DoForSessionGameObject("[Area AreaFromID(" .. tostring(AreaID) .. ") " .. tostring(FertilitiesOrLodesString) .. " Count]", true)
+    local count = serpLight.DoForSessionGameObject(
+    "[Area AreaFromID(" .. tostring(AreaID) .. ") " .. tostring(FertilitiesOrLodesString) .. " Count]", true)
     local results = {}
     if count ~= nil and count ~= "nil" then
         count = tonumber(count)
         if count ~= nil and count > 0 then
             local GUID
             for i = 0, count - 1 do
-                GUID = serpLight.DoForSessionGameObject("[Area AreaFromID(" .. tostring(AreaID) .. ") " .. tostring(FertilitiesOrLodesString) .. " At(" .. tostring(i) .. ") Guid]", true)
+                GUID = serpLight.DoForSessionGameObject(
+                "[Area AreaFromID(" ..
+                tostring(AreaID) .. ") " .. tostring(FertilitiesOrLodesString) .. " At(" .. tostring(i) .. ") Guid]",
+                    true)
                 if GUID ~= nil and GUID ~= "nil" then
                     results[tonumber(GUID)] = true -- use it as key, so you can easily check for a specific fertility without looping over the list
                 end
@@ -1056,7 +1081,8 @@ end
 -- it really ONLY returns Buffs which provide ProductivityUpgrade buff ... (mit ts.GetItemAssetData(BuffGUID) kommen wir an infos zu buffs/items, aber nicht ob etwas davon betroffen ist)
 -- you use "Count" in your ts_embed_string. the function will also automatically call At() for it (to get the actual content)
 local function GetVectorGuidsFromSessionObject(ts_embed_string, InfoToInclude)
-    InfoToInclude = InfoToInclude or { Guid = "string", Value = "number" } -- eg for Costs you want eg "ProductGuid" and "Amount". Or only Guid for Sockets (has no Value)
+    InfoToInclude = InfoToInclude or
+    { Guid = "string", Value = "number" }                                  -- eg for Costs you want eg "ProductGuid" and "Amount". Or only Guid for Sockets (has no Value)
     local ts_embed_string_guid, ts_embed_string_value
     local count = serpLight.DoForSessionGameObject(ts_embed_string, true)
     local results = {}
@@ -1072,7 +1098,9 @@ local function GetVectorGuidsFromSessionObject(ts_embed_string, InfoToInclude)
                 end
             end
         else
-            serpLight.modlog("GetVectorGuidsFromSessionObject: count is " .. tostring(count) .. " for " .. tostring(ts_embed_string), ModID)
+            serpLight.modlog(
+            "GetVectorGuidsFromSessionObject: count is " .. tostring(count) .. " for " .. tostring(ts_embed_string),
+                ModID)
         end
     end
     return results
@@ -1085,14 +1113,17 @@ end
 -- buildings (hängt vom GUIType ab): 116 Bauernhaus, 103 Marktplatz, 102 Kontor/Lagerhaus,97 handelskammer UI, 113 Kirche, 120 Werft, 192/193 oder 194 ist Movie beenden
 -- RefOid = 0 for whole menus , for ships/buildings: g_LTL_Serp.get_OID(session.getSelectedFactory())
 local function GetCoopPeersAtMarker(UIState, RefOid)
-    local count = serpLight.DoForSessionGameObject("[Online GetCoopPeersAtMarker(" .. tostring(UIState) .. "," .. tostring(RefOid) .. ") Count]", true)
+    local count = serpLight.DoForSessionGameObject(
+    "[Online GetCoopPeersAtMarker(" .. tostring(UIState) .. "," .. tostring(RefOid) .. ") Count]", true)
     local peerints = {}
     if count ~= nil and count ~= "nil" then
         count = tonumber(count)
         if count ~= nil and count > 0 then
             local peerint
             for i = 0, count - 1 do
-                peerint = serpLight.DoForSessionGameObject("[Online GetCoopPeersAtMarker(" .. tostring(UIState) .. "," .. tostring(RefOid) .. ") At(" .. tostring(i) .. ")]", true)
+                peerint = serpLight.DoForSessionGameObject(
+                "[Online GetCoopPeersAtMarker(" ..
+                tostring(UIState) .. "," .. tostring(RefOid) .. ") At(" .. tostring(i) .. ")]", true)
                 if peerint ~= nil and peerint ~= "nil" then
                     peerints[tonumber(peerint)] = true -- use it as key, so you can easily check for a specific without looping over the list
                 end
@@ -1109,9 +1140,11 @@ local function GetEffectivities(GUID)
     local Effectivities = {}
     if ts.ToolOneHelper.GetHasEffectivitiy(GUID) then
         local EffectivityPercentages
-        local EffectivityTargetGroups = serpLight.GetVectorGuidsFromSessionObject("[ToolOneHelper EffectivityTargetGroups(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
+        local EffectivityTargetGroups = serpLight.GetVectorGuidsFromSessionObject(
+        "[ToolOneHelper EffectivityTargetGroups(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
         if next(EffectivityTargetGroups) then
-            EffectivityPercentages = serpLight.GetVectorGuidsFromSessionObject("[ToolOneHelper EffectivityPercentages(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
+            EffectivityPercentages = serpLight.GetVectorGuidsFromSessionObject(
+            "[ToolOneHelper EffectivityPercentages(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
         end
         for k, info in pairs(EffectivityTargetGroups) do
             Effectivities[EffectivityTargetGroups[k]] = EffectivityPercentages[k]
@@ -1122,10 +1155,12 @@ end
 
 -- add GUIDs as ItemEffectTarget to an asset to be able to loop over them in lua, since looping over AssetPools in lua is not possible
 local function GetItemOrBuffEffectTargets(GUID)
-    local _ItemOrBuffEffectTargets = serpLight.GetVectorGuidsFromSessionObject("[ToolOneHelper ItemOrBuffEffectTargets(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
+    local _ItemOrBuffEffectTargets = serpLight.GetVectorGuidsFromSessionObject(
+    "[ToolOneHelper ItemOrBuffEffectTargets(" .. tostring(GUID) .. ") Count]", { [""] = "integer" })
     local ItemOrBuffEffectTargets = {}
     for _, PGinfo in pairs(_ItemOrBuffEffectTargets) do
-        local Product = PGinfo[""] -- ItemOrBuffEffectTargets directly returns a list of integers, so we used empty string as InfoToInclude
+        local Product = PGinfo
+        [""]                       -- ItemOrBuffEffectTargets directly returns a list of integers, so we used empty string as InfoToInclude
         table.insert(ItemOrBuffEffectTargets, Product)
     end
     return ItemOrBuffEffectTargets -- index,Product, starts at 1, so works with ipairs and pairs
@@ -1133,7 +1168,8 @@ end
 -- also as AssetPool alternative for lua, here you can combine Ingredient and Amount for 2 values which are ment to belong together
 -- Beware: Amount can be at max 100.000, so not be used for GUIDs!
 local function GetAssetCosts(GUID)
-    local _Costs = serpLight.GetVectorGuidsFromSessionObject("[ToolOneHelper BuildCost(" .. tostring(GUID) .. ") Costs Count]", { ProductGUID = "integer", Amount = "integer" })
+    local _Costs = serpLight.GetVectorGuidsFromSessionObject(
+    "[ToolOneHelper BuildCost(" .. tostring(GUID) .. ") Costs Count]", { ProductGUID = "integer", Amount = "integer" })
     local Costs = {}
     for _, info in pairs(_Costs) do
         local Product = info["ProductGUID"]
@@ -1160,7 +1196,8 @@ local function GetGameObjectPath(OID, path)
             -- string or bint. we can only return strings, not any tabeles/gameobjects this way
             local path_textemb = serpLight.ToTextembed(path)
             -- g_LTL_Serp.modlog("GetGameObjectPath : [MetaObjects SessionGameObject("..tostring(OID)..")"..path_textemb.."]",ModID)
-            ret = serpLight.DoForSessionGameObject("[MetaObjects SessionGameObject(" .. tostring(OID) .. ")" .. path_textemb .. "]", true)
+            ret = serpLight.DoForSessionGameObject(
+            "[MetaObjects SessionGameObject(" .. tostring(OID) .. ")" .. path_textemb .. "]", true)
             local status, err = xpcall(serpLight.myeval, serpLight.log_error, ret) -- to make "1" 1 or "true" true
             if status == true then
                 -- otherwise we keep it as string (eg. "Feld Besteller" Name causes an error with myeval)
@@ -1189,12 +1226,25 @@ end
 local function GetActiveQuestInstances(DescriptionTextGUID, firstfound, startfromID, logloop, maxemptycount)
     -- we can only search for DescriptionText, not the Quest GUID...
     local ID = startfromID or 2 -- 0 to 1 are empty it seems. 2 always seems to be  "153179 Writers Quests Trigger"
-    local QuestIndices = {} -- returning Indices instead of QuestInstance, because such instances are broken after one use (same for GameObject)
-    local abortcount = 0 -- we loop until we reach empty quests. But unfortunately sometimes some quests may appear as empty (eg. A7_QuestSubQuest), so only abort after we hit x empty quests in a row
+    local QuestIndices = {}     -- returning Indices instead of QuestInstance, because such instances are broken after one use (same for GameObject)
+    local abortcount = 0        -- we loop until we reach empty quests. But unfortunately sometimes some quests may appear as empty (eg. A7_QuestSubQuest), so only abort after we hit x empty quests in a row
     maxemptycount = maxemptycount or 20
     while true do
         if logloop then
-            serpLight.modlog("Quest ID " .. tostring(ID) .. ", active: " .. tostring(ts.Quests.GetQuest(ID).IsActive) .. ", HasEnded: " .. tostring(ts.Quests.GetQuest(ID).HasEnded) .. ", StoryText: " .. tostring(ts.Quests.GetQuest(ID).QuestStoryText) .. ", DescriptionText: " .. tostring(ts.Quests.GetQuest(ID).QuestDescriptionText) .. ", TimeLeft: " .. tostring(ts.Quests.GetQuest(ID).TimeLeft) .. ", StateReachable: " .. tostring(ts.Quests.GetQuest(ID).StateReachable), ModID)
+            serpLight.modlog(
+            "Quest ID " ..
+            tostring(ID) ..
+            ", active: " ..
+            tostring(ts.Quests.GetQuest(ID).IsActive) ..
+            ", HasEnded: " ..
+            tostring(ts.Quests.GetQuest(ID).HasEnded) ..
+            ", StoryText: " ..
+            tostring(ts.Quests.GetQuest(ID).QuestStoryText) ..
+            ", DescriptionText: " ..
+            tostring(ts.Quests.GetQuest(ID).QuestDescriptionText) ..
+            ", TimeLeft: " ..
+            tostring(ts.Quests.GetQuest(ID).TimeLeft) ..
+            ", StateReachable: " .. tostring(ts.Quests.GetQuest(ID).StateReachable), ModID)
         end
         local IsActive = ts.Quests.GetQuest(ID).IsActive
         local HasEnded = ts.Quests.GetQuest(ID).HasEnded
@@ -1257,7 +1307,7 @@ local function GetCurrentSessionObjectsFromLocaleByProperty(Property)
     end
     local GUID, OID
     local Objects = {}
-    local SessionGuid = session.getSessionGUID() -- only current session is found by getObjectGroupByProperty
+    local SessionGuid = session.getSessionGUID()                       -- only current session is found by getObjectGroupByProperty
     local ParticipantID = ts.Participants.GetGetCurrentParticipantID() -- finds only objects from local player
     if PropertyID ~= nil then
         local userdatas = session.getObjectGroupByProperty(PropertyID) -- game.MetaGameManager finds the same like session...
@@ -1269,7 +1319,8 @@ local function GetCurrentSessionObjectsFromLocaleByProperty(Property)
                     GUID = ts.Objects.GetObject(OID).GUID
                     if GUID ~= 0 then
                         -- is not the case here, but just to be save
-                        Objects[OID] = { GUID = GUID, userdata = userdata, OID = OID, ParticipantID = ParticipantID, SessionGuid = SessionGuid }
+                        Objects[OID] = { GUID = GUID, userdata = userdata, OID = OID, ParticipantID = ParticipantID, SessionGuid =
+                        SessionGuid }
                     end
                 end
             end
@@ -1304,7 +1355,8 @@ local function DestroyGUIDByLocal(PID, GUID, Property)
             end
             if next(victims) ~= nil then
                 for i, OID in ipairs(victims) do
-                    local owner = ts.GetGameObject(OID).Owner -- while we wait the session might change, so using GetGameObject is good
+                    local owner = ts.GetGameObject(OID)
+                    .Owner                                    -- while we wait the session might change, so using GetGameObject is good
                     local notstop = 0
                     while owner == PID do
                         -- wait for owner to change
@@ -1317,15 +1369,22 @@ local function DestroyGUIDByLocal(PID, GUID, Property)
                         end
                     end
                     if notstop > 100 then
-                        serpLight.modlog("DestroyGUIDByLocal: GUID " .. tostring(GUID) .. " did not change owner within 10 seconds.. abort", ModID)
+                        serpLight.modlog(
+                        "DestroyGUIDByLocal: GUID " ..
+                        tostring(GUID) .. " did not change owner within 10 seconds.. abort", ModID)
                     else
                         coroutine.yield() -- just to be sure owner change was completely done
                         ts.GetGameObject(OID).Attackable.SetAddDamagePercent(100, PID)
-                        serpLight.modlog("DestroyGUIDByLocal: GUID " .. tostring(GUID) .. " success, should be destroyed now", ModID)
+                        serpLight.modlog(
+                        "DestroyGUIDByLocal: GUID " .. tostring(GUID) .. " success, should be destroyed now", ModID)
                     end
                 end
             else
-                serpLight.modlog("DestroyGUIDByLocal: did not find GUID " .. tostring(GUID) .. " owned by local player in current session (normal in coop, but at least one from the coop team should find it, unless you called this fn with an GUID you did not spawn just to save scripts)", ModID)
+                serpLight.modlog(
+                "DestroyGUIDByLocal: did not find GUID " ..
+                tostring(GUID) ..
+                " owned by local player in current session (normal in coop, but at least one from the coop team should find it, unless you called this fn with an GUID you did not spawn just to save scripts)",
+                    ModID)
             end
         end)
     end
@@ -1341,7 +1400,8 @@ local function _OnObjectDeletionConfirmed(GUID)
         if type(fn) == "function" then
             local status, err = xpcall(fn, serpLight.log_error, GUID)
             if status == false then
-                serpLight.modlog("ERROR in _OnObjectDeletionConfirmed for mod '" .. tostring(modname) .. "': " .. tostring(err), ModID)
+                serpLight.modlog(
+                "ERROR in _OnObjectDeletionConfirmed for mod '" .. tostring(modname) .. "': " .. tostring(err), ModID)
             end
         end
     end
@@ -2411,7 +2471,8 @@ local function HasCommandQueue(OID, userdata)
         return true
     elseif hasproperty == nil then
         -- then try the less secure way via GetGameObject, which also works if object is in another session
-        return serpLight.GetGameObjectPath(OID, "CommandQueue.UI_IsNonMoving") or serpLight.GetGameObjectPath(OID, "CommandQueue.UI_IsMoving") -- scheint immer eins von beiden wahr zu sein, auch zb auf patroullie/traderoute
+        return serpLight.GetGameObjectPath(OID, "CommandQueue.UI_IsNonMoving") or
+        serpLight.GetGameObjectPath(OID, "CommandQueue.UI_IsMoving")                                                                           -- scheint immer eins von beiden wahr zu sein, auch zb auf patroullie/traderoute
     end
 end
 local function HasAttacker(OID, userdata)
@@ -2454,7 +2515,8 @@ end
 
 local function AffectedByStatusEffect(OID, StatusEffectGUID)
     -- eg StatusEffect dealt by projectiles. this way you can easily filter for objects hit with your custom projectile
-    return serpLight.GetGameObjectPath(OID, "Attackable.GetIsPartOfActiveStatusEffectChain(" .. tostring(StatusEffectGUID) .. ")") -- unfortunately does not work with buffs provided in a different way
+    return serpLight.GetGameObjectPath(OID,
+        "Attackable.GetIsPartOfActiveStatusEffectChain(" .. tostring(StatusEffectGUID) .. ")")                                     -- unfortunately does not work with buffs provided in a different way
 end
 -- for Productivity Buffs for Factory/Monument see GetVectorGuidsFromSessionObject ProductivityUpgradeList
 -- And you can check ItemContainer for "GetItemAlreadyEquipped" to check if a ship/guildhouse has an item euqipped
@@ -2467,7 +2529,8 @@ end
 -- [2025-09-18 16:39:05.830] [info] Load [Fix] Bar Flag fixed (Taludas) (1.0.0, Taludas_FixedBarFlag) from E:\Spiele\mod.io\4169\mods\3358529\Serp Modpack\[Fix] Community Bugfixes\shared\[Fix] Bar Flag fixed (Taludas)
 local function GetModloaderlog()
     -- written by pnski , may fail on Linux I guess?
-    local DefaultPath = os.getenv("USERPROFILE") .. [[\Documents\Anno 1800\log\mod-loader.log]] -- c:\User\<Username>\Documents\Anno 1800\log\mod-loader.log
+    local DefaultPath = os.getenv("USERPROFILE") ..
+    [[\Documents\Anno 1800\log\mod-loader.log]]                                                 -- c:\User\<Username>\Documents\Anno 1800\log\mod-loader.log
     -- if g_LTL_Serp.GetOS()~="win" then
     -- DefaultPath =  -- any way to get the path for all linux installations?!
     -- end
@@ -2580,43 +2643,266 @@ local z = {
 
     -- Some constants
     PIDs = {
-        Human0 = { PID = 0, GUID = 41 }, Human1 = { PID = 1, GUID = 600069 }, Human2 = { PID = 2, GUID = 600070 }, Human3 = { PID = 3, GUID = 42 },
-        General_Enemy = { PID = 9, GUID = 44 }, Neutral = { PID = 8, GUID = 34 }, Third_party_01_Queen = { PID = 15, GUID = 75 },
-        Second_ai_01_Jorgensen = { PID = 25, GUID = 47 }, Second_ai_02_Qing = { PID = 26, GUID = 79 }, Second_ai_03_Wibblesock = { PID = 27, GUID = 80 },
-        Second_ai_04_Smith = { PID = 28, GUID = 81 }, Second_ai_05_OMara = { PID = 29, GUID = 82 }, Second_ai_06_Gasparov = { PID = 30, GUID = 83 },
-        Second_ai_07_von_Malching = { PID = 31, GUID = 11 }, Second_ai_08_Gravez = { PID = 32, GUID = 48 }, Second_ai_09_Silva = { PID = 33, GUID = 84 },
-        Second_ai_10_Hunt = { PID = 34, GUID = 85 }, Second_ai_11_Mercier = { PID = 64, GUID = 220 },
-        Third_party_03_Pirate_Harlow = { PID = 17, GUID = 73 }, Third_party_04_Pirate_LaFortune = { PID = 18, GUID = 76 },
-        Third_party_02_Blake = { PID = 16, GUID = 45 }, Third_party_06_Nate = { PID = 22, GUID = 77 }, Third_party_05_Sarmento = { PID = 19, GUID = 29 },
-        Third_party_07_Jailor_Bleakworth = { PID = 23, GUID = 46 }, Third_party_08_Kahina = { PID = 24, GUID = 78 }, Africa_Ketema = { PID = 80, GUID = 119051 }, Arctic_Inuit = { PID = 72, GUID = 237 },
-        Scenario3_Editor = { GUID = 100131, PID = 117 }, Scenario3_Challenger1 = { GUID = 100132, PID = 118 }, Scenario3_Challenger2 = { GUID = 100938, PID = 119 },
-        Scenario3_Challenger3 = { GUID = 100939, PID = 120 }, Scenario3_Challenger4 = { GUID = 101507, PID = 121 }, Scenario3_Challenger5 = { GUID = 101508, PID = 122 },
-        Scenario3_Challenger6 = { GUID = 101509, PID = 123 }, Scenario3_Challenger7 = { GUID = 101517, PID = 124 }, Scenario3_Challenger8 = { GUID = 101518, PID = 125 },
-        Scenario3_Challenger9 = { GUID = 101519, PID = 126 }, Scenario3_Challenger10 = { GUID = 101520, PID = 127 }, Scenario3_Challenger11 = { GUID = 101521, PID = 128 },
-        Scenario3_Challenger12 = { GUID = 101522, PID = 129 }, Scenario3_Eli = { GUID = 103130, PID = 136 }, Scenario3_Ketema = { GUID = 103129, PID = 137 },
-        Scenario3_Archie = { GUID = 103131, PID = 138 }, Scenario_Item_Trader = { GUID = 4387, PID = 139 }, Scenario3_Queen = { GUID = 101523, PID = 130 },
+        Human0 = { PID = 0, GUID = 41 },
+        Human1 = { PID = 1, GUID = 600069 },
+        Human2 = { PID = 2, GUID = 600070 },
+        Human3 = { PID = 3, GUID = 42 },
+        General_Enemy = { PID = 9, GUID = 44 },
+        Neutral = { PID = 8, GUID = 34 },
+        Third_party_01_Queen = { PID = 15, GUID = 75 },
+        Second_ai_01_Jorgensen = { PID = 25, GUID = 47 },
+        Second_ai_02_Qing = { PID = 26, GUID = 79 },
+        Second_ai_03_Wibblesock = { PID = 27, GUID = 80 },
+        Second_ai_04_Smith = { PID = 28, GUID = 81 },
+        Second_ai_05_OMara = { PID = 29, GUID = 82 },
+        Second_ai_06_Gasparov = { PID = 30, GUID = 83 },
+        Second_ai_07_von_Malching = { PID = 31, GUID = 11 },
+        Second_ai_08_Gravez = { PID = 32, GUID = 48 },
+        Second_ai_09_Silva = { PID = 33, GUID = 84 },
+        Second_ai_10_Hunt = { PID = 34, GUID = 85 },
+        Second_ai_11_Mercier = { PID = 64, GUID = 220 },
+        Third_party_03_Pirate_Harlow = { PID = 17, GUID = 73 },
+        Third_party_04_Pirate_LaFortune = { PID = 18, GUID = 76 },
+        Third_party_02_Blake = { PID = 16, GUID = 45 },
+        Third_party_06_Nate = { PID = 22, GUID = 77 },
+        Third_party_05_Sarmento = { PID = 19, GUID = 29 },
+        Third_party_07_Jailor_Bleakworth = { PID = 23, GUID = 46 },
+        Third_party_08_Kahina = { PID = 24, GUID = 78 },
+        Africa_Ketema = { PID = 80, GUID = 119051 },
+        Arctic_Inuit = { PID = 72, GUID = 237 },
+        Scenario3_Editor = { GUID = 100131, PID = 117 },
+        Scenario3_Challenger1 = { GUID = 100132, PID = 118 },
+        Scenario3_Challenger2 = { GUID = 100938, PID = 119 },
+        Scenario3_Challenger3 = { GUID = 100939, PID = 120 },
+        Scenario3_Challenger4 = { GUID = 101507, PID = 121 },
+        Scenario3_Challenger5 = { GUID = 101508, PID = 122 },
+        Scenario3_Challenger6 = { GUID = 101509, PID = 123 },
+        Scenario3_Challenger7 = { GUID = 101517, PID = 124 },
+        Scenario3_Challenger8 = { GUID = 101518, PID = 125 },
+        Scenario3_Challenger9 = { GUID = 101519, PID = 126 },
+        Scenario3_Challenger10 = { GUID = 101520, PID = 127 },
+        Scenario3_Challenger11 = { GUID = 101521, PID = 128 },
+        Scenario3_Challenger12 = { GUID = 101522, PID = 129 },
+        Scenario3_Eli = { GUID = 103130, PID = 136 },
+        Scenario3_Ketema = { GUID = 103129, PID = 137 },
+        Scenario3_Archie = { GUID = 103131, PID = 138 },
+        Scenario_Item_Trader = { GUID = 4387, PID = 139 },
+        Scenario3_Queen = { GUID = 101523, PID = 130 },
 
         -- ={PID=,GUID=},={PID=,GUID=},={PID=,GUID=},
     },
     ShipNameGUIDs = { -- eg to choose a random name via lua g_LTL_Serp.weighted_random_choices(g_LTL_Serp.ShipNameGUIDs, 1)[1] (SetName("") does not work, although it should generate a random name...)
-        [2302] = 1, [2303] = 1, [2304] = 1, [2305] = 1, [2306] = 1, [2307] = 1, [2308] = 1, [2309] = 1, [2310] = 1, [2311] = 1, [2312] = 1, [2313] = 1, [2314] = 1,
-        [2315] = 1, [2316] = 1, [2317] = 1, [2318] = 1, [2319] = 1, [10715] = 1, [10716] = 1, [10717] = 1, [10718] = 1, [10719] = 1, [10720] = 1, [10721] = 1,
-        [10722] = 1, [10723] = 1, [10724] = 1, [10725] = 1, [10726] = 1, [10727] = 1, [10728] = 1, [10729] = 1, [10730] = 1, [10731] = 1, [10732] = 1, [10733] = 1,
-        [10734] = 1, [10735] = 1, [10736] = 1, [10737] = 1, [10738] = 1, [10739] = 1, [10740] = 1, [10741] = 1, [10742] = 1, [10743] = 1, [10744] = 1, [10745] = 1,
-        [10746] = 1, [10747] = 1, [10748] = 1, [10749] = 1, [10750] = 1, [10751] = 1, [10752] = 1, [10753] = 1, [10754] = 1, [10755] = 1, [10756] = 1, [10757] = 1,
-        [10758] = 1, [10759] = 1, [10760] = 1, [10761] = 1, [10762] = 1, [10763] = 1, [10764] = 1, [10765] = 1, [10766] = 1, [10767] = 1, [10768] = 1, [10769] = 1,
-        [10770] = 1, [10771] = 1, [10772] = 1, [10773] = 1, [10774] = 1, [10775] = 1, [10776] = 1, [10777] = 1, [10778] = 1, [10779] = 1, [10780] = 1, [10781] = 1,
-        [10782] = 1, [10783] = 1, [10784] = 1, [10785] = 1, [10786] = 1, [10787] = 1, [10788] = 1, [10789] = 1, [10790] = 1, [10791] = 1, [10792] = 1, [10793] = 1,
-        [10794] = 1, [10795] = 1, [10796] = 1, [10797] = 1, [10798] = 1, [10799] = 1, [10800] = 1, [10801] = 1, [10802] = 1, [10803] = 1, [10804] = 1, [10805] = 1,
-        [10806] = 1, [10807] = 1, [10808] = 1, [10809] = 1, [10810] = 1, [10811] = 1, [10812] = 1, [10813] = 1, [10814] = 1, [20495] = 1, [20496] = 1, [20497] = 1,
-        [20498] = 1, [20499] = 1, [20500] = 1, [20501] = 1, [20502] = 1, [20503] = 1, [20504] = 1, [20505] = 1, [20506] = 1, [20507] = 1, [20508] = 1, [20509] = 1,
-        [20510] = 1, [20511] = 1, [20512] = 1, [20513] = 1, [20514] = 1, [20515] = 1, [20516] = 1, [20517] = 1, [20518] = 1, [20519] = 1, [20520] = 1, [20521] = 1,
-        [20522] = 1, [20523] = 1, [20524] = 1, [20525] = 1, [20526] = 1, [20527] = 1, [20528] = 1, [20529] = 1, [20530] = 1, [20531] = 1, [20532] = 1, [20533] = 1,
-        [20534] = 1, [20535] = 1, [20536] = 1, [20537] = 1, [20538] = 1, [20539] = 1, [20540] = 1, [20541] = 1, [20542] = 1, [20543] = 1, [20544] = 1, [20545] = 1,
-        [20546] = 1, [20547] = 1, [20548] = 1, [20549] = 1, [20550] = 1, [20551] = 1, [20552] = 1, [20553] = 1, [20554] = 1, [20555] = 1, [20556] = 1, [20557] = 1,
-        [20558] = 1, [20559] = 1, [20560] = 1, [20561] = 1, [20562] = 1, [20563] = 1, [20564] = 1, [20565] = 1, [20566] = 1, [20567] = 1, [20568] = 1, [20569] = 1,
-        [20570] = 1, [20571] = 1, [20572] = 1, [20573] = 1, [20574] = 1, [20575] = 1, [20576] = 1, [20577] = 1, [20578] = 1, [20579] = 1, [20580] = 1, [20581] = 1,
-        [20582] = 1, [20583] = 1, [20584] = 1, [20585] = 1, [20586] = 1, [20587] = 1,
+        [2302] = 1,
+        [2303] = 1,
+        [2304] = 1,
+        [2305] = 1,
+        [2306] = 1,
+        [2307] = 1,
+        [2308] = 1,
+        [2309] = 1,
+        [2310] = 1,
+        [2311] = 1,
+        [2312] = 1,
+        [2313] = 1,
+        [2314] = 1,
+        [2315] = 1,
+        [2316] = 1,
+        [2317] = 1,
+        [2318] = 1,
+        [2319] = 1,
+        [10715] = 1,
+        [10716] = 1,
+        [10717] = 1,
+        [10718] = 1,
+        [10719] = 1,
+        [10720] = 1,
+        [10721] = 1,
+        [10722] = 1,
+        [10723] = 1,
+        [10724] = 1,
+        [10725] = 1,
+        [10726] = 1,
+        [10727] = 1,
+        [10728] = 1,
+        [10729] = 1,
+        [10730] = 1,
+        [10731] = 1,
+        [10732] = 1,
+        [10733] = 1,
+        [10734] = 1,
+        [10735] = 1,
+        [10736] = 1,
+        [10737] = 1,
+        [10738] = 1,
+        [10739] = 1,
+        [10740] = 1,
+        [10741] = 1,
+        [10742] = 1,
+        [10743] = 1,
+        [10744] = 1,
+        [10745] = 1,
+        [10746] = 1,
+        [10747] = 1,
+        [10748] = 1,
+        [10749] = 1,
+        [10750] = 1,
+        [10751] = 1,
+        [10752] = 1,
+        [10753] = 1,
+        [10754] = 1,
+        [10755] = 1,
+        [10756] = 1,
+        [10757] = 1,
+        [10758] = 1,
+        [10759] = 1,
+        [10760] = 1,
+        [10761] = 1,
+        [10762] = 1,
+        [10763] = 1,
+        [10764] = 1,
+        [10765] = 1,
+        [10766] = 1,
+        [10767] = 1,
+        [10768] = 1,
+        [10769] = 1,
+        [10770] = 1,
+        [10771] = 1,
+        [10772] = 1,
+        [10773] = 1,
+        [10774] = 1,
+        [10775] = 1,
+        [10776] = 1,
+        [10777] = 1,
+        [10778] = 1,
+        [10779] = 1,
+        [10780] = 1,
+        [10781] = 1,
+        [10782] = 1,
+        [10783] = 1,
+        [10784] = 1,
+        [10785] = 1,
+        [10786] = 1,
+        [10787] = 1,
+        [10788] = 1,
+        [10789] = 1,
+        [10790] = 1,
+        [10791] = 1,
+        [10792] = 1,
+        [10793] = 1,
+        [10794] = 1,
+        [10795] = 1,
+        [10796] = 1,
+        [10797] = 1,
+        [10798] = 1,
+        [10799] = 1,
+        [10800] = 1,
+        [10801] = 1,
+        [10802] = 1,
+        [10803] = 1,
+        [10804] = 1,
+        [10805] = 1,
+        [10806] = 1,
+        [10807] = 1,
+        [10808] = 1,
+        [10809] = 1,
+        [10810] = 1,
+        [10811] = 1,
+        [10812] = 1,
+        [10813] = 1,
+        [10814] = 1,
+        [20495] = 1,
+        [20496] = 1,
+        [20497] = 1,
+        [20498] = 1,
+        [20499] = 1,
+        [20500] = 1,
+        [20501] = 1,
+        [20502] = 1,
+        [20503] = 1,
+        [20504] = 1,
+        [20505] = 1,
+        [20506] = 1,
+        [20507] = 1,
+        [20508] = 1,
+        [20509] = 1,
+        [20510] = 1,
+        [20511] = 1,
+        [20512] = 1,
+        [20513] = 1,
+        [20514] = 1,
+        [20515] = 1,
+        [20516] = 1,
+        [20517] = 1,
+        [20518] = 1,
+        [20519] = 1,
+        [20520] = 1,
+        [20521] = 1,
+        [20522] = 1,
+        [20523] = 1,
+        [20524] = 1,
+        [20525] = 1,
+        [20526] = 1,
+        [20527] = 1,
+        [20528] = 1,
+        [20529] = 1,
+        [20530] = 1,
+        [20531] = 1,
+        [20532] = 1,
+        [20533] = 1,
+        [20534] = 1,
+        [20535] = 1,
+        [20536] = 1,
+        [20537] = 1,
+        [20538] = 1,
+        [20539] = 1,
+        [20540] = 1,
+        [20541] = 1,
+        [20542] = 1,
+        [20543] = 1,
+        [20544] = 1,
+        [20545] = 1,
+        [20546] = 1,
+        [20547] = 1,
+        [20548] = 1,
+        [20549] = 1,
+        [20550] = 1,
+        [20551] = 1,
+        [20552] = 1,
+        [20553] = 1,
+        [20554] = 1,
+        [20555] = 1,
+        [20556] = 1,
+        [20557] = 1,
+        [20558] = 1,
+        [20559] = 1,
+        [20560] = 1,
+        [20561] = 1,
+        [20562] = 1,
+        [20563] = 1,
+        [20564] = 1,
+        [20565] = 1,
+        [20566] = 1,
+        [20567] = 1,
+        [20568] = 1,
+        [20569] = 1,
+        [20570] = 1,
+        [20571] = 1,
+        [20572] = 1,
+        [20573] = 1,
+        [20574] = 1,
+        [20575] = 1,
+        [20576] = 1,
+        [20577] = 1,
+        [20578] = 1,
+        [20579] = 1,
+        [20580] = 1,
+        [20581] = 1,
+        [20582] = 1,
+        [20583] = 1,
+        [20584] = 1,
+        [20585] = 1,
+        [20586] = 1,
+        [20587] = 1,
     },
     Languages = { [0] = "English", [1] = "French", [2] = "Polish", [3] = "Russian", [4] = "Spanish", [5] = "German", [6] = "Chinese", [7] = "Taiwanese", [8] = "Japanese", [9] = "Korean", [10] = "Italian" },
     -- GetTopLevelDiplomacyStateTo only returns 0 to 3. to check CeaseFire/NonAttack use GetCheckDiplomacyStateTo

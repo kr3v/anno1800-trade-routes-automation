@@ -42,17 +42,17 @@ end
 
 function MapScannerHL.Region_AllAreas_ForceScan(region)
     local ret = cache.Set(
-            "map_scanner.Session(P11)",
-            MapScannerHL._Region_AllAreas_ScanImpl,
-            region
+        "map_scanner.Session(P11)",
+        MapScannerHL._Region_AllAreas_ScanImpl,
+        region
     );
     return map_scanner.Session_Areas_Rectangles(ret);
 end
 
 function MapScannerHL.Region_AllAreas_GetOrScan(region)
     local ret = cache.GetOrSetR(
-            MapScannerHL._Region_AllAreas_ScanImpl,
-            "map_scanner.Session(P11)", region
+        MapScannerHL._Region_AllAreas_ScanImpl,
+        "map_scanner.Session(P11)", region
     );
     return map_scanner.Session_Areas_Rectangles(ret);
 end
@@ -67,20 +67,20 @@ function WaterPoints.IsCached(L, areas, region, areaID, step)
 end
 
 function WaterPoints.Detect(
-        L,
-        areas,
-        region,
-        areaID,
-        step
+    L,
+    areas,
+    region,
+    areaID,
+    step
 )
     local scan = cache.GetOrSetR(
-            function(_, _areaID, _step)
-                local grid = areas[_areaID];
-                local lx, ly = grid.min_x, grid.min_y;
-                local hx, hy = grid.max_x, grid.max_y;
-                return map_scanner.Area_WaterPoints(L, lx, ly, hx, hy, _step);
-            end,
-            Area_WaterPoints_cacheKey, region, areaID, step
+        function(_, _areaID, _step)
+            local grid = areas[_areaID];
+            local lx, ly = grid.min_x, grid.min_y;
+            local hx, hy = grid.max_x, grid.max_y;
+            return map_scanner.Area_WaterPoints(L, lx, ly, hx, hy, _step);
+        end,
+        Area_WaterPoints_cacheKey, region, areaID, step
     );
 
     -- 2.2. Determine water access points for the area.
@@ -142,8 +142,8 @@ local function Areas_WithWaterPoints(L, areas, region)
         local cityName = Anno.Area_CityName(region, areaID);
 
         L.logf("%s / %d (owner=%s) grid{ minX=%d minY=%d maxX=%d maxY=%d }",
-                cityName, areaID, owner,
-                tostring(grid.min_x), tostring(grid.min_y), tostring(grid.max_x), tostring(grid.max_y));
+            cityName, areaID, owner,
+            tostring(grid.min_x), tostring(grid.min_y), tostring(grid.max_x), tostring(grid.max_y));
 
         -- owner = 0 => player-owned area
         if owner ~= 0 then
@@ -160,7 +160,7 @@ local function Areas_WithWaterPoints(L, areas, region)
                 L.logf("  reusing existing scan for area with step=%d", step);
                 scan, water_points_moved = MapScannerHL.Area.WaterPoints.Detect(L, areas, region, areaID, step);
                 if #water_points_moved >= 1 then
-                    break ;
+                    break;
                 end
             end
         end
@@ -182,7 +182,8 @@ local function Areas_WithWaterPoints(L, areas, region)
         end
         -- 2.2.1.debug. Log water access points.
         for _, point in ipairs(water_points_moved) do
-            lq.logf("%d,%d,%s", point.x, point.y, map_scanner.Coordinate_ToLetter(map_scanner.Coordinate_WaterAccessPoint));
+            lq.logf("%d,%d,%s", point.x, point.y,
+                map_scanner.Coordinate_ToLetter(map_scanner.Coordinate_WaterAccessPoint));
         end
 
         ret[areaID] = areas[areaID];

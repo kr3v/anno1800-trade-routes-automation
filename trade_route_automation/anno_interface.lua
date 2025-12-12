@@ -57,7 +57,6 @@ function Anno.Objects_GetAll_ByProperty(property)
     return serpLight.GetCurrentSessionObjectsFromLocaleByProperty(property);
 end
 
-
 ---
 Anno.TsVectorType = {
     Guid = "number",
@@ -68,7 +67,8 @@ Anno.TsVectorType = {
 
 ---@return TsVectorType[]
 function Anno.Object_ItemContainer_GetSockets(oid)
-    return serpLight.GetVectorGuidsFromSessionObject('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer Sockets Count]', Anno.TsVectorType);
+    return serpLight.GetVectorGuidsFromSessionObject(
+        '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer Sockets Count]', Anno.TsVectorType);
 end
 
 ---@return GUID[]
@@ -76,22 +76,32 @@ function Anno.SocketItemGuidsToInputReplacements(socketItemGUID)
     local res = {};
     local i = 0;
     while true do
-        local r = serpLight.DoForSessionGameObjectRaw('[AssetData([ItemAssetData(' .. tostring(socketItemGUID) .. ') ReplaceInputNewInput(' .. tostring(i) .. ')]) Guid]');
+        local r = serpLight.DoForSessionGameObjectRaw(
+            ('[AssetData([ItemAssetData(%s) ReplaceInputNewInput(%s)]) Guid]'):
+            format(tostring(socketItemGUID), tostring(i)));
         local rN = tonumber(r);
         if rN == nil or rN <= 0 then
-            break ;
+            break;
         end
         table.insert(res, r);
 
         i = i + 1;
         if i > 100 then
             --error("wtf? infinite loop detected in Anno.SocketItemGuidsToInputReplacements for socketItemGUID " .. tostring(socketItemGUID));
-            break ;
+            break;
         end
     end
     return res;
 end
 
+function Anno.Object_Name(guid)
+    local NO_RESULT = ts.Participants.GetParticipant(120).Profile.CompanyName;
+    local ret = serpLight.DoForSessionGameObjectRaw('[AssetData(' .. tostring(guid) .. ') Text]');
+    if ret == NO_RESULT then
+        return nil;
+    end
+    return ret;
+end
 
 ---
 
@@ -102,14 +112,16 @@ function Anno.Area_AddGood(region, areaID, guid, amount)
 
     local mapping = Anno.Region_AreaID_To_OID(region);
     local oid = mapping[tostring(areaID)];
-    local cmd = '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Area Economy AddAmount(' .. tostring(guid) .. ',' .. tostring(amount / 2) .. ')]';
+    local cmd = '[MetaObjects SessionGameObject(' ..
+        tostring(oid) .. ') Area Economy AddAmount(' .. tostring(guid) .. ',' .. tostring(amount / 2) .. ')]';
     return serpLight.DoForSessionGameObjectRaw(cmd);
 end
 
 function Anno.Area_GetGood(region, areaID, guid)
     local mapping = Anno.Region_AreaID_To_OID(region);
     local oid = mapping[tostring(areaID)];
-    local cmd = '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Area Economy AvailableAmount(' .. tostring(guid) .. ')]';
+    local cmd = '[MetaObjects SessionGameObject(' ..
+        tostring(oid) .. ') Area Economy AvailableAmount(' .. tostring(guid) .. ')]';
     local ret = serpLight.DoForSessionGameObjectRaw(cmd);
     return tonumber(ret);
 end
@@ -117,7 +129,8 @@ end
 function Anno.Area_GetGoodCapacity(region, areaID, guid)
     local mapping = Anno.Region_AreaID_To_OID(region);
     local oid = mapping[tostring(areaID)];
-    local cmd = '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Area Economy StorageCapacity(' .. tostring(guid) .. ')]';
+    local cmd = '[MetaObjects SessionGameObject(' ..
+        tostring(oid) .. ') Area Economy StorageCapacity(' .. tostring(guid) .. ')]';
     local ret = serpLight.DoForSessionGameObjectRaw(cmd);
     local cap = tonumber(ret);
     if cap >= 2147483647 or cap < 0 or cap == nil then
@@ -154,37 +167,42 @@ local type_Cargo = {
     Value = "number"
 }
 
-function Anno. Ship_Cargo_Get(oid)
-    return serpLight.GetVectorGuidsFromSessionObject('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer Cargo Count]', type_Cargo);
+function Anno.Ship_Cargo_Get(oid)
+    return serpLight.GetVectorGuidsFromSessionObject(
+        '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer Cargo Count]', type_Cargo);
 end
 
 function Anno.Ship_Cargo_Set(oid, slot, cargo)
     if cargo.Value == 1 then
         cargo.Value = 2;
     end
-    return serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer CheatItemInSlot(' .. tostring(cargo.Guid) .. ',' .. tostring(cargo.Value / 2) .. ')]');
+    return serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' ..
+        tostring(oid) ..
+        ') ItemContainer CheatItemInSlot(' .. tostring(cargo.Guid) .. ',' .. tostring(cargo.Value / 2) .. ')]');
 end
 
 function Anno.Ship_Cargo_Clear(oid, slot)
-    return serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer ClearSlot(' .. tostring(slot) .. '))]');
+    return serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' ..
+        tostring(oid) .. ') ItemContainer ClearSlot(' .. tostring(slot) .. '))]');
 end
 
 local guidToCargoSlotCapacity = {
-    ["100438"] = 2, -- Schooner
-    ["100441"] = 4, -- Clipper
-    ["100443"] = 2, -- Monitor
-    ["101121"] = 3, -- Flagship
-    ["100439"] = 3, -- Frigate
-    ["118718"] = 8, -- The Great Eastern
+    ["100438"] = 2,  -- Schooner
+    ["100441"] = 4,  -- Clipper
+    ["100443"] = 2,  -- Monitor
+    ["101121"] = 3,  -- Flagship
+    ["100439"] = 3,  -- Frigate
+    ["118718"] = 8,  -- The Great Eastern
     ["1010062"] = 6, -- Cargo Ship
-    ["132404"] = 6, -- World-Class Reefer
+    ["132404"] = 6,  -- World-Class Reefer
 
     ["1058"] = 3,
     ["1060"] = 8,
 }
 
 function Anno.Ship_Cargo_SlotCapacity(oid)
-    local guid = serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' .. tostring(oid) .. ') Static Guid]');
+    local guid = serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' ..
+        tostring(oid) .. ') Static Guid]');
     return guidToCargoSlotCapacity[tostring(guid)] or -1;
 end
 
@@ -195,24 +213,28 @@ function Anno.Ship_Name_Get(oid)
 end
 
 function Anno.Ship_Name_Set(oid, name)
-    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") Nameable Name(" .. tostring(name) .. ")]");
+    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" ..
+        tostring(oid) .. ") Nameable Name(" .. tostring(name) .. ")]");
 end
 
 ---
 
 function Anno.Ship_IsMoving(oid)
-    local ret = serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") Walking IsMoving(true)]");
+    local ret = serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" ..
+        tostring(oid) .. ") Walking IsMoving(true)]");
     return ret == "true";
 end
 
 function Anno.Ship_MoveTo(oid, x, y)
-    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") Walking DebugGoto(" .. tostring(x) .. "," .. tostring(y) .. ")]");
+    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" ..
+        tostring(oid) .. ") Walking DebugGoto(" .. tostring(x) .. "," .. tostring(y) .. ")]");
 end
 
 ---
 
 function Anno.Ship_TradeRoute_GetName(oid)
-    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" .. tostring(oid) .. ") TradeRouteVehicle RouteName]");
+    return serpLight.DoForSessionGameObjectRaw("[MetaObjects SessionGameObject(" ..
+        tostring(oid) .. ") TradeRouteVehicle RouteName]");
 end
 
 ---
@@ -250,6 +272,7 @@ end
 
 ----- high level region functions -----
 
+---@return ShipID[]
 local function _Ships_GetAll()
     local objs = serpLight.GetCurrentSessionObjectsFromLocaleByProperty("Walking");
     local ret = {};
@@ -312,7 +335,6 @@ local function _BuildingsWithSockets()
 
         local sockets = Anno.Object_ItemContainer_GetSockets(oid);
         if #sockets > 0 then
-
             local socketItemsGuids = {};
             for _, v in ipairs(sockets) do
                 table.insert(socketItemsGuids, v.Guid);
@@ -378,6 +400,8 @@ function Anno.Region_AreaID_To_OID(region)
     return cache.GetOrSet("Anno.AreaID_To_ItsOID", _AreaID_To_ItsOID_Build, region);
 end
 
+---@param region RegionID
+---@return ShipID[]|nil
 function Anno.Region_Ships_GetAll(region)
     local currentRegion = Anno.Region_Current();
     if currentRegion ~= region then
@@ -414,10 +438,10 @@ end
 
 function Anno.Region_IsCached(region)
     return cache.Exists("Anno.AreaID_To_ItsOID", region)
-            and cache.Exists("Anno.Ships_GetAll", region)
-            and cache.Exists("Anno.AreasToResidenceGuids", region)
-            and cache.Exists("Anno.AreasToProductionGuids", region)
-            and cache.Exists("Anno.BuildingsWithSockets", region);
+        and cache.Exists("Anno.Ships_GetAll", region)
+        and cache.Exists("Anno.AreasToResidenceGuids", region)
+        and cache.Exists("Anno.AreasToProductionGuids", region)
+        and cache.Exists("Anno.BuildingsWithSockets", region);
 end
 
 function Anno.Region_CanCache(region)

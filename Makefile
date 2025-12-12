@@ -6,6 +6,7 @@ REGIONS ?= OW NW ER AR CT
 BASE ?= $(INSTALL_BASEDIR_E)
 
 install: install/mkdir
+	mkdir -p mods/dev/data/trade_route_automation
 	cp -r trade_route_automation/* mods/dev/data/trade_route_automation
 	cp -r mods/dev/* "$(INSTALL_BASEDIR)"
 

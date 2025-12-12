@@ -23,7 +23,6 @@ local function _execute_in_thread_with_xpcall(name, func)
         end,
         "TrRAt_UI." .. name
     );
-
 end
 
 ----- Area Rescan -----
@@ -52,18 +51,18 @@ function TrRAt_UI.AreaRescan.impl(step)
     local scan = MapScannerLL.Area_WaterPoints(TrRAt_UI.L, lx, ly, hx, hy, step);
 
     cache.Set(
-            "areaScanner_dfs",
-            function()
-                return scan;
-            end,
-            region, areaID, step
+        "areaScanner_dfs",
+        function()
+            return scan;
+        end,
+        region, areaID, step
     );
     cache.Set(
-            "areaScanner_dfs",
-            function()
-                return scan;
-            end,
-            tostring(region), areaName, tostring(step)
+        "areaScanner_dfs",
+        function()
+            return scan;
+        end,
+        tostring(region), areaName, tostring(step)
     );
 
     -- Trigger events
@@ -103,13 +102,12 @@ function TrRAt_UI.RegionRescan.impl()
     end
 end
 
-
 function TrRAt_UI.RegionRescan.Do(step)
     _execute_in_thread_with_xpcall(
-            "TrRAt_UI.RegionRescan.impl",
-            function()
-                TrRAt_UI.RegionRescan.impl(step);
-            end
+        "TrRAt_UI.RegionRescan.impl",
+        function()
+            TrRAt_UI.RegionRescan.impl(step);
+        end
     );
 end
 
@@ -125,10 +123,10 @@ end
 
 function TrRAt_UI.Enable.Do()
     _execute_in_thread_with_xpcall(
-            "TrRAt_UI.Enable.impl",
-            function()
-                TrRAt_UI.Enable.impl();
-            end
+        "TrRAt_UI.Enable.impl",
+        function()
+            TrRAt_UI.Enable.impl();
+        end
     );
 end
 

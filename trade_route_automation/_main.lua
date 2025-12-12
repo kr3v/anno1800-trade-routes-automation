@@ -59,7 +59,7 @@ local function async_watcher(L, interrupt)
         if tick_count % 100 == 0 then
             local stats = async.tick()
             L.logf("[Tick %d] Async stats: running=%d, waiting=%d, completed=%d, errors=%d",
-                    tick_count, stats.running, stats.waiting, stats.completed, stats.errors)
+                tick_count, stats.running, stats.waiting, stats.completed, stats.errors)
         end
         if tick_count % 1000 == 0 then
             async.cleanup(true)
@@ -71,7 +71,7 @@ local function async_watcher(L, interrupt)
 
     local final_stats = async.tick()
     L.logf("Final stats after %d ticks: completed=%d, errors=%d",
-            tick_count, final_stats.completed, final_stats.errors)
+        tick_count, final_stats.completed, final_stats.errors)
 
     local errored = async.get_tasks_by_state("error")
     if #errored > 0 then
@@ -147,7 +147,7 @@ function M.theTradeRouteAutomation_threads(profileName, luaRoot)
         while true do
             if interruptF() then
                 L.log("Received external interrupt signal, stopping trade route automation.");
-                return ;
+                return;
             end
             if interruptOnProfileNameChange() then
                 L.log("Profile name changed, restarting trade route automation.");
@@ -170,18 +170,20 @@ function M.theTradeRouteAutomation_threads(profileName, luaRoot)
 
     local asyncInterrupt = _or(asyncInterruptF, interruptOnProfileNameChange, interruptOnFail, interruptOnDisable);
     local heartbeatInterrupt = _or(heartbeatInterruptF, interruptOnProfileNameChange, interruptOnFail, interruptOnDisable);
-    local tradeRouteLoopInterruptOW = _or(tradeRouteLoopInterruptOwF, interruptOnProfileNameChange, interruptOnFail, interruptOnDisable);
-    local tradeRouteLoopInterruptNW = _or(tradeRouteLoopInterruptNwF, interruptOnProfileNameChange, interruptOnFail, interruptOnDisable);
+    local tradeRouteLoopInterruptOW = _or(tradeRouteLoopInterruptOwF, interruptOnProfileNameChange, interruptOnFail,
+        interruptOnDisable);
+    local tradeRouteLoopInterruptNW = _or(tradeRouteLoopInterruptNwF, interruptOnProfileNameChange, interruptOnFail,
+        interruptOnDisable);
 
     local ts = {
         AnnoThread:new("trade-route-async-watcher",
-                apply(async_watcher, L.with("loc", "async_watcher"), asyncInterrupt)),
+            apply(async_watcher, L.with("loc", "async_watcher"), asyncInterrupt)),
         AnnoThread:new("trade-executor-alive-heartbeat",
-                apply(heartbeat_loop, L.with("loc", "heartbeat_loop"), heartbeatInterrupt)),
+            apply(heartbeat_loop, L.with("loc", "heartbeat_loop"), heartbeatInterrupt)),
         AnnoThread:new("trade-route-executor-loop-ow",
-                apply(TradePlannerHL.Loop, L.with("loc", "Trade.Loop"), Anno.Region_OldWorld, tradeRouteLoopInterruptOW)),
+            apply(TradePlannerHL.Loop, L.with("loc", "Trade.Loop"), Anno.Region_OldWorld, tradeRouteLoopInterruptOW)),
         AnnoThread:new("trade-route-executor-loop-nw",
-                apply(TradePlannerHL.Loop, L.with("loc", "Trade.Loop"), Anno.Region_NewWorld, tradeRouteLoopInterruptNW)),
+            apply(TradePlannerHL.Loop, L.with("loc", "Trade.Loop"), Anno.Region_NewWorld, tradeRouteLoopInterruptNW)),
     }
 
     while true do
@@ -195,7 +197,7 @@ function M.theTradeRouteAutomation_threads(profileName, luaRoot)
         if interruptF() then
             interruptAll = true;
             L.log("Received external interrupt signal, stopping trade route automation.");
-            return ;
+            return;
         end
         if interruptOnProfileNameChange() then
             L.log("Profile name changed, restarting trade route automation.");
@@ -224,7 +226,7 @@ function M.theTradeRouteAutomation_threads(profileName, luaRoot)
         end
     end
 
-    return ;
+    return;
 end
 
 return M;

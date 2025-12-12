@@ -22,7 +22,13 @@ function AreaRequests.Population(L, region)
                 if ret[areaID_num] == nil then
                     ret[areaID_num] = {};
                 end
-                ret[areaID_num][product.Guid] = true;
+                if ret[areaID_num][product.Guid] == nil then
+                    ret[areaID_num][product.Guid] = {};
+                end
+                table.insert(ret[areaID_num][product.Guid], {
+                    type = "Population",
+                    name = residence.Name or ("GUID:" .. tostring(guid))
+                });
             end
             :: continue ::
         end
@@ -49,7 +55,13 @@ function AreaRequests.Production(L, region)
                 if ret[areaID_num] == nil then
                     ret[areaID_num] = {};
                 end
-                ret[areaID_num][tonumber(product.Guid)] = true;
+                if ret[areaID_num][tonumber(product.Guid)] == nil then
+                    ret[areaID_num][tonumber(product.Guid)] = {};
+                end
+                table.insert(ret[areaID_num][tonumber(product.Guid)], {
+                    type = "Production",
+                    name = production.Name or ("GUID:" .. tostring(guid))
+                });
             end
 
             :: continue ::
@@ -61,20 +73,30 @@ end
 function AreaRequests.Construction(L, region)
     local ret = {};
     local areas = Anno.Region_AreaID_To_OID(region);
+
+    local _constructionGoods = {
+        120008,  -- Wood
+        1010196, -- Timber
+        1010205, -- Bricks
+        1010218, -- Steel Beams
+        1010207, -- Windows
+        1010202, -- Reinforced Concrete
+        134623,  -- Elevator
+        1010224, -- Steam Motors
+        838,     -- Aluminium Profiles
+    };
+
     for areaID, areaOID in pairs(areas) do
         areaID = tonumber(areaID);
         if ret[areaID] == nil then
             ret[areaID] = {};
         end
-        ret[areaID][120008] = true; -- Wood
-        ret[areaID][1010196] = true; -- Timber
-        ret[areaID][1010205] = true; -- Bricks
-        ret[areaID][1010218] = true; -- Steel Beams
-        ret[areaID][1010207] = true; -- Windows
-        ret[areaID][1010202] = true; -- Reinforced Concrete
-        ret[areaID][134623] = true; -- Elevator
-        ret[areaID][1010224] = true; -- Steam Motors
-        ret[areaID][838] = true; -- Aluminium Profiles
+
+        for _, guid in pairs(_constructionGoods) do
+            ret[areaID][guid] = { {
+                type = "Construction",
+            } }
+        end
     end
     return ret;
 end
@@ -84,8 +106,8 @@ function AreaRequests.TradeUnionAlikeReplacements(L, region)
     local buildings = Anno.Region_BuildingsWithSockets(region);
     for areaIdStr, items in pairs(buildings) do
         local areaID = tonumber(areaIdStr);
-        for _, socketItemGuids in pairs(items) do
-            local reps = Anno.SocketItemGuidsToInputReplacements(socketItemGuids);
+        for _, socketItemGuid in pairs(items) do
+            local reps = Anno.SocketItemGuidsToInputReplacements(socketItemGuid);
             if #(reps) == 0 then
                 goto continue;
             end
@@ -93,7 +115,14 @@ function AreaRequests.TradeUnionAlikeReplacements(L, region)
                 ret[areaID] = {};
             end
             for _, rep in pairs(reps) do
-                ret[areaID][tonumber(rep.Guid)] = true;
+                local productGuid = tonumber(rep.Guid);
+                if ret[areaID][productGuid] == nil then
+                    ret[areaID][productGuid] = {};
+                end
+                table.insert(ret[areaID][productGuid], {
+                    type = "TradeUnion",
+                    name = tostring(socketItemGuid)
+                });
             end
             :: continue ::
         end
@@ -107,37 +136,22 @@ function AreaRequests.All(L, region)
     local construction = AreaRequests.Construction(L, region);
     local tu = AreaRequests.TradeUnionAlikeReplacements(L, region);
 
+    local rs = { population, production, construction, tu };
+
     local ret = {};
-    for areaID, products in pairs(population) do
-        if ret[areaID] == nil then
-            ret[areaID] = {};
-        end
-        for productGuid, _ in pairs(products) do
-            ret[areaID][productGuid] = true;
-        end
-    end
-    for areaID, products in pairs(production) do
-        if ret[areaID] == nil then
-            ret[areaID] = {};
-        end
-        for productGuid, _ in pairs(products) do
-            ret[areaID][productGuid] = true;
-        end
-    end
-    for areaID, products in pairs(construction) do
-        if ret[areaID] == nil then
-            ret[areaID] = {};
-        end
-        for productGuid, _ in pairs(products) do
-            ret[areaID][productGuid] = true;
-        end
-    end
-    for areaID, products in pairs(tu) do
-        if ret[areaID] == nil then
-            ret[areaID] = {};
-        end
-        for productGuid, _ in pairs(products) do
-            ret[areaID][productGuid] = true;
+    for _, r in pairs(rs) do
+        for areaID, products in pairs(r) do
+            if ret[areaID] == nil then
+                ret[areaID] = {};
+            end
+            for productGuid, infos in pairs(products) do
+                if ret[areaID][productGuid] == nil then
+                    ret[areaID][productGuid] = {};
+                end
+                for _, info in pairs(infos) do
+                    table.insert(ret[areaID][productGuid], info);
+                end
+            end
         end
     end
     return ret;

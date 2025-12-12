@@ -22,7 +22,7 @@ local function em_do(file)
     log("dofile(..) " .. file)
     local success, err = pcall(dofile, file)
     if not success then
-        log("success:", tostring(success))
+        log("success:" .. tostring(success))
         if err then
             log("ERROR executing script: " .. tostring(err))
         end

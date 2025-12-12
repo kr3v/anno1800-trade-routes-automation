@@ -4,12 +4,14 @@
     - "other mods support" aka automate extracting objects request, don't use statically generated ones
 2. observability
     - mod status (regions, areas, ships)
-    - current deficit/surplus per region and area
-    - total trade volume
+    - extract goods icons from game
 3. bug fixing
     - enable mod in region without restarting it; aka check what happens if unscanned region has ships, but no areas
       scanned yet
-    - keybind to force restart mod
+    - names at deficit/surplus web page
+    - fail checks to ensure no goods:
+      - appear from nowhere if island capacity is lower than what is loaded to ship
+      - disappear if island capacity is lower than what is unloaded from ship             <- very important
 
 ----
 

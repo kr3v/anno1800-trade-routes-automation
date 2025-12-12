@@ -129,11 +129,11 @@ local function _inspect_object_yaml(L, obj, name, allowGetFuncCall, depth, marke
                 metatable_value = metatable_value,
                 actual_value_str = tostring_quote(_obj[k]),
                 is_property = metatable_value:match("^property<C") ~= nil
-                        or metatable_value:match("^C") ~= nil
-                        or metatable_value:match("^table")
-                        or metatable_value:match("^property<")
-                        or metatable_value:match("^userdata")
-                        or metatable_value:match("^property<rdui::C") ~= nil,
+                    or metatable_value:match("^C") ~= nil
+                    or metatable_value:match("^table")
+                    or metatable_value:match("^property<")
+                    or metatable_value:match("^userdata")
+                    or metatable_value:match("^property<rdui::C") ~= nil,
                 object = _obj[k],
             }
             table.insert(properties, prop)

@@ -56,6 +56,7 @@ function _Residence.Scan(L, residenceOID)
     return ret;
 end
 
+---@return AnnoInfo.ResidenceInfo|nil
 function _Residence.FindAndScan(L, region, residenceGuid)
     local curr_region = Anno.Region_Current();
     if curr_region ~= region then
@@ -146,7 +147,7 @@ function AnnoInfo.Product(productGuid)
     return ret;
 end
 
----@param region string
+---@param region RegionID
 ---@param residenceGuid number|string
 ---@return AnnoInfo.ResidenceInfo|nil
 function AnnoInfo.Residence(L, region, residenceGuid)

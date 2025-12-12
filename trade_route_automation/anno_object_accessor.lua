@@ -62,41 +62,41 @@ end
 return {
     GameObject = function(oid)
         return getObjectAccessor(
-                function()
-                    return ts.GetGameObject(oid);
-                end,
-                {}
+            function()
+                return ts.GetGameObject(oid);
+            end,
+            {}
         );
     end,
     Objects = function(oid)
         return getObjectAccessor(
-                function()
-                    return ts.Objects.GetObject(oid);
-                end,
-                {}
+            function()
+                return ts.Objects.GetObject(oid);
+            end,
+            {}
         );
     end,
     AreaFromID = function(areaID)
         return getObjectAccessor(
-                function()
-                    return ts.Area.GetAreaFromID(areaID);
-                end,
-                {}
+            function()
+                return ts.Area.GetAreaFromID(areaID);
+            end,
+            {}
         );
     end,
     AreaFromAreatable = function(areatable)
         local areaID = serpLight.AreatableToAreaID(areatable);
         return getObjectAccessor(
-                function()
-                    return ts.Area.GetAreaFromID(areaID);
-                end,
-                {}
+            function()
+                return ts.Area.GetAreaFromID(areaID);
+            end,
+            {}
         );
     end,
     Generic = function(getter)
         return getObjectAccessor(
-                getter,
-                {}
+            getter,
+            {}
         );
     end
 }

@@ -1,3 +1,28 @@
+--[[
+    Trade Planner - Low Level Planning Logic
+
+    DOCUMENTATION: See docs/architecture-trade-automation.md
+    - Overview: "mod_trade_planner_ll.lua (Low-Level Planning Logic)"
+    - Key sections:
+      * Supply/Request Tables - core data structure
+      * In-Flight Tracking - prevents double-shipping
+      * Stock Thresholds - o2, o6, o8 explained
+      * Command Structure - full type definitions
+
+    This module contains the CORE PLANNING LOGIC. It:
+    1. Analyzes stock across all areas
+    2. Builds supply/request tables (accounts for in-flight goods)
+    3. Converts requests into concrete orders
+    4. Matches ships to orders (distance-optimized)
+    5. Spawns execution tasks
+
+    Key functions:
+    - SupplyRequest_Build: Analyzes areas -> supply/request table (lines 227-356)
+    - SupplyRequest_ToOrders: supply/request -> Orders (lines 412-459)
+    - SupplyRequestOrders_ToShipCommands: Orders -> Commands (lines 467-534)
+    - SupplyRequestShipCommands_Execute: Commands -> async tasks (lines 542-642)
+]]
+
 local Anno = require("trade_route_automation/anno_interface");
 local AreasRequest = require("trade_route_automation/mod_area_requests");
 local AnnoInfo = require("trade_route_automation/generator/products");
@@ -73,59 +98,183 @@ end
 
 ---
 
-function TradePlannerLL.Ships_StockInFlight(L, region, ships)
-    local _stockFromInFlight = {}; -- table<areaID, table<productID, amount>>
+---@param L Logger
+---@param region RegionID
+---@param trades ActiveTrades
+---@return TradePlanner.AreaGoodsInFlight
+function TradePlannerLL.Ships_StockInFlight(
+    L, region, trades
+)
+    local _inFlight = {}; -- table<areaID, table<productID, amount>>
     -- 3.2. In flight
-    for ship, _ in pairs(ships) do
-        local info = TradeExecutor.Ship_Name_FetchCmdInfo(ship);
+    for _, trade in ipairs(trades) do
+        local shipOID = trade.command.Key.ShipID;
+
+        local tCargo = {};
+        table.insert(tCargo, {
+            Guid = trade.command.Key.Order.GoodID,
+            Amount = trade.command.Value.Amount,
+        });
+
+        local info = TradeExecutor.Ship_Name_FetchCmdInfo(shipOID);
         if info.area_id == nil then
             goto continue;
         end
 
-        local area_id = info.area_id;
-
-        local cargo = Anno.Ship_Cargo_Get(ship);
+        local sCargo = {};
+        local cargo = Anno.Ship_Cargo_Get(shipOID);
         for _, cargo_item in pairs(cargo) do
             if cargo_item.Value == 0 then
                 goto continue_j;
             end
-
-            if _stockFromInFlight[area_id] == nil then
-                _stockFromInFlight[area_id] = {};
-            end
-            if _stockFromInFlight[area_id][cargo_item.Guid] == nil then
-                _stockFromInFlight[area_id][cargo_item.Guid] = 0;
-            end
-            _stockFromInFlight[area_id][cargo_item.Guid] = _stockFromInFlight[area_id][cargo_item.Guid] + cargo_item.Value;
+            table.insert(sCargo, {
+                Guid = cargo_item.Guid,
+                Amount = cargo_item.Value,
+            });
 
             :: continue_j ::
+        end
+
+        if #sCargo == 0 then
+            -- cargo was not set; tCargo is to be consumed from the source area
+            local area_id = trade.command.Key.Order.AreaID_from;
+            if area_id == nil then
+                L.logf("[warn]: Ship %d has no area_id_from set in trade command; skipping", shipOID);
+                goto continue;
+            end
+
+            for _, cargo_item in pairs(tCargo) do
+                if _inFlight[area_id] == nil then
+                    _inFlight[area_id] = {};
+                end
+                if _inFlight[area_id][cargo_item.Guid] == nil then
+                    _inFlight[area_id][cargo_item.Guid] = { In = 0, Out = 0 };
+                end
+                _inFlight[area_id][cargo_item.Guid].Out = _inFlight[area_id][cargo_item.Guid].Out + cargo_item.Amount;
+            end
+        else
+            -- cargo is set; sCargo is to be delivered to the destination area
+            local area_id = trade.command.Key.Order.AreaID_to;
+            for _, cargo_item in pairs(sCargo) do
+                if _inFlight[area_id] == nil then
+                    _inFlight[area_id] = {};
+                end
+                if _inFlight[area_id][cargo_item.Guid] == nil then
+                    _inFlight[area_id][cargo_item.Guid] = { In = 0, Out = 0 };
+                end
+                _inFlight[area_id][cargo_item.Guid].In = _inFlight[area_id][cargo_item.Guid].In + cargo_item.Amount;
+            end
         end
 
         :: continue ::
     end
 
-    return _stockFromInFlight;
+    return _inFlight;
 end
 
 ---
 
+local TradeDirection_In = "In";
+local TradeDirection_Out = "Out";
+
+---@alias AreaID number
+---@alias ProductGUID number
+---@alias Amount number
+---@alias TradePlanner.AreaGoodAmount table<AreaID, table<ProductGUID, Amount>>
+---@alias TradePlanner.GoodAreaAmount table<ProductGUID, table<AreaID, Amount>>
+---@alias Distance { src: Coordinate, dst: Coordinate, dist: number }
+
+
+---@alias InOut { In: Amount, Out: Amount }
+---@alias TradePlanner.AreaGoodsInFlight table<AreaID, table<ProductGUID, InOut>>
+
+---@class TradePlanner.SupplyRequestTable
+---@field Supply TradePlanner.AreaGoodAmount
+---@field Request TradePlanner.AreaGoodAmount
+
+---@class TradePlanner.OrderKey
+---@field AreaID_from AreaID
+---@field AreaID_to AreaID
+---@field GoodID ProductGUID
+---@field RequestAmount Amount
+---@field SupplyAmount Amount
+
+---@param t TradePlanner.OrderKey
+---@return TradePlanner.OrderKey
+local function OrderKey(t)
+    return t;
+end
+
+---@param t TradePlanner.OrderValue
+---@return TradePlanner.OrderValue
+local function OrderValue(t)
+    return t;
+end
+
+---@param t TradePlanner.Order
+---@return TradePlanner.Order
+local function Order(t)
+    return t;
+end
+
+---@class TradePlanner.OrderValue
+---@field OrderDistance Distance
+
+---@class TradePlanner.Order
+---@field Key TradePlanner.OrderKey
+---@field Value TradePlanner.OrderValue
+
+---@alias TradePlanner.Orders TradePlanner.Order[]
+
+---@class TradePlanner.CommandKey
+---@field ShipID ShipID
+---@field Order TradePlanner.OrderKey
+
+---@class TradePlanner.CommandValue
+---@field Order TradePlanner.OrderValue
+---@field Amount Amount
+---@field ShipDistance number
+---@field ShipSlots number
+
+---@class TradePlanner.Command
+---@field Key TradePlanner.CommandKey
+---@field Value TradePlanner.CommandValue
+
+---@alias TradePlanner.Commands TradePlanner.Command[]
+
 ---@param L Logger
 ---@param region RegionID
----@param _stockFromInFlight TradePlanner.AreaGoodAmount
+---@param areaToGoodsInFlight TradePlanner.AreaGoodsInFlight
 ---@param areas table<AreaID, AreaData>
+---@param state tradeExecutor_iteration_state
+---@param _request_modifier fun(areaID: AreaID, request: Amount): Amount
 ---@return TradePlanner.SupplyRequestTable
 function TradePlannerLL.supplyRequest_Build(
-        L, region, _stockFromInFlight, areas,
-        _request_modifier
+    L, region, areaToGoodsInFlight, areas, state,
+    _request_modifier
 )
     local areaToProductRequest = AreasRequest.All(L, region);
+
+    local function formatReasons(reasons)
+        local formatted = {};
+        for _, reason in ipairs(reasons) do
+            local rS = reason.type;
+            if reason.name ~= nil then
+                rS = rS .. "/" .. reason.name;
+            end
+            table.insert(formatted, rS);
+        end
+
+        return formatted
+    end
+
     local allProducts = {};
     for areaID, products in pairs(areaToProductRequest) do
         for productID, _ in pairs(products) do
             allProducts[productID] = true;
         end
     end
-    for productID in allProducts do
+    for productID in pairs(allProducts) do
         local product = AnnoInfo.Product(productID);
         if product == nil then
             if not TradePlannerLL.__Internal.ProductGUID_Unknown[productID] then
@@ -138,8 +287,19 @@ function TradePlannerLL.supplyRequest_Build(
     local supply = {};
     local request = {};
     for areaID, areaData in pairs(areas) do
-        local inFlightStock_area = _stockFromInFlight[areaID] or {};
+        local o2_cap = 200;
+        local o4_cap = 225;
+        local _minTransfer = 25;
+
+        local inFlightStock_area = areaToGoodsInFlight[areaID] or {};
         local _areaCap = areaData.capacity or 75;
+
+        if supply[areaID] == nil then
+            supply[areaID] = {}
+        end
+        if request[areaID] == nil then
+            request[areaID] = {}
+        end
 
         for productID in pairs(allProducts) do
             local product = AnnoInfo.Product(productID);
@@ -148,37 +308,85 @@ function TradePlannerLL.supplyRequest_Build(
             end
             local productName = product.Name;
 
-            local inFlightStock = inFlightStock_area[productID] or 0;
+            local inFlightStock_t = inFlightStock_area[productID] or { In = 0, Out = 0 };
+            local stock_incoming = inFlightStock_t.In;
+            local stock_outgoing = inFlightStock_t.Out;
 
             local _stock = Anno.Area_GetGood(region, areaID, productID);
 
-            local _request = 0;
-            local t = math.floor(math.max(_areaCap * 2 / 3, 50));
-            local g = math.floor((_areaCap - t) / 2)
-            local doesAreaRequestProduct = areaToProductRequest[areaID] and areaToProductRequest[areaID][productID];
-            if doesAreaRequestProduct then
-                _request = g;
-            end
-            _request = _request_modifier(areaID, _request)
+            local _lastTrade_direction = state:areaTradeDirection_Last(L, areaID, productID);
 
-            if _request == 0 and _stock == 0 then
+            local o2 = math.min(o2_cap, math.floor(_areaCap * 2 / 10));
+            local o6 = math.min(o2 + 300, math.max(o2_cap + 300, math.floor(_areaCap * 6 / 10)));
+            local o4 = math.min(o4_cap, math.floor(_areaCap * 4 / 10));
+            local o8 = math.min(o4 + 300, math.max(o4_cap + 300, math.floor(_areaCap * 8 / 10)));
+
+            local doesAreaRequestProduct = areaToProductRequest[areaID] and areaToProductRequest[areaID][productID];
+
+            local _request_reasons = nil;
+            if doesAreaRequestProduct then
+                local _rr = areaToProductRequest[areaID][productID];
+                local _rr_fmt = formatReasons(_rr);
+                _request_reasons = '[' .. table.concat(_rr_fmt, ",") .. ']';
+            end
+
+            -- Skip if area doesn't request this product and has no stock
+            if not doesAreaRequestProduct and _stock == 0 then
                 goto continue;
             end
 
-            L.logf("Area %s (id=%d) %s stock=%s (+%s) request=%s", areaData.city_name, areaID, productName, _stock, inFlightStock, _request);
-            _request = _request - inFlightStock;
+            local isRequester = _lastTrade_direction == TradeDirection_In;
 
-            local _minTransfer = math.min(50, math.floor(t / 2));
-            if _stock >= _request + _minTransfer and _stock >= _minTransfer then
-                if supply[areaID] == nil then
-                    supply[areaID] = {};
+            local _request = 0;
+            if doesAreaRequestProduct then
+                if isRequester then
+                    _request = o6;
+                else
+                    _request = o2;
                 end
-                supply[areaID][productID] = _stock - _request;
-            elseif _request - _stock >= _minTransfer then
-                if request[areaID] == nil then
-                    request[areaID] = {};
+            end
+            local _request_ask = o6;
+
+            L.logf("Area %s (id=%d) %s stock=%s (+%s) (-%s) request=%s (reasons=%s)", areaData.city_name, areaID, productName, _stock,
+                stock_incoming, stock_outgoing, _request, _request_reasons or '[]');
+
+            _stock = _stock - stock_outgoing;
+            _request = _request - stock_incoming;
+            _request_ask = _request_ask - stock_incoming;
+
+            if not doesAreaRequestProduct then
+                _stock = _stock - stock_outgoing;
+                if _stock >= _minTransfer then
+                    supply[areaID][productID] = _stock;
                 end
-                request[areaID][productID] = _request - _stock;
+                goto continue;
+            end
+
+
+            local _surplus = _stock - o2;
+            if isRequester then
+                _surplus = _surplus - 15;
+                if _stock > o8 then
+                    if _surplus >= _minTransfer then
+                        supply[areaID][productID] = _surplus;
+                    end
+                end
+                if _stock < o2 then
+                    if _request_ask >= _minTransfer then
+                        request[areaID][productID] = _request_ask;
+                    end
+                end
+            else -- Supplier
+                if _stock > o2 then
+                    if _surplus >= _minTransfer then
+                        supply[areaID][productID] = _surplus;
+                    end
+                end
+                if _stock < o2 then
+                    if _request_ask >= _minTransfer then
+                        request[areaID][productID] = _request_ask;
+                    end
+                end
             end
 
             :: continue ::
@@ -186,41 +394,40 @@ function TradePlannerLL.supplyRequest_Build(
     end
 
     ---@type TradePlanner.SupplyRequestTable
-    local ret = {};
-    ret.Supply = supply;
-    ret.Request = request;
+    local ret = {
+        Supply = supply,
+        Request = request,
+    };
     return ret;
 end
 
 ---@param L Logger
 ---@param region RegionID
----@param _stockFromInFlight TradePlanner.AreaGoodAmount
+---@param _stockFromInFlight TradePlanner.AreaGoodsInFlight
 ---@param areas table<AreaID, AreaData>
+---@param state table
 ---@return TradePlanner.SupplyRequestTable
-function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas)
-    return TradePlannerLL.supplyRequest_Build(
-            L,
-            region,
-            _stockFromInFlight,
-            areas,
-            function(areaID, request)
-                return request
-            end
+function TradePlannerLL.SupplyRequest_Build(L, region, _stockFromInFlight, areas, state)
+    return TradePlannerLL.supplyRequest_Build(L, region, _stockFromInFlight, areas, state,
+        function(areaID, request)
+            return request
+        end
     );
 end
 
 ---@param L Logger
 ---@param region RegionID
----@param _stockFromInFlight TradePlanner.AreaGoodAmount
+---@param _stockFromInFlight TradePlanner.AreaGoodsInFlight
 ---@param areas table<AreaID, AreaData>
+---@param state tradeExecutor_iteration_state
 ---@return TradePlanner.SupplyRequestTable
-function TradePlannerLL.SupplyRequest_BuildHubs(L, region, _stockFromInFlight, areas)
+function TradePlannerLL.SupplyRequest_BuildHubs(L, region, _stockFromInFlight, areas, state)
     local hub = nil;
     for areaID, areaData in pairs(areas) do
         -- has suffix `(h)`
         if areaData.city_name:find("%(h%)$") then
             hub = areaID;
-            break ;
+            break;
         end
     end
     if hub == nil then
@@ -229,18 +436,18 @@ function TradePlannerLL.SupplyRequest_BuildHubs(L, region, _stockFromInFlight, a
     end
 
     return TradePlannerLL.supplyRequest_Build(
-            L,
-            region,
-            _stockFromInFlight,
-            areas,
-            function(areaID, request)
-                if areaID == hub then
-                    local _areaCap = areas[areaID].capacity or 75;
-                    return math.ceil(_areaCap * 9 / 10);
-                else
-                    return 0;
-                end
+        L,
+        region,
+        _stockFromInFlight,
+        areas,
+        state,
+        function(areaID, request)
+            if areaID == hub then
+                local _areaCap = areas[areaID].capacity or 75;
+                return math.ceil(_areaCap * 9 / 10);
             end
+            return request;
+        end
     );
 end
 
@@ -249,11 +456,12 @@ end
 ---@param areas table<AreaID, AreaData>
 ---@return TradePlanner.Orders
 function TradePlannerLL.SupplyRequest_ToOrders(
-        L,
-        supplyRequest,
-        areas
+    L,
+    supplyRequest,
+    areas
 )
-    local request_orders = {} -- table<orderKeyType, orderValueType>
+    ---@type TradePlanner.Orders
+    local request_orders = {}
 
     local supply_gta = dict123to213(supplyRequest.Supply)
 
@@ -267,22 +475,25 @@ function TradePlannerLL.SupplyRequest_ToOrders(
 
                     if distance.dist == math.huge then
                         L.logf("Skipping order from area %d to area %d for good %d due to no water route",
-                                supply_areaID, areaID, goodID);
+                            supply_areaID, areaID, goodID);
                         goto continue;
                     end
 
-                    local key = {
+                    local key = OrderKey {
                         AreaID_from = supply_areaID,
                         AreaID_to = areaID,
                         GoodID = goodID,
                         RequestAmount = amount,
                         SupplyAmount = supply_amount,
                     }
-                    local value = {
+                    local value = OrderValue {
                         OrderDistance = distance,
                     }
 
-                    request_orders[key] = value
+                    table.insert(request_orders, Order {
+                        Key = key,
+                        Value = value,
+                    })
 
                     :: continue ::
                 end
@@ -296,13 +507,12 @@ end
 ---@param L Logger
 ---@param available_ships table<ShipID, any>
 ---@param request_orders TradePlanner.Orders
+---@param areas table<AreaID, AreaData>
+---@param state tradeExecutor_iteration_state
 ---@return TradePlanner.Commands
 function TradePlannerLL.SupplyRequestOrders_ToShipCommands(
-        L,
-        areas,
-        available_ships,
-        stock,
-        request_orders
+    L, areas, available_ships,
+    request_orders, state
 )
     ---@type TradePlanner.Commands
     local available_commands = {}
@@ -316,7 +526,8 @@ function TradePlannerLL.SupplyRequestOrders_ToShipCommands(
             goto continue;
         end
 
-        for order_key, order_value in pairs(request_orders) do
+        for _, order in ipairs(request_orders) do
+            local order_key, order_value = order.Key, order.Value
             local ship_position = order_value.OrderDistance.src
 
             local info = TradeExecutor.Ship_Name_FetchCmdInfo(ship)
@@ -325,19 +536,14 @@ function TradePlannerLL.SupplyRequestOrders_ToShipCommands(
             end
 
             local distance_to_pickup = CalculateDistanceBetweenCoordinates(
-                    ship_position,
-                    order_value.OrderDistance.src
+                ship_position,
+                order_value.OrderDistance.src
             )
 
             local total_distance = distance_to_pickup + order_value.OrderDistance.dist
 
-            local amount;
-            -- load to ship as much as we can, as long as supply is met
-            if order_key.SupplyAmount >= cap then
-                amount = cap;
-            else
-                amount = order_key.SupplyAmount;
-            end
+            -- Calculate transfer amount: limited by ship capacity, supply available, AND request needed
+            local amount = math.min(cap, order_key.SupplyAmount, order_key.RequestAmount)
 
             ---@type TradePlanner.CommandKey
             local command_key = {
@@ -368,12 +574,18 @@ function TradePlannerLL.SupplyRequestOrders_ToShipCommands(
     return available_commands;
 end
 
+---@param L Logger
+---@param region RegionID
+---@param supplyRequestTable TradePlanner.SupplyRequestTable
+---@param commands TradePlanner.Commands
+---@param ships table<ShipID, any>
+---@return ActiveTrades
 function TradePlannerLL.SupplyRequestShipCommands_Execute(
-        L,
-        region,
-        supplyRequestTable,
-        commands,
-        ships
+    L,
+    region,
+    supplyRequestTable,
+    commands,
+    ships
 )
     local spawned_tasks = {}
     for _, kv in ipairs(commands) do
@@ -387,8 +599,6 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
 
         local available_supply = supplyRequestTable.Supply[order.AreaID_from][order.GoodID]
         local available_request = supplyRequestTable.Request[order.AreaID_to][order.GoodID]
-
-        local original_request
 
         if available_request <= 0 then
             -- filled
@@ -405,7 +615,7 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
 
         if available_supply < amount then
             L.logf("Skipping order: insufficient supply: available_supply=%d < order=%d",
-                    available_supply, amount);
+                available_supply, amount);
             goto continue;
         end
         --if available_request < 50 then
@@ -414,12 +624,15 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
         --    goto continue;
         --end
 
-        supplyRequestTable.Supply[order.AreaID_from][order.GoodID] = supplyRequestTable.Supply[order.AreaID_from][order.GoodID] - amount
-        supplyRequestTable.Request[order.AreaID_to][order.GoodID] = supplyRequestTable.Request[order.AreaID_to][order.GoodID] - amount
+        supplyRequestTable.Supply[order.AreaID_from][order.GoodID] = supplyRequestTable.Supply[order.AreaID_from]
+            [order.GoodID] - amount
+        supplyRequestTable.Request[order.AreaID_to][order.GoodID] = supplyRequestTable.Request[order.AreaID_to]
+            [order.GoodID] - amount
         ships[ship] = nil;
 
         -- Spawn async task
 
+        ---@type TradeExecutor.Command
         local cmd = {
             Key = {
                 ShipID = ship,
@@ -437,6 +650,7 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
                         dst = order_value.OrderDistance.dst,
                         dist = order_value.OrderDistance.dist,
                     },
+                    FullSlotsNeeded = math.ceil(amount / 50),
                 },
                 ShipDistance = command_value.ShipDistance,
             }
@@ -457,8 +671,11 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
         end
         Lt.logf("Spawning trade order");
 
-        local task_id = TradeExecutor.SpawnTradeOrder(Lt, region, ship, cmd)
-        spawned_tasks[ship] = task_id;
+        local task_id = TradeExecutor.SpawnTradeOrder(Lt, region, cmd)
+        table.insert(spawned_tasks, {
+            coroutineID = task_id,
+            command = kv,
+        })
 
         :: continue ::
     end
@@ -471,11 +688,12 @@ end
 ---@param region RegionID
 ---@param areas table<AreaID, AreaData>
 ---@param toUnload table<ShipID, any>
+---@return ActiveTrades
 function TradePlannerLL.Ships_ForceUnloadStoppedShips(
-        L,
-        region,
-        areas,
-        toUnload
+    L,
+    region,
+    areas,
+    toUnload
 )
     local trades = {};
     for ship, _ in pairs(toUnload) do
@@ -541,64 +759,60 @@ function TradePlannerLL.Ships_ForceUnloadStoppedShips(
 
         :: continue ::
     end
+
+    ---@type ActiveTrades
+    local spawned_tasks = {};
+
     for _, trade in ipairs(trades) do
         local goodID = trade.good_id;
         local shipName = Anno.Ship_Name_Get(trade.ship_oid);
         local Lt = L.with("ship", tostring(trade.ship_oid) .. " (" .. shipName .. ")")
-                    .with("aDst", trade.areaID_dst .. " (" .. Anno.Area_CityName(region, trade.areaID_dst) .. ")")
-                    .with("good", goodID .. " (" .. AnnoInfo.Product(goodID).Name .. ")")
-                    .with("amount", tostring(trade.total_cargo));
+            .with("aDst", trade.areaID_dst .. " (" .. Anno.Area_CityName(region, trade.areaID_dst) .. ")")
+            .with("good", goodID .. " (" .. AnnoInfo.Product(goodID).Name .. ")")
+            .with("amount", tostring(trade.total_cargo));
         Lt.logf("Forcing ship %d to unload %d of good %d to area %d",
-                trade.ship_oid,
-                trade.total_cargo,
-                trade.good_id,
-                trade.areaID_dst
+            trade.ship_oid,
+            trade.total_cargo,
+            trade.good_id,
+            trade.areaID_dst
         );
-        TradeExecutor._ExecuteUnloadWithShip(
-                Lt,
-                region,
-                trade.ship_oid,
-                trade.good_id,
-                trade.areaID_dst,
-                trade.area_dst_coords
+        local task_id = TradeExecutor._ExecuteUnloadWithShip(
+            Lt,
+            region,
+            trade.ship_oid,
+            trade.good_id,
+            trade.areaID_dst,
+            trade.area_dst_coords
         );
+
+        table.insert(spawned_tasks, {
+            coroutineID = task_id,
+            command = {
+                Key = {
+                    ShipID = trade.ship_oid,
+                    Order = {
+                        AreaID_from = nil,
+                        AreaID_to = trade.areaID_dst,
+                        GoodID = trade.good_id,
+                        RequestAmount = nil,
+                        SupplyAmount = nil,
+                    }
+                },
+                Value = {
+                    Order = {
+                        OrderDistance = {
+                            src = trade.area_dst_coords,
+                            dst = nil,
+                            dist = nil,
+                        },
+                    },
+                    ShipDistance = nil,
+                }
+            }
+        })
     end
+
+    return spawned_tasks;
 end
-
-------
-
----@alias AreaID number
----@alias ProductGUID number
----@alias Amount number
----@alias TradePlanner.AreaGoodAmount table<AreaID, table<ProductGUID, Amount>>
----@alias TradePlanner.GoodAreaAmount table<ProductGUID, table<AreaID, Amount>>
----@alias Distance { src: Coordinate, dst: Coordinate, dist: number }
-
----@class TradePlanner.SupplyRequestTable
----@field Supply TradePlanner.AreaGoodAmount
----@field Request TradePlanner.AreaGoodAmount
-
----@class TradePlanner.OrderKey
----@field AreaID_from AreaID
----@field AreaID_to AreaID
----@field GoodID ProductGUID
----@field RequestAmount Amount
----@field SupplyAmount Amount
-
----@class TradePlanner.OrderValue
----@field Distance Distance
-
----@alias TradePlanner.Orders table<TradePlanner.OrderKey, TradePlanner.OrderValue>
-
----@class TradePlanner.CommandKey
----@field ShipID ShipID
----@field Order TradePlanner.OrderKey
----@class TradePlanner.CommandValue
----@field Order TradePlanner.OrderValue
----@field ShipDistance number
----@field Amount Amount
----@field ShipSlots number
-
----@alias TradePlanner.Commands table<TradePlanner.CommandKey, TradePlanner.CommandValue>
 
 return TradePlannerLL;
