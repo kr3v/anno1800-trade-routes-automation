@@ -1,0 +1,92 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine version and base path
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "base_path=/anno1800-trade-routes-automation/$VERSION/" >> $GITHUB_OUTPUT
+            echo "deploy_path=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "version=latest" >> $GITHUB_OUTPUT
+            echo "base_path=/anno1800-trade-routes-automation/" >> $GITHUB_OUTPUT
+            echo "deploy_path=." >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install dependencies
+        run: cd webapp && npm ci
+
+      - name: Build
+        run: cd webapp && BASE_PATH="${{ steps.version.outputs.base_path }}" npm run build
+
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p deploy_root
+
+          # Try to download existing GitHub Pages content to preserve other versions
+          # This will fail on first deployment, which is fine
+          curl -L -f -o pages.tar.gz \
+            "https://github.com/${{ github.repository }}/archive/refs/heads/gh-pages.tar.gz" \
+            2>/dev/null && \
+            tar -xzf pages.tar.gz --strip-components=1 -C deploy_root || \
+            echo "No existing gh-pages branch found (first deployment)"
+
+          # Copy new build to appropriate location
+          if [ "${{ steps.version.outputs.deploy_path }}" = "." ]; then
+            # Deploy latest to root (but preserve versioned directories)
+            rsync -av --exclude='v*.*.*' webapp/dist/ deploy_root/
+          else
+            # Deploy versioned build to subdirectory
+            mkdir -p deploy_root/${{ steps.version.outputs.deploy_path }}
+            cp -r webapp/dist/* deploy_root/${{ steps.version.outputs.deploy_path }}/
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy_root
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
