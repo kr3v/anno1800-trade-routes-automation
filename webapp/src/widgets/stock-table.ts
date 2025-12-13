@@ -153,7 +153,7 @@ function calculateIterationDelta(oldIteration: number, newIteration: number): st
  */
 function getGoodIconPath(goodName: string): string {
   const iconName = goodName.toLowerCase().replace(/\s+/g, '_');
-  return `/icon_${iconName}.png`;
+  return `${import.meta.env.BASE_URL}icon_${iconName}.png`;
 }
 
 /**
