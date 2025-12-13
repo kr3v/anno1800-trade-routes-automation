@@ -106,6 +106,7 @@ end
 ---@field with fun(key: string, value: any): Logger
 ---@field logger fun(dst: string, forceRemoval: boolean): Logger
 ---@field dst string -- <internal>
+---@field __base string -- <internal>
 
 local default_dst = "tra-log.txt";
 

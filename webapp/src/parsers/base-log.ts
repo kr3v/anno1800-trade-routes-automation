@@ -229,17 +229,43 @@ function parseIdName(str: string): {id: number; name: string} | null {
  *   2025-12-11T21:46:02Z type=regular iteration=20251211214602 loc=Trade.Loop region=NW Area Tartagena (id=9155) Steel Beams stock=26 (+0) (-0) request=15
  *   2025-12-11T21:46:02Z type=regular iteration=20251211214602 loc=Trade.Loop region=NW Area n1_(h) (id=8323) Ponchos stock=301 (+0) (-150) request=90
  *   2025-12-12T01:09:54Z type=regular iteration=20251212010954 loc=Trade.Loop region=OW Area c1_(h) (id=8706) Pigs stock=3 (+0) (-0) request=200 (reasons=[Production/Rendering Works,Production/Slaughterhouse,Production/Restaurant: Archduke's Schnitzel])
+ *   2025-12-12T22:22:07Z iteration=20251212222206 loc=Trade.Loop type=regular region=OW Area c1_(h) (id=8706) Red Peppers stock=155 (+0) (-0) request=500 (reasons=[Production/Artisanal Kitchen])
  */
 function parseAreaStock(line: string): AreaStockLogEntry | null {
-    const pattern =
-        /type=(?<tradeType>regular|hub)\s+iteration=(?<iteration>\d+)\s+.*?Area\s+(?<areaName>.+?)\s+\(id=(?<areaId>\d+)\)\s+(?<goodName>.+?)\s+stock=(?<stock>\d+)\s+\((?<inFlightIn>[+-]?\d+)\)\s+\((?<inFlightOut>[+-]?\d+)\)\s+request=(?<request>[\d.]+)/;
-    const match = line.match(pattern);
-    if (!match?.groups) return null;
-
-    const {tradeType, iteration, areaName, areaId, goodName, stock, inFlightIn, inFlightOut, request} =
-        match.groups;
+    // Check if this line contains an "Area" entry with stock info
+    if (!line.includes(' Area ') || !line.includes(' stock=')) {
+        return null;
+    }
 
     const base = extractBaseFields(line);
+
+    // Extract all key=value pairs (order-independent)
+    const fields: Record<string, string> = {};
+    const fieldRegex = /(\w+)=(?:"([^"]*)"|(\S+))/g;
+    let match;
+
+    while ((match = fieldRegex.exec(line)) !== null) {
+        const key = match[1];
+        const value = match[2] !== undefined ? match[2] : match[3];
+        fields[key] = value;
+    }
+
+    // Check required fields exist
+    if (!fields.type || !fields.iteration) {
+        return null;
+    }
+
+    // Validate type
+    if (fields.type !== 'regular' && fields.type !== 'hub') {
+        return null;
+    }
+
+    // Extract Area information using a regex
+    const areaPattern = /Area\s+(?<areaName>.+?)\s+\(id=(?<areaId>\d+)\)\s+(?<goodName>.+?)\s+stock=(?<stock>\d+)\s+\((?<inFlightIn>[+-]?\d+)\)\s+\((?<inFlightOut>[+-]?\d+)\)\s+request=(?<request>[\d.]+)/;
+    const areaMatch = line.match(areaPattern);
+    if (!areaMatch?.groups) return null;
+
+    const {areaName, areaId, goodName, stock, inFlightIn, inFlightOut, request} = areaMatch.groups;
 
     // Parse numeric values and normalize -0 to 0
     const parsedInFlightIn = parseInt(inFlightIn, 10);
@@ -262,8 +288,8 @@ function parseAreaStock(line: string): AreaStockLogEntry | null {
     return {
         ...base,
         type: 'area_stock',
-        tradeType: tradeType as 'regular' | 'hub',
-        iteration: parseInt(iteration, 10),
+        tradeType: fields.type as 'regular' | 'hub',
+        iteration: parseInt(fields.iteration, 10),
         areaName,
         areaId: parseInt(areaId, 10),
         goodName,

@@ -32,7 +32,10 @@ local M = require("trade_route_automation/_main");
 L = L.logger("sample.log", true);
 
 local f = function()
-    inspector.Do(L, AnnoInfo.__Products:GetAll());
+    local ps = AnnoInfo.__Products:GetAll();
+    for g, p in pairs(ps) do
+        L.logf("%s: %s", g, Anno.Object_Icon(g));
+    end
 end
 
 local success, err = xpcall(f, debug.traceback);

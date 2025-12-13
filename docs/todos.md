@@ -1,9 +1,11 @@
 1. features
     - use contract imports as 'request' from islands
     - arctic/enbesa/trelawney support
-    - "other mods support" aka automate extracting objects request, don't use statically generated ones
+    - "other mods support" aka automate extracting objects request, don't use statically generated ones <- test this case
+    - if ship gets allocated to a trade between two areas and the trade does not use all the ship goods, pick more trades for the same path using the ship remaining capacity
 2. observability
     - mod status (regions, areas, ships)
+    - extract errors from the game log
     - extract goods icons from game
 3. bug fixing
     - enable mod in region without restarting it; aka check what happens if unscanned region has ships, but no areas

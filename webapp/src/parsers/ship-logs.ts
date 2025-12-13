@@ -31,33 +31,39 @@ export interface ShipUsageResult {
 function parseLogContent(content: string): {regular: ShipLogEntry[]; hub: ShipLogEntry[]} {
     const entries = parseBaseLog(content);
 
-    // Group data by iteration and type
-    const regularData = new Map<number, {timestamp: Date; ships?: number; tasks?: number; region?: string}>();
-    const hubData = new Map<number, {timestamp: Date; ships?: number; tasks?: number; region?: string}>();
+    // Group data by (iteration, region) pair to handle cases where
+    // the same iteration number is used across multiple regions
+    type MapKey = string; // Format: "iteration:region"
+    const regularData = new Map<MapKey, {timestamp: Date; ships?: number; tasks?: number; region: string; iteration: number}>();
+    const hubData = new Map<MapKey, {timestamp: Date; ships?: number; tasks?: number; region: string; iteration: number}>();
 
     for (const entry of entries) {
         if (entry.type === 'ship_count') {
             const shipCount = entry as ShipCountLogEntry;
             if (shipCount.iteration && shipCount.countType === 'available') {
                 const map = shipCount.tradeType === 'hub' ? hubData : regularData;
-                if (!map.has(shipCount.iteration)) {
-                    map.set(shipCount.iteration, {timestamp: shipCount.timestamp!, region: shipCount.region});
+                const key = `${shipCount.iteration}:${shipCount.region || 'unknown'}`;
+                if (!map.has(key)) {
+                    map.set(key, {
+                        timestamp: shipCount.timestamp!,
+                        region: shipCount.region || 'unknown',
+                        iteration: shipCount.iteration
+                    });
                 }
-                map.get(shipCount.iteration)!.ships = shipCount.count;
-                if (shipCount.region) {
-                    map.get(shipCount.iteration)!.region = shipCount.region;
-                }
+                map.get(key)!.ships = shipCount.count;
             }
         } else if (entry.type === 'tasks_spawned') {
             const tasksSpawned = entry as TasksSpawnedLogEntry;
             const map = tasksSpawned.tradeType === 'hub' ? hubData : regularData;
-            if (!map.has(tasksSpawned.iteration)) {
-                map.set(tasksSpawned.iteration, {timestamp: tasksSpawned.timestamp!, region: tasksSpawned.region});
+            const key = `${tasksSpawned.iteration}:${tasksSpawned.region || 'unknown'}`;
+            if (!map.has(key)) {
+                map.set(key, {
+                    timestamp: tasksSpawned.timestamp!,
+                    region: tasksSpawned.region || 'unknown',
+                    iteration: tasksSpawned.iteration
+                });
             }
-            map.get(tasksSpawned.iteration)!.tasks = tasksSpawned.tasksSpawned;
-            if (tasksSpawned.region) {
-                map.get(tasksSpawned.iteration)!.region = tasksSpawned.region;
-            }
+            map.get(key)!.tasks = tasksSpawned.tasksSpawned;
         }
     }
 
@@ -65,7 +71,7 @@ function parseLogContent(content: string): {regular: ShipLogEntry[]; hub: ShipLo
     const regularEntries: ShipLogEntry[] = [];
     const hubEntries: ShipLogEntry[] = [];
 
-    for (const [_iteration, data] of regularData.entries()) {
+    for (const [_key, data] of regularData.entries()) {
         if (data.ships !== undefined || data.tasks !== undefined) {
             regularEntries.push({
                 timestamp: data.timestamp,
@@ -76,7 +82,7 @@ function parseLogContent(content: string): {regular: ShipLogEntry[]; hub: ShipLo
         }
     }
 
-    for (const [_iteration, data] of hubData.entries()) {
+    for (const [_key, data] of hubData.entries()) {
         if (data.ships !== undefined || data.tasks !== undefined) {
             hubEntries.push({
                 timestamp: data.timestamp,

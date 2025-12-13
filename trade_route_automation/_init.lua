@@ -1,4 +1,8 @@
-local function package_requireAll(luaRoot)
+local function package_requireAll(
+    luaRoot,
+    base,
+    profileNameSafe
+)
     for k, v in pairs(package.loaded) do
         if type(k) == "string" and k:find("trade_route_automation") == 1 then
             package.loaded[k] = nil;
@@ -29,12 +33,18 @@ local function package_requireAll(luaRoot)
     local TradeExecutor = require("trade_route_automation/mod_trade_executor");
 
     local AnnoInfo = require("trade_route_automation/generator/products");
-    AnnoInfo.Load(L, luaRoot .. "trade_route_automation/generator/");
 
     local TrRAt_UI = require("trade_route_automation/ui_cmds");
+    local M = require("trade_route_automation/_main");
+
+    L.__base = base .. "\\log\\" .. "TrRAt_" .. profileNameSafe .. "_";
+    L.dst = L.__base .. "base.log";
+    cache.baseDir = base .. "\\log\\" .. "TrRAt_Cache_" .. profileNameSafe .. "_";
+
+    AnnoInfo.Load(L, luaRoot .. "trade_route_automation/generator/", cache.baseDir);
     TrRAt_UI.L = L;
 
-    local M = require("trade_route_automation/_main");
+    Anno.Load(L, cache.baseDir)
 end
 
 ---
@@ -104,15 +114,10 @@ local function theTradeRouteAutomation_init()
         package.path = package.path .. ";" .. pathEntry;
     end
 
-    package_requireAll(luaRoot);
+    package_requireAll(luaRoot, base, profileNameSafe);
 
     local L = require("trade_route_automation/utils_logger");
     local cache = require("trade_route_automation/utils_cache");
-
-    L.__base = base .. "\\log\\" .. "TrRAt_" .. profileNameSafe .. "_";
-    L.dst = L.__base .. "base.log";
-
-    cache.baseDir = base .. "\\log\\" .. "TrRAt_Cache_" .. profileNameSafe .. "_";
 
     print(string.format("base=%s dst=%s", tostring(base), tostring(L.dst)));
 

@@ -103,6 +103,36 @@ function init(): void {
     if (dataStore) loadTradesTab();
   });
 
+  // Configure trade table with navigation callback
+  tradeTableWidget.configure({
+    onNavigateToLogs: (filters) => {
+      // Build URL state update
+      const stateUpdate: Partial<AppState> = {
+        tab: 'logs',
+      };
+
+      // If good is specified, set it as the only selected good
+      if (filters.good) {
+        stateUpdate.logGood = filters.good;
+      }
+
+      // If city is specified, set it as the only selected city for both src and dst
+      if (filters.city) {
+        stateUpdate.logAreaSrc = filters.city;
+        stateUpdate.logAreaDst = filters.city;
+      }
+
+      // Update URL state (creates single history entry with tab + filters)
+      writeStateToURL(stateUpdate);
+
+      // Update tab UI without touching URL state (already updated above)
+      updateTabUI('logs');
+
+      // Apply the new filters to the logs table
+      logsTableWidget.applyFiltersFromURL();
+    }
+  });
+
   regionFilter.addEventListener('change', () => {
     currentRegion = regionFilter.value;
     shipUsageWidget.configure({ region: currentRegion });
@@ -154,8 +184,8 @@ function init(): void {
   // Show initial state
   updateFolderPath();
 
-  // Switch to tab from URL
-  switchTab(urlState.tab);
+  // Switch to tab from URL (no need to update URL, just UI)
+  updateTabUI(urlState.tab);
 
   // Try to auto-load last used directory
   tryAutoLoadDirectory();
@@ -213,9 +243,10 @@ async function tryAutoLoadDirectory(): Promise<void> {
 }
 
 /**
- * Switch to a different tab
+ * Update tab UI without touching URL state
+ * Use this when URL state has already been updated separately
  */
-function switchTab(tab: string): void {
+function updateTabUI(tab: string): void {
   // Update tab button states
   tabButtons.forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tab);
@@ -225,8 +256,14 @@ function switchTab(tab: string): void {
   tabContents.forEach(content => {
     content.classList.toggle('active', content.id === `tab-${tab}`);
   });
+}
 
-  // Update URL state
+/**
+ * Switch to a different tab
+ * Updates both UI and URL state
+ */
+function switchTab(tab: string): void {
+  updateTabUI(tab);
   writeStateToURL({ tab });
 }
 
@@ -356,8 +393,8 @@ function handleURLStateChange(state: AppState): void {
   // Update area visualizer state
   areaVisualizerWidget.restoreState(state);
 
-  // Switch tab
-  switchTab(state.tab);
+  // Update tab UI to match URL (URL already changed via back/forward)
+  updateTabUI(state.tab);
 }
 
 

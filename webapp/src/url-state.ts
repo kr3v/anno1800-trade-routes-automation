@@ -24,6 +24,7 @@ export interface AppState {
   logIterationType: string | null;
   logAreaSrc: string | null;
   logAreaDst: string | null;
+  logAreaMode: string | null;
   logShip: string | null;
   logGood: string | null;
   logOtherDataRegex: string | null;
@@ -55,6 +56,7 @@ const DEFAULT_STATE: AppState = {
   logIterationType: null,
   logAreaSrc: null,
   logAreaDst: null,
+  logAreaMode: null,
   logShip: null,
   logGood: null,
   logOtherDataRegex: null,
@@ -164,6 +166,7 @@ export function readStateFromURL(): AppState {
     logIterationType: params.get('logIterationType'),
     logAreaSrc: params.get('logAreaSrc'),
     logAreaDst: params.get('logAreaDst'),
+    logAreaMode: params.get('logAreaMode'),
     logShip: params.get('logShip'),
     logGood: params.get('logGood'),
     logOtherDataRegex: params.get('logOtherDataRegex'),
@@ -182,7 +185,8 @@ export function readStateFromURL(): AppState {
 
 /**
  * Write application state to URL query parameters
- * Uses replaceState to avoid polluting browser history
+ * Uses pushState for tab changes (adds to browser history)
+ * Uses replaceState for filter changes (avoids polluting browser history)
  */
 export function writeStateToURL(state: Partial<AppState>): void {
   const currentState = readStateFromURL();
@@ -244,6 +248,10 @@ export function writeStateToURL(state: Partial<AppState>): void {
     params.set('logAreaDst', newState.logAreaDst);
   }
 
+  if (newState.logAreaMode) {
+    params.set('logAreaMode', newState.logAreaMode);
+  }
+
   if (newState.logShip) {
     params.set('logShip', newState.logShip);
   }
@@ -297,12 +305,21 @@ export function writeStateToURL(state: Partial<AppState>): void {
     params.set('stockSortOrder', newState.stockSortOrder);
   }
 
-  // Update URL without reloading page or adding to history
+  // Build new URL
   const newURL = params.toString()
     ? `${window.location.pathname}?${params.toString()}`
     : window.location.pathname;
 
-  window.history.replaceState(null, '', newURL);
+  // Detect if this is a tab change
+  const isTabChange = 'tab' in state && state.tab !== currentState.tab;
+
+  // Use pushState for tab changes (adds to browser history)
+  // Use replaceState for filter changes (doesn't pollute history)
+  if (isTabChange) {
+    window.history.pushState(null, '', newURL);
+  } else {
+    window.history.replaceState(null, '', newURL);
+  }
 }
 
 /**

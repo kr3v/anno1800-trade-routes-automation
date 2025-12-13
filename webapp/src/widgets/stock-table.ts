@@ -231,15 +231,15 @@ function aggregateStockData(logs: LogEntry[]): AggregatedStockData {
 /**
  * Classify stock status based on stock/request values
  */
-type StockClassification = 'bold-green' | 'green' | 'neutral' | 'red' | 'bold-red';
+type StockClassification = 'bold-green' | 'green' | 'red' | 'unavailable';
 
 function classifyStock(stock: number, request: number): StockClassification {
-  if (stock > request) {
+  if (stock === 0 && request > 0) {
+    return 'unavailable'; // Completely unavailable
+  } else if (stock >= request) {
     return stock >= request * 2 ? 'bold-green' : 'green';
-  } else if (stock < request) {
-    return stock < request * 0.5 && stock < 10 ? 'bold-red' : 'red';
   } else {
-    return 'neutral';
+    return 'red';
   }
 }
 
@@ -250,9 +250,8 @@ function getStockClass(classification: StockClassification): string {
   switch (classification) {
     case 'bold-green': return 'stock-high-bold';
     case 'green': return 'stock-high';
-    case 'neutral': return 'stock-neutral';
     case 'red': return 'stock-low';
-    case 'bold-red': return 'stock-low-bold';
+    case 'unavailable': return 'stock-unavailable';
   }
 }
 
@@ -688,11 +687,9 @@ export class StockTableWidget {
     container.appendChild(latestIterGroup);
 
     // Legend filter
-    const legendOptions = new Set(['bold-red', 'red', 'neutral', 'green', 'bold-green']);
     const legendLabels: Record<string, string> = {
-      'bold-red': 'Bold Red (Critical)',
+      'unavailable': 'Unavailable (Stock = 0)',
       'red': 'Red (Low Stock)',
-      'neutral': 'Neutral (Balanced)',
       'green': 'Green (Surplus)',
       'bold-green': 'Bold Green (High Surplus)',
     };
@@ -739,7 +736,7 @@ export class StockTableWidget {
     legendCheckboxContainer.appendChild(legendButtonContainer);
 
     // Create checkboxes for each legend type (in logical order)
-    const legendOrder = ['bold-red', 'red', 'neutral', 'green', 'bold-green'];
+    const legendOrder = ['unavailable', 'red', 'green', 'bold-green'];
     for (const legendType of legendOrder) {
       const checkboxLabel = document.createElement('label');
       checkboxLabel.className = 'checkbox-label';
@@ -871,6 +868,37 @@ export class StockTableWidget {
         return a.localeCompare(b);
       });
 
+    // Helper function to check if a good is unavailable everywhere (stock = 0 or no data in all areas)
+    const isGoodUnavailableEverywhere = (goodName: string): boolean => {
+      const goodMap = stocks.get(goodName);
+      if (!goodMap) return true; // No data at all
+
+      // Check if there's any area with stock > 0
+      for (const areaName of filteredAreas) {
+        const data = goodMap.get(areaName);
+        if (!data) continue;
+
+        // Apply region filter
+        if (this.config.regionFilter.size > 0 && !this.config.regionFilter.has(data.region)) {
+          continue;
+        }
+
+        // Check if data is from latest iteration (if filter enabled)
+        const areaRegion = data.region;
+        const latestIter = latestIterations.get(areaRegion);
+        if (this.config.onlyLatestIteration && latestIter && data.iteration !== latestIter) {
+          continue;
+        }
+
+        // If we find any area with stock > 0, the good is not unavailable everywhere
+        if (data.stock > 0) {
+          return false;
+        }
+      }
+
+      return true; // No area has stock > 0
+    };
+
     // Helper function to get the highest priority category for a good
     const getCategoryPriority = (goodName: string): number => {
       const goodMap = stocks.get(goodName);
@@ -943,12 +971,21 @@ export class StockTableWidget {
         }
       });
     } else {
-      // No city selected - sort by category first, then alphabetically
+      // No city selected - sort by availability, then category, then alphabetically
       filteredGoods.sort((a, b) => {
+        // First, check if goods are unavailable everywhere
+        const aUnavailable = isGoodUnavailableEverywhere(a);
+        const bUnavailable = isGoodUnavailableEverywhere(b);
+
+        if (aUnavailable !== bUnavailable) {
+          // Put unavailable goods at the end
+          return aUnavailable ? 1 : -1;
+        }
+
+        // Both available or both unavailable - sort by category priority
         const aPriority = getCategoryPriority(a);
         const bPriority = getCategoryPriority(b);
 
-        // First sort by category priority
         if (aPriority !== bPriority) {
           return aPriority - bPriority;
         }
@@ -1275,9 +1312,9 @@ export class StockTableWidget {
         <div class="legend-separator">|</div>
         <div class="legend-items">
           <div><span class="stock-high-bold">Bold Green</span>: Stock &ge; 2× Request</div>
-          <div><span class="stock-high">Green</span>: Stock &gt; Request</div>
+          <div><span class="stock-high">Green</span>: Stock &ge; Request</div>
           <div><span class="stock-low">Red</span>: Stock &lt; Request</div>
-          <div><span class="stock-low-bold">Bold Red</span>: Stock &lt; 50% Request AND &lt; 10</div>
+          <div><span class="stock-unavailable">Unavailable</span>: Stock = 0 (not available anywhere)</div>
           <div><span class="request-ok">Blue</span>: Request (stock OK)</div>
           <div><span class="request-alert">Bold Blue</span>: Request (stock low)</div>
           <div><span class="stock-flight">(+X/-Y)</span>: In-flight goods (incoming/outgoing)</div>
@@ -1363,7 +1400,7 @@ export class StockTableWidget {
     }
 
     if (urlState.stockLegend !== null) {
-      const validLegendTypes = new Set(['bold-red', 'red', 'neutral', 'green', 'bold-green']);
+      const validLegendTypes = new Set(['unavailable', 'red', 'green', 'bold-green']);
       const decoded = decodeFilterSet(urlState.stockLegend, validLegendTypes);
       if (decoded !== null) {
         this.config.legendFilter = decoded;
@@ -1396,7 +1433,7 @@ export class StockTableWidget {
   private writeFiltersToURL(): void {
     if (!this.aggregatedData) return;
 
-    const validLegendTypes = new Set(['bold-red', 'red', 'neutral', 'green', 'bold-green']);
+    const validLegendTypes = new Set(['unavailable', 'red', 'green', 'bold-green']);
 
     writeStateToURL({
       stockRegion: encodeFilterSet(this.config.regionFilter, this.aggregatedData.regions),

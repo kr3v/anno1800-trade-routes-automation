@@ -186,7 +186,7 @@ button:disabled {
 }
 
 .trade-table {
-  font-family: var(--font-mono);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 0.8125rem;
   border-collapse: collapse;
   width: 100%;
@@ -665,6 +665,11 @@ button:disabled {
   font-weight: 700;
 }
 
+.stock-unavailable {
+  color: #a855f7;
+  font-weight: 700;
+}
+
 .stock-neutral {
   color: var(--text-primary);
   font-weight: 400;
@@ -744,6 +749,51 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* Clickable elements in trade table */
+.clickable-good,
+.clickable-city,
+.clickable-cell {
+  cursor: pointer !important;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+
+/* Add visual indicator for clickable elements */
+.clickable-good::after,
+th.clickable-city::after {
+  content: ' →';
+  font-size: 0.75em;
+  opacity: 0.5;
+  margin-left: 0.25rem;
+  transition: opacity 0.2s;
+}
+
+.clickable-cell::after {
+  content: ' →';
+  font-size: 0.65em;
+  opacity: 0.4;
+  margin-left: 0.3rem;
+  transition: opacity 0.2s;
+}
+
+.clickable-good:hover,
+th.clickable-city:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.clickable-good:hover::after,
+th.clickable-city:hover::after {
+  opacity: 1;
+}
+
+.clickable-cell:hover {
+  text-decoration: underline;
+}
+
+.clickable-cell:hover::after {
+  opacity: 1;
 }
 
 /* Responsive */

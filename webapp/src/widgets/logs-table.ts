@@ -15,6 +15,7 @@ export interface LogsTableConfig {
   iterationFilter: Set<string>; // Iteration numbers
   areaSrcFilter: Set<string>;
   areaDstFilter: Set<string>;
+  areaFilterMode: 'AND' | 'OR'; // How to combine areaSrc and areaDst filters
   shipFilter: Set<string>;
   goodFilter: Set<string>;
   iterationTypeFilter: Set<string>; // 'regular' | 'hub'
@@ -164,30 +165,56 @@ function filterLogs(logs: LogEntry[], config: LogsTableConfig, filterOptions: Fi
       }
     }
 
-    // Filter by area source (allow empty if all selected)
-    if (config.areaSrcFilter.size > 0) {
+    // Filter by area source and destination (with AND/OR mode support)
+    const hasAreaSrcFilter = config.areaSrcFilter.size > 0;
+    const hasAreaDstFilter = config.areaDstFilter.size > 0;
+
+    if (hasAreaSrcFilter || hasAreaDstFilter) {
+      // Extract area source
       let areaSrc: string | null = null;
       if ('areaSrc' in log && log.areaSrc) {
         areaSrc = cleanName(log.areaSrc.name);
       } else if (log.type === 'area_stock') {
         areaSrc = cleanName(log.areaName);
       }
-      const allAreaSrcSelected = allSelected(config.areaSrcFilter, filterOptions.areaSrcNames);
-      if (!areaSrc) {
-        if (!allAreaSrcSelected) return false; // Empty value not allowed
-      } else if (!config.areaSrcFilter.has(areaSrc)) {
-        return false;
-      }
-    }
 
-    // Filter by area destination (allow empty if all selected)
-    if (config.areaDstFilter.size > 0) {
+      // Extract area destination
       const areaDst = 'areaDst' in log && log.areaDst ? cleanName(log.areaDst.name) : null;
+
+      // Check if all options are selected for each filter
+      const allAreaSrcSelected = allSelected(config.areaSrcFilter, filterOptions.areaSrcNames);
       const allAreaDstSelected = allSelected(config.areaDstFilter, filterOptions.areaDstNames);
-      if (!areaDst) {
-        if (!allAreaDstSelected) return false; // Empty value not allowed
-      } else if (!config.areaDstFilter.has(areaDst)) {
-        return false;
+
+      // Apply filters based on mode
+      if (config.areaFilterMode === 'OR' && hasAreaSrcFilter && hasAreaDstFilter) {
+        // OR mode: log passes if it matches EITHER area src OR area dst filter
+        const srcMatches = areaSrc
+          ? config.areaSrcFilter.has(areaSrc)
+          : allAreaSrcSelected;
+        const dstMatches = areaDst
+          ? config.areaDstFilter.has(areaDst)
+          : allAreaDstSelected;
+
+        if (!srcMatches && !dstMatches) {
+          return false; // Neither matches, reject
+        }
+      } else {
+        // AND mode (or only one filter is set): both filters must pass independently
+        if (hasAreaSrcFilter) {
+          if (!areaSrc) {
+            if (!allAreaSrcSelected) return false;
+          } else if (!config.areaSrcFilter.has(areaSrc)) {
+            return false;
+          }
+        }
+
+        if (hasAreaDstFilter) {
+          if (!areaDst) {
+            if (!allAreaDstSelected) return false;
+          } else if (!config.areaDstFilter.has(areaDst)) {
+            return false;
+          }
+        }
       }
     }
 
@@ -322,6 +349,7 @@ export class LogsTableWidget {
     iterationFilter: new Set(),
     areaSrcFilter: new Set(),
     areaDstFilter: new Set(),
+    areaFilterMode: 'AND',
     shipFilter: new Set(),
     goodFilter: new Set(),
     iterationTypeFilter: new Set(),
@@ -625,6 +653,36 @@ export class LogsTableWidget {
       }
     );
 
+    // Add AND/OR toggle for area filters
+    const modeToggleGroup = document.createElement('div');
+    modeToggleGroup.className = 'control-group filter-mode-toggle';
+    modeToggleGroup.style.cssText = 'display: flex; align-items: center; gap: 8px; padding: 8px 0;';
+
+    const modeLabel = document.createElement('label');
+    modeLabel.textContent = 'Area Filter Mode:';
+    modeLabel.style.cssText = 'margin: 0; font-weight: bold;';
+    modeToggleGroup.appendChild(modeLabel);
+
+    const modeButton = document.createElement('button');
+    modeButton.type = 'button';
+    modeButton.className = 'filter-mode-btn';
+    modeButton.textContent = this.config.areaFilterMode;
+    modeButton.style.cssText = 'padding: 4px 12px; cursor: pointer;';
+    modeButton.addEventListener('click', () => {
+      this.config.areaFilterMode = this.config.areaFilterMode === 'AND' ? 'OR' : 'AND';
+      modeButton.textContent = this.config.areaFilterMode;
+      this.writeFiltersToURL();
+      this.render();
+    });
+
+    const modeHint = document.createElement('span');
+    modeHint.textContent = '(AND = both must match, OR = either can match)';
+    modeHint.style.cssText = 'font-size: 0.9em; color: #666;';
+    modeToggleGroup.appendChild(modeButton);
+    modeToggleGroup.appendChild(modeHint);
+
+    container.appendChild(modeToggleGroup);
+
     createCheckboxFilter(
       'Area Dst:',
       this.filterOptions.areaDstNames,
@@ -749,6 +807,13 @@ export class LogsTableWidget {
       }
     }
 
+    if (urlState.logAreaMode !== null) {
+      if (urlState.logAreaMode === 'AND' || urlState.logAreaMode === 'OR') {
+        this.config.areaFilterMode = urlState.logAreaMode;
+        restored = true;
+      }
+    }
+
     if (urlState.logOtherDataRegex !== null) {
       this.config.otherDataRegex = urlState.logOtherDataRegex;
       restored = true;
@@ -770,10 +835,26 @@ export class LogsTableWidget {
       logIterationType: encodeFilterSet(this.config.iterationTypeFilter, this.filterOptions.iterationTypes),
       logAreaSrc: encodeFilterSet(this.config.areaSrcFilter, this.filterOptions.areaSrcNames),
       logAreaDst: encodeFilterSet(this.config.areaDstFilter, this.filterOptions.areaDstNames),
+      logAreaMode: this.config.areaFilterMode !== 'AND' ? this.config.areaFilterMode : null,
       logShip: encodeFilterSet(this.config.shipFilter, this.filterOptions.shipNames),
       logGood: encodeFilterSet(this.config.goodFilter, this.filterOptions.goodNames),
       logOtherDataRegex: this.config.otherDataRegex || null,
     });
+  }
+
+  /**
+   * Apply filters from current URL state and re-render
+   * This is useful when navigating to the logs tab from another widget with specific filters
+   */
+  applyFiltersFromURL(): void {
+    if (!this.filterOptions) return;
+
+    const urlState = readStateFromURL();
+    const restored = this.restoreFiltersFromURL(urlState);
+
+    if (restored) {
+      this.render();
+    }
   }
 
   destroy(): void {

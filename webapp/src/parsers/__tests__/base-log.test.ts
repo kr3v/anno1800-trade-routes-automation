@@ -167,6 +167,23 @@ describe('base-log parser', () => {
                     reasons: ['Population/Worker Residence', 'Population/Farmer Residence'],
                 },
             },
+            {
+                name: 'with iteration before type (alternative field order)',
+                input: '2025-12-12T22:22:07Z iteration=20251212222206 loc=Trade.Loop type=regular region=OW Area c1_(h) (id=8706) Red Peppers stock=155 (+0) (-0) request=500 (reasons=[Production/Artisanal Kitchen])',
+                expected: {
+                    type: 'area_stock',
+                    tradeType: 'regular',
+                    iteration: 20251212222206,
+                    areaName: 'c1_(h)',
+                    areaId: 8706,
+                    goodName: 'Red Peppers',
+                    stock: 155,
+                    inFlightIn: 0,
+                    inFlightOut: 0,
+                    request: 500,
+                    reasons: ['Production/Artisanal Kitchen'],
+                },
+            },
         ];
 
         testCases.forEach(({name, input, expected}) => {
@@ -277,6 +294,18 @@ describe('base-log parser', () => {
             expect(result.tradeType).toBe('regular');
             expect(result.iteration).toBe(1765311369);
             expect(result.tasksSpawned).toBe(0);
+            expect(result.region).toBe('NW');
+        });
+
+        it('should parse tasks spawned with iteration before type', () => {
+            const input =
+                '2025-12-12T23:18:18Z iteration=20251212231818 loc=Trade.Loop type=regular region=OW Spawned 0 async tasks for trade route execution.';
+            const result = parseLogLine(input) as TasksSpawnedLogEntry;
+            expect(result.type).toBe('tasks_spawned');
+            expect(result.tradeType).toBe('regular');
+            expect(result.iteration).toBe(20251212231818);
+            expect(result.tasksSpawned).toBe(0);
+            expect(result.region).toBe('OW');
         });
     });
 

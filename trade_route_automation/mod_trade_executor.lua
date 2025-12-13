@@ -1,7 +1,7 @@
 --[[
     Trade Executor Module
 
-    DOCUMENTATION: See docs/architecture-trade-automation.md
+    DOCUMENTATION: See docs/CLAUDE_architecture-trade-automation.md
     - Overview: "mod_trade_executor.lua (Ship Command Execution)"
     - Key sections:
       * Ship Name Encoding (Base62 Trick) - explains the encoding system
@@ -188,13 +188,11 @@ TradeExecutor.Records = {};
             }
         },
         Value = {
-            Order = {
-                FullSlotsNeeded = number,
-                OrderDistance = {
-                    src = {x = number, y = number},
-                    dst = {x = number, y = number},
-                    dist = number
-                }
+            FullSlotsNeeded = number,
+            OrderDistance = {
+                src = {x = number, y = number},
+                dst = {x = number, y = number},
+                dist = number
             },
             ShipDistance = number
         }
@@ -204,27 +202,16 @@ TradeExecutor.Records = {};
     @param cmd table - Command structure
 ]]
 
----@class TradeExecutor.CommandKeyOrder
+---@class TradeExecutor.Command
 ---@field AreaID_from number
 ---@field AreaID_to number
 ---@field GoodID number
 ---@field Amount number
-
----@class TradeExecutor.CommandKey
----@field ShipID number
----@field Order TradeExecutor.CommandKeyOrder
-
----@class TradeExecutor.CommandValueOrder
+---@field Ship_ID number
+---@field Ship_AmountPerSlot number
 ---@field FullSlotsNeeded number
 ---@field OrderDistance Distance
-
----@class TradeExecutor.CommandValue
----@field Order TradeExecutor.CommandValueOrder
 ---@field ShipDistance number
-
----@class TradeExecutor.Command
----@field Key TradeExecutor.CommandKey
----@field Value TradeExecutor.CommandValue
 
 ---@param L Logger
 ---@param region RegionID
@@ -232,11 +219,11 @@ TradeExecutor.Records = {};
 function TradeExecutor._ExecuteTradeOrderWithShip(L, region, cmd)
     local start_at = os.date("%Y-%m-%dT%H:%M:%SZ");
 
-    local ship_oid = cmd.Key.ShipID
-    local order_key = cmd.Key.Order
-    local order_value = cmd.Value.Order
-    local aSrc = order_key.AreaID_from;
-    local aDst = order_key.AreaID_to;
+    local ship_oid = cmd.Ship_ID
+    local amount_per_slot = cmd.Ship_AmountPerSlot
+    local order_key = cmd
+    local order_distance = cmd.OrderDistance
+    local aSrc, aDst = order_key.AreaID_from, order_key.AreaID_to
 
     L = L.with("loc", "TradeExecutor._ExecuteTradeOrderWithShip");
 
@@ -250,22 +237,21 @@ function TradeExecutor._ExecuteTradeOrderWithShip(L, region, cmd)
 
     -- Step 2: Move ship to source area
     L.logf("Moving ship %d to source area %d (x=%d, y=%d)", ship_oid, order_key.AreaID_from,
-        order_value.OrderDistance.src.x, order_value.OrderDistance.src.y)
+        order_distance.src.x, order_distance.src.y)
     TradeExecutor.Ship_Name_StoreCmdInfo(ship_oid, {
-        x = order_value.OrderDistance.src.x,
-        y = order_value.OrderDistance.src.y,
+        x = order_distance.src.x,
+        y = order_distance.src.y,
         area_id = aSrc
     })
     shipCmd.MoveShipToAsync(
         ship_oid,
-        order_value.OrderDistance.src.x,
-        order_value.OrderDistance.src.y
+        order_distance.src.x,
+        order_distance.src.y
     )
     L.logf("Ship %d arrived at source area", ship_oid)
 
     -- Step 3: Load cargo at source
-    local slots_needed = math.ceil(order_key.Amount / 50)
-    local amount_per_slot = 50
+    local slots_needed = math.ceil(order_key.Amount / amount_per_slot)
     local total_loaded = 0
     for i = 1, slots_needed do
         local amount_to_load = math.min(amount_per_slot, order_key.Amount - total_loaded)
@@ -280,10 +266,10 @@ function TradeExecutor._ExecuteTradeOrderWithShip(L, region, cmd)
     local areaSrcGAfter = Anno.Area_GetGood(region, aSrc, order_key.GoodID);
 
     L.logf("Loaded %d total units; area src: %d -> %d; moving to dst area (x=%d y=%d)",
-        total_loaded, aSrcGBefore, areaSrcGAfter, order_value.OrderDistance.dst.x, order_value.OrderDistance.dst.y)
+        total_loaded, aSrcGBefore, areaSrcGAfter, order_distance.dst.x, order_distance.dst.y)
 
     -- Step 4: Move ship to destination area
-    dst_moveTo(ship_oid, order_value.OrderDistance.dst, aDst)
+    dst_moveTo(ship_oid, order_distance.dst, aDst)
     L.logf("Ship arrived at destination area")
 
     -- Step 5: Unload cargo at destination
@@ -376,7 +362,7 @@ function TradeExecutor.SpawnTradeOrder(L, region, cmd)
         end, debug.traceback)
 
         if not success then
-            L.logf("[Error] executing trade order for ship %d: %s", cmd.Key.ShipID, tostring(result))
+            L.logf("[Error] executing trade order for ship %d: %s", cmd.Ship_ID, tostring(result))
         end
 
         return result

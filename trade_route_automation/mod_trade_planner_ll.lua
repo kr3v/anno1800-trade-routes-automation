@@ -1,7 +1,7 @@
 --[[
     Trade Planner - Low Level Planning Logic
 
-    DOCUMENTATION: See docs/architecture-trade-automation.md
+    DOCUMENTATION: See docs/CLAUDE_architecture-trade-automation.md
     - Overview: "mod_trade_planner_ll.lua (Low-Level Planning Logic)"
     - Key sections:
       * Supply/Request Tables - core data structure
@@ -177,9 +177,6 @@ end
 local TradeDirection_In = "In";
 local TradeDirection_Out = "Out";
 
----@alias AreaID number
----@alias ProductGUID number
----@alias Amount number
 ---@alias TradePlanner.AreaGoodAmount table<AreaID, table<ProductGUID, Amount>>
 ---@alias TradePlanner.GoodAreaAmount table<ProductGUID, table<AreaID, Amount>>
 ---@alias Distance { src: Coordinate, dst: Coordinate, dist: number }
@@ -317,9 +314,9 @@ function TradePlannerLL.supplyRequest_Build(
             local _lastTrade_direction = state:areaTradeDirection_Last(L, areaID, productID);
 
             local o2 = math.min(o2_cap, math.floor(_areaCap * 2 / 10));
-            local o6 = math.min(o2 + 300, math.max(o2_cap + 300, math.floor(_areaCap * 6 / 10)));
+            local o6 = math.min(o2 + 300, math.min(o2_cap + 300, math.floor(_areaCap * 6 / 10)));
             local o4 = math.min(o4_cap, math.floor(_areaCap * 4 / 10));
-            local o8 = math.min(o4 + 300, math.max(o4_cap + 300, math.floor(_areaCap * 8 / 10)));
+            local o8 = math.min(o4 + 300, math.min(o4_cap + 300, math.floor(_areaCap * 8 / 10)));
 
             local doesAreaRequestProduct = areaToProductRequest[areaID] and areaToProductRequest[areaID][productID];
 
@@ -339,7 +336,7 @@ function TradePlannerLL.supplyRequest_Build(
 
             local _request = 0;
             if doesAreaRequestProduct then
-                if isRequester then
+                if isRequester and _stock < o2 then
                     _request = o6;
                 else
                     _request = o2;
@@ -347,7 +344,8 @@ function TradePlannerLL.supplyRequest_Build(
             end
             local _request_ask = o6;
 
-            L.logf("Area %s (id=%d) %s stock=%s (+%s) (-%s) request=%s (reasons=%s)", areaData.city_name, areaID, productName, _stock,
+            L.logf("Area %s (id=%d) %s stock=%s (+%s) (-%s) request=%s (reasons=%s)", areaData.city_name, areaID,
+                productName, _stock,
                 stock_incoming, stock_outgoing, _request, _request_reasons or '[]');
 
             _stock = _stock - stock_outgoing;
@@ -588,6 +586,31 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
     ships
 )
     local spawned_tasks = {}
+
+    -- local commands_perShip_perAreaPair = {};
+    -- for _, cmd in ipairs(commands) do
+    --     local command_key = cmd.Key
+    --     local ship = command_key.ShipID
+    --     local areaID_from = command_key.Order.AreaID_from
+    --     local areaID_to = command_key.Order.AreaID_to
+
+    --     if commands_perShip_perAreaPair[ship] == nil then
+    --         commands_perShip_perAreaPair[ship] = {}
+    --     end
+    --     local pair_key = tostring(areaID_from) .. "->" .. tostring(areaID_to);
+    --     if commands_perShip_perAreaPair[ship][pair_key] == nil then
+    --         commands_perShip_perAreaPair[ship][pair_key] = {}
+    --     end
+    --     table.insert(commands_perShip_perAreaPair[ship][pair_key], cmd)
+    -- end
+
+    -- for ship, areaPair_cmds in pairs(commands_perShip_perAreaPair) do
+        
+    -- end
+
+    -- note: above will be the new implementation
+    -- note: below is old implementation, it takes one ship and gives it one good at a time.
+
     for _, kv in ipairs(commands) do
         local command_key = kv.Key
         local command_value = kv.Value
@@ -618,42 +641,35 @@ function TradePlannerLL.SupplyRequestShipCommands_Execute(
                 available_supply, amount);
             goto continue;
         end
-        --if available_request < 50 then
-        --    L.logf("Skipping order: insufficient request: available_request=%d (type=%s) < 50 %s",
-        --            available_request, type(available_request), available_request < 50);
-        --    goto continue;
-        --end
+        if available_request < 25 then
+           L.logf("Skipping order: insufficient request: available_request=%d (type=%s) < 25 %s",
+                   available_request, type(available_request), available_request < 25);
+           goto continue;
+        end
 
-        supplyRequestTable.Supply[order.AreaID_from][order.GoodID] = supplyRequestTable.Supply[order.AreaID_from]
-            [order.GoodID] - amount
-        supplyRequestTable.Request[order.AreaID_to][order.GoodID] = supplyRequestTable.Request[order.AreaID_to]
-            [order.GoodID] - amount
+        supplyRequestTable.Supply[order.AreaID_from][order.GoodID] =
+            supplyRequestTable.Supply[order.AreaID_from][order.GoodID] - amount
+        supplyRequestTable.Request[order.AreaID_to][order.GoodID] =
+            supplyRequestTable.Request[order.AreaID_to][order.GoodID] - amount
         ships[ship] = nil;
 
         -- Spawn async task
 
         ---@type TradeExecutor.Command
         local cmd = {
-            Key = {
-                ShipID = ship,
-                Order = {
-                    AreaID_from = order.AreaID_from,
-                    AreaID_to = order.AreaID_to,
-                    GoodID = order.GoodID,
-                    Amount = amount,
-                }
+            Ship_ID = ship,
+            AreaID_from = order.AreaID_from,
+            AreaID_to = order.AreaID_to,
+            GoodID = order.GoodID,
+            Amount = amount,
+            OrderDistance = {
+                src = order_value.OrderDistance.src,
+                dst = order_value.OrderDistance.dst,
+                dist = order_value.OrderDistance.dist,
             },
-            Value = {
-                Order = {
-                    OrderDistance = {
-                        src = order_value.OrderDistance.src,
-                        dst = order_value.OrderDistance.dst,
-                        dist = order_value.OrderDistance.dist,
-                    },
-                    FullSlotsNeeded = math.ceil(amount / 50),
-                },
-                ShipDistance = command_value.ShipDistance,
-            }
+            ShipDistance = command_value.ShipDistance,
+            FullSlotsNeeded = math.ceil(amount / 50),
+            Ship_AmountPerSlot = 50,
         }
 
         local shipName = TradeExecutor.Ship_Name_FetchCmdInfo(ship).name;

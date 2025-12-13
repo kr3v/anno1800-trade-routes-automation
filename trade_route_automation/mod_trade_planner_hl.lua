@@ -1,7 +1,7 @@
 --[[
     Trade Planner - High Level Orchestrator
 
-    DOCUMENTATION: See docs/architecture-trade-automation.md
+    DOCUMENTATION: See docs/CLAUDE_architecture-trade-automation.md
     - Overview: "mod_trade_planner_hl.lua (High-Level Orchestrator & Main Loop)"
     - Key sections:
       * Main Loop - the continuous execution loop (lines 395-512)
@@ -10,7 +10,7 @@
       * tradeExecutor_iteration_state - state tracking
 
     This is the MAIN ORCHESTRATOR. It:
-    1. Manages the iteration loop (~10 min cycles)
+    1. Manages the iteration loop (~30-60s cycles)
     2. Identifies available ships (TRA_* trade routes)
     3. Tracks active trades & in-flight goods
     4. Calls into mod_trade_planner_ll for planning logic

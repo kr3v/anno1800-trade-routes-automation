@@ -26,6 +26,8 @@ local Anno = {
 ---@alias AreaID number
 ---@alias AreaID_str string
 ---@alias ShipID number
+---@alias ProductGUID number
+---@alias Amount number
 
 ---@class AreaData
 ---@field city_name string
@@ -101,6 +103,10 @@ function Anno.Object_Name(guid)
         return nil;
     end
     return ret;
+end
+
+function Anno.Object_Icon(guid)
+    return serpLight.DoForSessionGameObjectRaw('[AssetData(' .. tostring(guid) .. ') Icon]');
 end
 
 ---
@@ -186,24 +192,44 @@ function Anno.Ship_Cargo_Clear(oid, slot)
         tostring(oid) .. ') ItemContainer ClearSlot(' .. tostring(slot) .. '))]');
 end
 
-local guidToCargoSlotCapacity = {
-    ["100438"] = 2,  -- Schooner
-    ["100441"] = 4,  -- Clipper
-    ["100443"] = 2,  -- Monitor
-    ["101121"] = 3,  -- Flagship
-    ["100439"] = 3,  -- Frigate
-    ["118718"] = 8,  -- The Great Eastern
-    ["1010062"] = 6, -- Cargo Ship
-    ["132404"] = 6,  -- World-Class Reefer
+function Anno.Load(L, base)
+    local cache_path_shipCargoSlotCap = base .. "ship_cargo_slot_capacity.json";
+    local cache_path_shipCargoStackLimit = base .. "ship_cargo_stack_limit.json";
+    Anno.__Cache_Ship_Cargo_SlotCapacity = cache.NewMapCache(L, cache_path_shipCargoSlotCap);
+    Anno.__Cache_Ship_Cargo_StackLimit = cache.NewMapCache(L, cache_path_shipCargoStackLimit);
+end
 
-    ["1058"] = 3,
-    ["1060"] = 8,
-}
+function Anno.__Ship_Cargo_SlotCapacity(oid)
+    local slotAmount = serpLight.DoForSessionGameObjectRaw(
+        '[ToolOneHelper SlotAmount([MetaObjects SessionGameObject(' .. tostring(oid) .. ') Static Guid])]');
+    return tonumber(slotAmount) or -1;
+end
+
+function Anno.__Ship_Cargo_StackLimit(oid)
+    local stackLimit = serpLight.DoForSessionGameObjectRaw(
+        '[MetaObjects SessionGameObject(' .. tostring(oid) .. ') ItemContainer StackLimit]');
+    return tonumber(stackLimit) or -1;
+end
+
 
 function Anno.Ship_Cargo_SlotCapacity(oid)
-    local guid = serpLight.DoForSessionGameObjectRaw('[MetaObjects SessionGameObject(' ..
-        tostring(oid) .. ') Static Guid]');
-    return guidToCargoSlotCapacity[tostring(guid)] or -1;
+    local cache = Anno.__Cache_Ship_Cargo_SlotCapacity;
+    local ret = cache:Get(tostring(oid));
+    if ret == nil then
+        ret = Anno.__Ship_Cargo_SlotCapacity(oid);
+        cache:Set(tostring(oid), ret);
+    end
+    return ret;
+end
+
+function Anno.Ship_Cargo_StackLimit(oid)
+    local cache = Anno.__Cache_Ship_Cargo_StackLimit;
+    local ret = cache:Get(tostring(oid));
+    if ret == nil then
+        ret = Anno.__Ship_Cargo_StackLimit(oid);
+        cache:Set(tostring(oid), ret);
+    end
+    return ret;
 end
 
 ---
